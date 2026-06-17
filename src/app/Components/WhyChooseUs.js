@@ -1,7 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaChalkboardTeacher, FaGlobe, FaComments, FaAward } from "react-icons/fa";
+import {
+  FaChalkboardTeacher,
+  FaGlobe,
+  FaComments,
+  FaAward,
+} from "react-icons/fa";
 
 const features = [
   {
@@ -28,66 +33,97 @@ const features = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="relative bg-white text-slate-900 py-24 overflow-hidden">
+    <section className="relative bg-white text-slate-900 py-28 overflow-hidden">
 
-      {/* Background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.08),transparent_60%)]" />
+      {/* ambient background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.06),transparent_60%)]" />
 
       <div className="relative max-w-6xl mx-auto px-6">
 
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="text-xs tracking-[0.3em] text-slate-400">
+        {/* HEADER */}
+        <div className="text-center mb-20">
+          <div className="text-[10px] tracking-[0.35em] text-slate-400">
             TRUSTED LANGUAGE ACADEMY
           </div>
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold">
-            Why Choose{" "}
+          <h2 className="mt-4 text-4xl sm:text-5xl font-bold leading-tight">
+            Why learners choose{" "}
             <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
-              Our Academy
+              real fluency
             </span>
           </h2>
 
-          <p className="mt-4 text-slate-600 max-w-2xl mx-auto">
-            We don’t teach memorization. We build real fluency through structured
-            speaking practice and immersive learning.
+          <p className="mt-5 text-slate-600 max-w-2xl mx-auto">
+            We don’t teach memorization. We build real communication ability
+            through structured speaking systems and immersion.
           </p>
         </div>
 
-        {/* Feature Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((item, i) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.12 }}
-              className="group relative rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-xl transition"
-            >
-              {/* Icon */}
-              <div className="text-blue-500 text-xl">
-                {item.icon}
-              </div>
+        {/* CONTENT LAYOUT */}
+        <div className="grid lg:grid-cols-3 gap-12 items-start">
 
-              {/* Title */}
-              <h3 className="mt-4 text-lg font-semibold">
-                {item.title}
-              </h3>
+          {/* LEFT BIG STATEMENT */}
+          <div className="lg:col-span-1 space-y-6">
 
-              {/* Description */}
-              <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                {item.desc}
-              </p>
+            <div className="text-[10px] tracking-[0.35em] text-slate-400">
+              THE DIFFERENCE
+            </div>
 
-              {/* Hover glow */}
-              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-blue-500/5 to-violet-500/5 pointer-events-none" />
-            </motion.div>
-          ))}
+            <h3 className="text-3xl font-bold leading-tight">
+              Not just learning a language —{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-violet-500">
+                living it
+              </span>
+            </h3>
+
+            <p className="text-slate-600 leading-relaxed">
+              Most platforms teach vocabulary. We train your brain to think,
+              respond, and communicate naturally in real situations.
+            </p>
+
+            <div className="pt-6 border-t border-slate-100 text-xs tracking-[0.3em] text-slate-400">
+              IMMERSION • SPEAKING • CONFIDENCE
+            </div>
+          </div>
+
+          {/* RIGHT FEATURE FLOW (NOT GRID CARDS) */}
+          <div className="lg:col-span-2 space-y-12">
+
+            {features.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12 }}
+                className="flex gap-5 items-start"
+              >
+
+                {/* icon node */}
+                <div className="mt-1 text-blue-500 text-xl shrink-0">
+                  {item.icon}
+                </div>
+
+                {/* content */}
+                <div className="space-y-2">
+
+                  <h3 className="text-xl font-semibold">
+                    {item.title}
+                  </h3>
+
+                  <p className="text-slate-600 leading-relaxed max-w-xl">
+                    {item.desc}
+                  </p>
+
+                </div>
+              </motion.div>
+            ))}
+
+          </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-20 text-center">
+        {/* CTA */}
+        <div className="mt-24 text-center">
           <h3 className="text-2xl font-semibold">
             Start your fluency journey today
           </h3>

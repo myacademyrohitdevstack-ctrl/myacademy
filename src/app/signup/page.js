@@ -10,13 +10,12 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white text-slate-900 relative overflow-hidden px-4 sm:px-6">
-
+<div className="min-h-screen pt-20 flex items-center justify-center bg-white text-slate-900 relative overflow-hidden px-4 sm:px-6">
       {/* Background Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.12),transparent_60%)]" />
 
       {/* MAIN CARD */}
-      <div className="relative w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 shadow-xl border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden">
+      <div className="relative w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 shadow-xl border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden ">
 
         {/* LEFT SIDE (hidden on mobile) */}
         <div className="hidden md:flex flex-col justify-center p-10 lg:p-12 bg-gradient-to-br from-slate-900 to-slate-800 text-white">

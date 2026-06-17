@@ -8,140 +8,159 @@ const communityStats = [
     icon: <FaGlobe />,
     value: "25+",
     label: "Countries",
-    desc: "Students learning from around the world",
+    desc: "Students learning across continents",
   },
   {
     icon: <FaUsers />,
     value: "12K+",
     label: "Active Learners",
-    desc: "Daily practicing real conversations",
+    desc: "Daily real conversation practice",
   },
   {
     icon: <FaComments />,
     value: "50K+",
     label: "Live Conversations",
-    desc: "Monthly speaking practice sessions",
+    desc: "Monthly speaking interactions",
   },
   {
     icon: <FaVideo />,
     value: "1.5K+",
     label: "Live Classes",
-    desc: "Interactive sessions with mentors",
+    desc: "Interactive mentor-led sessions",
   },
 ];
 
 export default function GlobalCommunity() {
   return (
-    <section className="relative bg-white text-slate-900 py-24 overflow-hidden">
+    <section className="relative bg-white text-slate-900 py-28 overflow-hidden">
 
-      {/* Soft background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(59,130,246,0.08),transparent_60%)]" />
+      {/* ambient global glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_60%)]" />
+      <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(circle,#000_1px,transparent_1px)] bg-[size:40px_40px]" />
 
       <div className="relative max-w-6xl mx-auto px-6">
 
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="text-xs tracking-[0.3em] text-slate-400">
+        {/* HEADER */}
+        <div className="text-center mb-20">
+          <div className="text-[10px] tracking-[0.35em] text-slate-400">
             WORLDWIDE LANGUAGE NETWORK
           </div>
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold">
-            Join Our{" "}
+          <h2 className="mt-4 text-4xl sm:text-5xl font-bold leading-tight">
+            A{" "}
             <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
-              Global Community
-            </span>
+              living community
+            </span>{" "}
+            of learners
           </h2>
 
-          <p className="mt-4 text-slate-600 max-w-2xl mx-auto">
-            Connect with learners, practice real conversations, and grow your
-            confidence with people from across the world.
+          <p className="mt-5 text-slate-600 max-w-2xl mx-auto">
+            Not a platform — a global language ecosystem where people practice,
+            fail, improve, and grow together in real time.
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-6">
-          {communityStats.map((item, i) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.12 }}
-              className="group relative rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-xl transition"
-            >
-              {/* Icon */}
-              <div className="text-blue-500 text-xl">
-                {item.icon}
-              </div>
+        {/* FLOATING STATS (not grid cards) */}
+        <div className="relative mb-24">
 
-              {/* Value */}
-              <div className="mt-4 text-3xl font-bold">
-                {item.value}
-              </div>
+          <div className="flex flex-wrap justify-center gap-12">
 
-              {/* Label */}
-              <div className="mt-1 text-sm font-medium text-slate-700">
-                {item.label}
-              </div>
+            {communityStats.map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center max-w-[160px]"
+              >
 
-              {/* Description */}
-              <p className="mt-3 text-sm text-slate-500">
-                {item.desc}
-              </p>
+                {/* icon */}
+                <div className="text-blue-500 text-xl flex justify-center">
+                  {item.icon}
+                </div>
 
-              {/* Hover glow */}
-              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-blue-500/5 to-violet-500/5 pointer-events-none" />
-            </motion.div>
-          ))}
+                {/* value */}
+                <div className="mt-3 text-3xl font-bold">
+                  {item.value}
+                </div>
+
+                {/* label */}
+                <div className="mt-1 text-sm font-medium text-slate-700">
+                  {item.label}
+                </div>
+
+                {/* subtle desc */}
+                <div className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  {item.desc}
+                </div>
+
+              </motion.div>
+            ))}
+
+          </div>
         </div>
 
-        {/* Bottom section */}
-        <div className="mt-20 grid lg:grid-cols-2 gap-10 items-center">
+        {/* CENTRAL ECOSYSTEM SECTION */}
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
 
-          {/* Left text */}
-          <div>
-            <h3 className="text-3xl font-bold leading-snug">
-              Learn beyond classrooms with real people worldwide
+          {/* LEFT STORY */}
+          <div className="space-y-6">
+
+            <div className="text-[10px] tracking-[0.35em] text-slate-400">
+              REAL TIME ACTIVITY
+            </div>
+
+            <h3 className="text-3xl font-bold leading-tight">
+              Every second, someone somewhere is{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-violet-500">
+                speaking
+              </span>
             </h3>
 
-            <p className="mt-4 text-slate-600">
-              Our global ecosystem connects you with native speakers, mentors,
-              and learners so you can practice language in real-time, not just
-              theory.
+            <p className="text-slate-600 leading-relaxed">
+              You’re not learning alone. You’re entering a live network of
+              conversations happening across the world — 24/7.
             </p>
 
-            <button className="mt-6 flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-white hover:scale-105 transition">
-              Join Community
+            <button className="mt-4 flex items-center gap-2 border-b border-slate-300 pb-1 font-medium">
+              Join Community <span>→</span>
             </button>
           </div>
 
-          {/* Right visual card */}
-          <div className="relative rounded-2xl border border-slate-200 p-8 bg-gradient-to-br from-blue-50 to-violet-50">
-            <div className="text-xs tracking-[0.3em] text-slate-500">
-              LIVE GLOBAL ACTIVITY
-            </div>
+          {/* RIGHT LIVE FEED (no card box feel) */}
+          <div className="relative">
 
-            <div className="mt-6 space-y-4">
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-slate-200" />
+
+            <div className="space-y-6 pl-6">
+
               {[
                 "🇫🇷 Sarah joined a French speaking room",
                 "🇮🇳 Arjun practiced English with a tutor",
                 "🇪🇸 Maria completed A2 speaking test",
                 "🇺🇸 John started beginner pathway",
               ].map((text, i) => (
-                <div
+                <motion.div
                   key={i}
-                  className="rounded-xl bg-white/80 border border-slate-200 p-3 text-sm text-slate-700"
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-sm text-slate-700"
                 >
+                  <span className="text-slate-400 mr-2">●</span>
                   {text}
-                </div>
+                </motion.div>
               ))}
+
             </div>
           </div>
 
         </div>
 
-        {/* Footer line */}
-        <div className="mt-16 text-center text-xs tracking-[0.3em] text-slate-400">
+        {/* FOOTER */}
+        <div className="mt-24 text-center text-[10px] tracking-[0.35em] text-slate-400">
           CONNECT • PRACTICE • GROW GLOBALLY
         </div>
 
