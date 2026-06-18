@@ -32,39 +32,38 @@ const communityStats = [
 
 export default function GlobalCommunity() {
   return (
-    <section className="relative bg-white text-slate-900 py-28 overflow-hidden">
+    <section className="relative overflow-hidden bg-white py-28 text-slate-900">
+      {/* Brand Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(214,69,27,0.06),transparent_60%)]" />
 
-      {/* ambient global glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_60%)]" />
-      <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(circle,#000_1px,transparent_1px)] bg-[size:40px_40px]" />
+      <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle,#000_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-      <div className="relative max-w-6xl mx-auto px-6">
-
+      <div className="relative mx-auto max-w-6xl px-6">
         {/* HEADER */}
-        <div className="text-center mb-20">
+        <div className="mb-20 text-center">
           <div className="text-[10px] tracking-[0.35em] text-slate-400">
             WORLDWIDE LANGUAGE NETWORK
           </div>
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold leading-tight">
+          <h2 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">
             A{" "}
-            <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
               living community
             </span>{" "}
             of learners
           </h2>
 
-          <p className="mt-5 text-slate-600 max-w-2xl mx-auto">
+          <div className="mx-auto mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-[#D6451B] to-[#7BC3D7]" />
+
+          <p className="mx-auto mt-5 max-w-2xl text-slate-600">
             Not a platform — a global language ecosystem where people practice,
             fail, improve, and grow together in real time.
           </p>
         </div>
 
-        {/* FLOATING STATS (not grid cards) */}
+        {/* STATS */}
         <div className="relative mb-24">
-
           <div className="flex flex-wrap justify-center gap-12">
-
             {communityStats.map((item, i) => (
               <motion.div
                 key={item.label}
@@ -72,69 +71,58 @@ export default function GlobalCommunity() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="text-center max-w-[160px]"
+                className="max-w-[180px] text-center"
               >
-
-                {/* icon */}
-                <div className="text-blue-500 text-xl flex justify-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D6451B]/10 text-xl text-[#D6451B]">
                   {item.icon}
                 </div>
 
-                {/* value */}
-                <div className="mt-3 text-3xl font-bold">
+                <div className="mt-4 text-3xl font-bold">
                   {item.value}
                 </div>
 
-                {/* label */}
                 <div className="mt-1 text-sm font-medium text-slate-700">
                   {item.label}
                 </div>
 
-                {/* subtle desc */}
-                <div className="mt-2 text-xs text-slate-500 leading-relaxed">
+                <div className="mt-2 text-xs leading-relaxed text-slate-500">
                   {item.desc}
                 </div>
-
               </motion.div>
             ))}
-
           </div>
         </div>
 
-        {/* CENTRAL ECOSYSTEM SECTION */}
-        <div className="grid lg:grid-cols-2 gap-14 items-center">
-
-          {/* LEFT STORY */}
+        {/* MAIN CONTENT */}
+        <div className="grid items-center gap-14 lg:grid-cols-2">
+          {/* LEFT */}
           <div className="space-y-6">
-
             <div className="text-[10px] tracking-[0.35em] text-slate-400">
               REAL TIME ACTIVITY
             </div>
 
             <h3 className="text-3xl font-bold leading-tight">
               Every second, someone somewhere is{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-violet-500">
+              <span className="bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
                 speaking
               </span>
             </h3>
 
-            <p className="text-slate-600 leading-relaxed">
+            <p className="leading-relaxed text-slate-600">
               You’re not learning alone. You’re entering a live network of
               conversations happening across the world — 24/7.
             </p>
 
-            <button className="mt-4 flex items-center gap-2 border-b border-slate-300 pb-1 font-medium">
+            <button className="mt-4 flex items-center gap-2 border-b border-[#D6451B]/30 pb-1 font-medium text-[#D6451B]">
               Join Community <span>→</span>
             </button>
           </div>
 
-          {/* RIGHT LIVE FEED (no card box feel) */}
+          {/* RIGHT FEED */}
           <div className="relative">
-
-            <div className="absolute left-0 top-0 bottom-0 w-px bg-slate-200" />
+            <div className="absolute bottom-0 left-0 top-0 w-px bg-[#D6451B]/20" />
 
             <div className="space-y-6 pl-6">
-
               {[
                 "🇫🇷 Sarah joined a French speaking room",
                 "🇮🇳 Arjun practiced English with a tutor",
@@ -149,21 +137,18 @@ export default function GlobalCommunity() {
                   transition={{ delay: i * 0.1 }}
                   className="text-sm text-slate-700"
                 >
-                  <span className="text-slate-400 mr-2">●</span>
+                  <span className="mr-2 text-[#D6451B]">●</span>
                   {text}
                 </motion.div>
               ))}
-
             </div>
           </div>
-
         </div>
 
         {/* FOOTER */}
         <div className="mt-24 text-center text-[10px] tracking-[0.35em] text-slate-400">
           CONNECT • PRACTICE • GROW GLOBALLY
         </div>
-
       </div>
     </section>
   );

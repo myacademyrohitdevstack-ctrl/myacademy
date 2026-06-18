@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import {
   FaFacebook,
   FaInstagram,
@@ -12,106 +12,123 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="relative bg-white text-slate-900 overflow-hidden">
+    <footer className="relative overflow-hidden bg-white border-t border-slate-100">
+      {/* Brand Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.06),transparent_60%)]" />
+      {/* Premium Watermark */}
+<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+  <div className="relative">
 
-      {/* glow background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.10),transparent_60%)]" />
+    <div className="absolute inset-0 blur-3xl bg-[#D6451B]/10 rounded-full" />
 
-      <div className="relative max-w-6xl mx-auto px-6 pt-24 pb-12">
+    <img
+      src="/icon1.png"
+      alt=""
+      className="relative w-[450px] h-[450px] object-contain opacity-[0.04]"
+    />
+  </div>
+</div>
+      <div className="relative mx-auto max-w-7xl px-6 py-20">
+        {/* TOP */}
+        <div className="grid gap-12 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-4">
+              <img
+                src="/icon1.png"
+                alt="Inquisitive Mind Academy"
+                className="h-14 w-14 object-contain"
+              />
 
-        {/* ================= NAME MONUMENT ================= */}
-        <div className="text-center">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Inquisitive Mind Academy
+                </h3>
 
-          <p className="text-[10px] tracking-[0.35em] text-slate-400">
-            GLOBAL LANGUAGE ACADEMY
-          </p>
+                <p className="text-xs tracking-[0.3em] text-slate-500 mt-1">
+                  LANGUAGE • COMMUNICATION • CONFIDENCE
+                </p>
+              </div>
+            </div>
 
-          <h1 className="mt-6 text-4xl sm:text-6xl font-bold leading-tight">
-            Speak{" "}
-            <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
-              confidently
-            </span>
-          </h1>
+            <p className="mt-6 max-w-lg text-slate-600 leading-relaxed">
+              Empowering learners through English and French language training,
+              real conversation practice, live mentorship, and structured
+              fluency pathways designed for long-term success.
+            </p>
 
-          <p className="mt-5 text-slate-600 max-w-2xl mx-auto">
-            English & French fluency training through live practice, real conversations,
-            and structured learning paths.
-          </p>
-
-          {/* CTA */}
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
-
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full sm:w-80 rounded-full border border-slate-300 px-5 py-3 text-sm outline-none focus:border-blue-500"
-            />
-
-            <button className="rounded-full bg-slate-900 px-8 py-3 text-white hover:scale-105 transition">
-              Get Free Demo
-            </button>
-
+            <div className="mt-6 flex gap-4 text-lg">
+              <FaFacebook className="cursor-pointer text-slate-500 transition hover:text-[#D6451B]" />
+              <FaInstagram className="cursor-pointer text-slate-500 transition hover:text-[#D6451B]" />
+              <FaLinkedin className="cursor-pointer text-slate-500 transition hover:text-[#D6451B]" />
+              <FaYoutube className="cursor-pointer text-slate-500 transition hover:text-[#D6451B]" />
+            </div>
           </div>
 
-        </div>
+          {/* Quick Links */}
+          <div>
+            <h4 className="font-semibold text-slate-900">
+              Quick Links
+            </h4>
 
-        {/* ================= DIVIDER ================= */}
-        <div className="my-16 flex items-center justify-center">
-          <div className="h-px w-full bg-slate-200" />
-        </div>
-
-        {/* ================= BRAND DETAILS (minimal) ================= */}
-        <div className="grid md:grid-cols-3 gap-10 text-center md:text-left">
+            <div className="mt-5 flex flex-col gap-3 text-sm text-slate-600">
+              <Link href="/">Home</Link>
+              <Link href="/about">About</Link>
+              <Link href="/courses">Courses</Link>
+              <Link href="/contact">Contact</Link>
+            </div>
+          </div>
 
           {/* Contact */}
-          <div className="space-y-3 text-sm text-slate-600">
+          <div>
+            <h4 className="font-semibold text-slate-900">
+              Contact
+            </h4>
 
-            <div className="flex items-center justify-center md:justify-start gap-2">
-              <FaPhone /> +91 98765 43210
+            <div className="mt-5 space-y-4 text-sm text-slate-600">
+              <div className="flex gap-3">
+                <FaPhone className="mt-1 text-[#D6451B]" />
+                <span>+91 98765 43210</span>
+              </div>
+
+              <div className="flex gap-3">
+                <FaEnvelope className="mt-1 text-[#D6451B]" />
+                <span>support@academy.com</span>
+              </div>
+
+              <div className="flex gap-3">
+                <FaMapMarkerAlt className="mt-1 text-[#D6451B]" />
+                <span>India • Online & Offline Classes</span>
+              </div>
             </div>
-
-            <div className="flex items-center justify-center md:justify-start gap-2">
-              <FaEnvelope /> support@academy.com
-            </div>
-
-            <div className="flex items-center justify-center md:justify-start gap-2">
-              <FaMapMarkerAlt /> India • Online Classes
-            </div>
-
           </div>
-
-          {/* Social */}
-          <div className="flex justify-center gap-5 text-xl text-slate-600">
-            <FaFacebook className="hover:text-blue-600 cursor-pointer transition" />
-            <FaInstagram className="hover:text-pink-500 cursor-pointer transition" />
-            <FaLinkedin className="hover:text-blue-700 cursor-pointer transition" />
-            <FaYoutube className="hover:text-red-500 cursor-pointer transition" />
-          </div>
-
-          {/* Tagline */}
-          <div className="text-center md:text-right text-xs tracking-[0.3em] text-slate-400">
-            SPEAK • PRACTICE • FLUENCY
-          </div>
-
         </div>
 
-        {/* ================= FINAL BRAND EMPHASIS ================= */}
-        <div className="mt-16 text-center">
+        {/* Divider */}
+        <div className="my-12 h-px bg-slate-200" />
 
+        {/* Bottom CTA */}
+        <div className="text-center">
           <div className="text-[10px] tracking-[0.35em] text-slate-400">
-            THE FUTURE OF LANGUAGE LEARNING
+            BUILDING CONFIDENT COMMUNICATORS
           </div>
 
-          <div className="mt-4 text-2xl sm:text-3xl font-semibold">
-            INQUISTIVE MIND ACADEMY
-          </div>
+          <h2 className="mt-4 text-3xl sm:text-4xl font-bold">
+            Speak with Confidence.
+            <span className="block bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
+              Learn Without Limits.
+            </span>
+          </h2>
 
-          <p className="mt-3 text-xs text-slate-500">
-            © {new Date().getFullYear()} All rights reserved
-          </p>
-
+          <button className="mt-8 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
+            Enroll Now
+          </button>
         </div>
 
+        {/* Copyright */}
+        <div className="mt-14 border-t border-slate-100 pt-6 text-center text-sm text-slate-500">
+          © {new Date().getFullYear()} Inquisitive Mind Academy. All Rights Reserved.
+        </div>
       </div>
     </footer>
   );

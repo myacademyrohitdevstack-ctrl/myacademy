@@ -3,106 +3,113 @@
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
+  const links = [
+    { name: "Home", path: "/" },
+    { name: "Courses", path: "/courses" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
+  ];
+
   return (
-    <header className="fixed top-0 left-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-100">
-
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-12">
-
-        {/* LOGO */}
-        <div className="flex items-center gap-3">
+    <header className="fixed top-0 left-0 z-50 w-full border-b border-slate-200/60 bg-white/90 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3">
           <img
-            src="/logo.png"
+            src="/icon1.png"
             alt="Inquisitive Mind Academy"
-            className="h-9 w-9 rounded-full object-cover"
+            className="h-11 w-11 object-contain"
           />
 
-          <div className="leading-tight">
-            <div className="text-sm font-semibold text-slate-900">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900">
               Inquisitive Mind
-            </div>
-            <div className="text-[10px] tracking-[0.3em] text-slate-500">
-              ACADEMY
-            </div>
-          </div>
-        </div>
+            </h2>
 
-        {/* DESKTOP MENU */}
-        <nav className="hidden items-center gap-8 text-sm text-slate-600 lg:flex">
-          <a href="#" className="hover:text-slate-900 transition">Home</a>
-          <a href="#courses" className="hover:text-slate-900 transition">Courses</a>
-          <a href="#about" className="hover:text-slate-900 transition">About</a>
-          <a href="#success" className="hover:text-slate-900 transition">Results</a>
-          <a href="#contact" className="hover:text-slate-900 transition">Contact</a>
+            <p className="text-[10px] tracking-[0.35em] text-[#D6451B]">
+              ACADEMY
+            </p>
+          </div>
+        </Link>
+
+        {/* Desktop Menu */}
+        <nav className="hidden lg:flex items-center gap-8">
+          {links.map((item) => (
+            <Link
+              key={item.name}
+              href={item.path}
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-[#D6451B]"
+            >
+              {item.name}
+            </Link>
+          ))}
         </nav>
 
-        {/* ACTIONS */}
+        {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-5">
-
-          {/* LOGIN (subtle text button) */}
-          <a
+          <Link
             href="/login"
-            className="text-sm text-slate-600 hover:text-slate-900 transition"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900"
           >
             Login
-          </a>
+          </Link>
 
-          {/* CTA */}
-          <button className="rounded-full bg-slate-900 px-5 py-2 text-sm text-white hover:scale-105 transition">
+          <button className="rounded-full bg-[#D6451B] px-6 py-2.5 text-sm font-medium text-white transition hover:opacity-90">
             Enroll Now
           </button>
         </div>
 
-        {/* MOBILE BUTTON */}
+        {/* Mobile Toggle */}
         <button
           onClick={() => setOpen(!open)}
-          className="text-slate-900 lg:hidden text-xl"
+          className="text-xl text-slate-900 lg:hidden"
+          aria-label="Toggle Menu"
         >
           {open ? <FaTimes /> : <FaBars />}
         </button>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            className="lg:hidden overflow-hidden border-t border-slate-100 bg-white"
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.2 }}
+            className="border-t border-slate-100 bg-white lg:hidden"
           >
-            <div className="flex flex-col gap-5 px-6 py-6 text-sm text-slate-600">
-
-              {["Home", "Courses", "About", "Results", "Contact"].map(
-                (item, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="hover:text-slate-900 transition"
+            <div className="px-6 py-6">
+              <nav className="flex flex-col gap-5">
+                {links.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.path}
                     onClick={() => setOpen(false)}
+                    className="text-sm font-medium text-slate-700"
                   >
-                    {item}
-                  </a>
-                )
-              )}
+                    {item.name}
+                  </Link>
+                ))}
 
-              {/* LOGIN */}
-              <a
-                href="/login"
-                className="text-slate-700 hover:text-slate-900 transition"
-              >
-                Login
-              </a>
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <Link
+                    href="/login"
+                    className="block text-sm font-medium text-slate-700"
+                  >
+                    Login
+                  </Link>
 
-              {/* CTA */}
-              <button className="mt-2 rounded-full bg-slate-900 px-5 py-3 text-white">
-                Enroll Now
-              </button>
-
+                  <button className="mt-4 w-full rounded-full bg-[#D6451B] py-3 text-sm font-medium text-white">
+                    Enroll Now
+                  </button>
+                </div>
+              </nav>
             </div>
           </motion.div>
         )}

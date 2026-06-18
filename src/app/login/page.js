@@ -2,121 +2,110 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaLock, FaEnvelope } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLock,
+  FaGoogle,
+  FaArrowRight,
+} from "react-icons/fa";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white text-slate-900 relative overflow-hidden px-4 sm:px-6">
+    <section className="relative min-h-screen overflow-hidden bg-white py-20">
 
-      {/* Background Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.12),transparent_60%)]" />
+      {/* Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.08),transparent_50%)]" />
 
-      {/* MAIN CARD */}
-      <div className="relative w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 shadow-xl border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden">
+      <div className="relative mx-auto flex min-h-screen max-w-md items-center px-5 py-12">
 
-        {/* LEFT SIDE (hidden on mobile) */}
-        <div className="hidden md:flex flex-col justify-center p-10 lg:p-12 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full"
+        >
+          {/* Logo */}
+          <div className="text-center">
+            <img
+              src="/icon1.png"
+              alt="IMA"
+              className="mx-auto h-16 w-16 object-contain"
+            />
 
-          <h1 className="text-3xl font-bold leading-snug">
-            Welcome Back to{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
-              Global Language Academy
-            </span>
-          </h1>
+            <h1 className="mt-6 text-3xl font-bold text-slate-900">
+              Welcome Back
+            </h1>
 
-          <p className="mt-4 text-slate-300 text-sm leading-relaxed">
-            Continue your journey to fluency with live classes, structured learning,
-            and global speaking practice.
-          </p>
-
-          <div className="mt-8 space-y-2 text-sm text-slate-300">
-            <p>✔ Live speaking practice</p>
-            <p>✔ Expert trainers</p>
-            <p>✔ Global community</p>
-            <p>✔ Structured roadmap</p>
-          </div>
-        </div>
-
-        {/* RIGHT SIDE (FORM) */}
-        <div className="bg-white p-6 sm:p-10 lg:p-12">
-
-          {/* Header */}
-          <div className="mb-6 sm:mb-8 text-center md:text-left">
-            <h2 className="text-2xl font-bold">Login</h2>
-            <p className="text-sm text-slate-500 mt-1">
-              Access your learning dashboard
+            <p className="mt-3 text-sm text-slate-500">
+              Login to continue your learning journey.
             </p>
           </div>
 
-          {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4 sm:space-y-5"
-          >
+          {/* Form Card */}
+          <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl">
 
             {/* Email */}
             <div className="relative">
-              <FaEnvelope className="absolute top-3.5 left-3 text-slate-400" />
+              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
               <input
                 type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-500 outline-none"
+                placeholder="Email Address"
+                className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
               />
             </div>
 
             {/* Password */}
-            <div className="relative">
-              <FaLock className="absolute top-3.5 left-3 text-slate-400" />
+            <div className="relative mt-4">
+              <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
               <input
                 type="password"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-500 outline-none"
+                className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
               />
             </div>
 
-            {/* Forgot */}
-            <div className="flex justify-end text-xs text-slate-500 hover:text-slate-900 cursor-pointer">
-              Forgot password?
+            {/* Forgot Password */}
+            <div className="mt-3 text-right">
+              <span className="text-xs font-medium text-[#D6451B] cursor-pointer hover:underline">
+                Forgot password?
+              </span>
             </div>
 
-            {/* Button */}
+            {/* Submit */}
             <button
-              type="submit"
-              className="w-full bg-slate-900 text-white py-3 rounded-xl hover:scale-[1.02] transition"
+              onClick={() => setLoading(true)}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90"
             >
-              Sign In
+              {loading ? "Logging in..." : "Login"}
+              <FaArrowRight />
             </button>
 
             {/* Divider */}
-            <div className="flex items-center gap-3 my-5">
-              <div className="h-px bg-slate-200 flex-1" />
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
               <span className="text-xs text-slate-400">OR</span>
-              <div className="h-px bg-slate-200 flex-1" />
+              <div className="h-px flex-1 bg-slate-200" />
             </div>
 
             {/* Google */}
-            <button className="w-full border border-slate-300 py-3 rounded-xl text-sm hover:bg-slate-50 transition">
+            <button className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 py-3.5 hover:bg-slate-50">
+              <FaGoogle />
               Continue with Google
             </button>
+          </div>
 
-            {/* Signup */}
-            <p className="text-xs text-center text-slate-500 mt-5">
-              Don’t have an account?{" "}
-              <span className="text-blue-600 cursor-pointer">Sign up</span>
-            </p>
-
-          </motion.form>
-        </div>
-
+          {/* Footer */}
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don’t have an account?
+            <span className="ml-2 font-medium text-[#D6451B] cursor-pointer hover:underline">
+              Sign up
+            </span>
+          </p>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

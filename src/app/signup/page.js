@@ -2,135 +2,163 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaGoogle,
+  FaArrowRight,
+} from "react-icons/fa";
 
 export default function SignUpPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student");
 
   return (
-<div className="min-h-screen pt-20 flex items-center justify-center bg-white text-slate-900 relative overflow-hidden px-4 sm:px-6">
-      {/* Background Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.12),transparent_60%)]" />
+    <section className="relative min-h-screen overflow-hidden bg-white py-20">
 
-      {/* MAIN CARD */}
-      <div className="relative w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 shadow-xl border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden ">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.08),transparent_50%)]" />
 
-        {/* LEFT SIDE (hidden on mobile) */}
-        <div className="hidden md:flex flex-col justify-center p-10 lg:p-12 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      <div className="relative mx-auto flex min-h-screen max-w-md items-center px-5 py-12">
 
-          <h1 className="text-3xl font-bold leading-snug">
-            Start Your Journey at{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
-              Global Language Academy
-            </span>
-          </h1>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full"
+        >
+          {/* Logo */}
+          <div className="text-center">
+            <img
+              src="/icon1.png"
+              alt="IMA"
+              className="mx-auto h-16 w-16 object-contain"
+            />
 
-          <p className="mt-4 text-slate-300 text-sm leading-relaxed">
-            Join thousands of learners improving fluency through live classes,
-            structured learning paths, and real conversations.
-          </p>
+            <h1 className="mt-6 text-3xl font-bold text-slate-900">
+              Create Account
+            </h1>
 
-          <div className="mt-8 space-y-2 text-sm text-slate-300">
-            <p>✔ Beginner → Advanced roadmap</p>
-            <p>✔ Live speaking practice</p>
-            <p>✔ Global community access</p>
-            <p>✔ Expert trainers</p>
-          </div>
-        </div>
-
-        {/* RIGHT SIDE (FORM) */}
-        <div className="bg-white p-6 sm:p-10 lg:p-12">
-
-          {/* Header */}
-          <div className="mb-6 sm:mb-8 text-center md:text-left">
-            <h2 className="text-2xl font-bold">Create Account</h2>
-            <p className="text-sm text-slate-500 mt-1">
-              Start your free learning journey
+            <p className="mt-3 text-sm text-slate-500">
+              Join thousands of learners improving communication skills worldwide.
             </p>
           </div>
 
-          {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4 sm:space-y-5"
-          >
+          {/* Form Card */}
+          <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl">
 
-            {/* Name */}
-            <div className="relative">
-              <FaUser className="absolute top-3.5 left-3 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-500 outline-none"
-              />
+            {/* Role */}
+            <div>
+              <p className="mb-3 text-sm font-medium text-slate-700">
+                Register As
+              </p>
+
+              <div className="flex rounded-2xl bg-slate-100 p-1">
+                <button
+                  onClick={() => setRole("student")}
+                  type="button"
+                  className={`flex-1 rounded-xl py-3 text-sm font-medium transition ${
+                    role === "student"
+                      ? "bg-white shadow text-[#D6451B]"
+                      : "text-slate-500"
+                  }`}
+                >
+                  🎓 Student
+                </button>
+
+                <button
+                  onClick={() => setRole("teacher")}
+                  type="button"
+                  className={`flex-1 rounded-xl py-3 text-sm font-medium transition ${
+                    role === "teacher"
+                      ? "bg-white shadow text-[#D6451B]"
+                      : "text-slate-500"
+                  }`}
+                >
+                  👨‍🏫 Teacher
+                </button>
+              </div>
             </div>
 
-            {/* Email */}
-            <div className="relative">
-              <FaEnvelope className="absolute top-3.5 left-3 text-slate-400" />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-500 outline-none"
-              />
+            {/* Inputs */}
+            <div className="mt-6 space-y-4">
+
+              <div className="relative">
+                <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+                <input
+                  placeholder="Full Name"
+                  className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
+                />
+              </div>
+
+              <div className="relative">
+                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+                <input
+                  placeholder="Email Address"
+                  className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
+                />
+              </div>
+
+              <div className="relative">
+                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
+                />
+              </div>
+
+              {role === "teacher" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="space-y-4"
+                >
+                  <input
+                    placeholder="Specialization"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 outline-none focus:border-[#D6451B]"
+                  />
+
+                  <input
+                    placeholder="Years of Experience"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 outline-none focus:border-[#D6451B]"
+                  />
+                </motion.div>
+              )}
+
             </div>
 
-            {/* Password */}
-            <div className="relative">
-              <FaLock className="absolute top-3.5 left-3 text-slate-400" />
-              <input
-                type="password"
-                placeholder="Create Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-500 outline-none"
-              />
-            </div>
-
-            {/* Terms */}
-            <div className="text-xs text-slate-500 leading-relaxed">
-              By signing up, you agree to our{" "}
-              <span className="text-blue-600 cursor-pointer">Terms</span> and{" "}
-              <span className="text-blue-600 cursor-pointer">Privacy Policy</span>.
-            </div>
-
-            {/* Button */}
-            <button
-              type="submit"
-              className="w-full bg-slate-900 text-white py-3 rounded-xl hover:scale-[1.02] transition"
-            >
+            {/* Submit */}
+            <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90">
               Create Account
+              <FaArrowRight />
             </button>
 
             {/* Divider */}
-            <div className="flex items-center gap-3 my-5">
-              <div className="h-px bg-slate-200 flex-1" />
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
               <span className="text-xs text-slate-400">OR</span>
-              <div className="h-px bg-slate-200 flex-1" />
+              <div className="h-px flex-1 bg-slate-200" />
             </div>
 
             {/* Google */}
-            <button className="w-full border border-slate-300 py-3 rounded-xl text-sm hover:bg-slate-50 transition">
+            <button className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 py-3.5 hover:bg-slate-50">
+              <FaGoogle />
               Continue with Google
             </button>
+          </div>
 
-            {/* Login */}
-            <p className="text-xs text-center text-slate-500 mt-5">
-              Already have an account?{" "}
-              <span className="text-blue-600 cursor-pointer">Login</span>
-            </p>
-
-          </motion.form>
-        </div>
-
+          {/* Footer */}
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Already have an account?
+            <span className="ml-2 font-medium text-[#D6451B] cursor-pointer">
+              Login
+            </span>
+          </p>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

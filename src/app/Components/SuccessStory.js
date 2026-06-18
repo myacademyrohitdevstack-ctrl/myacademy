@@ -1,132 +1,130 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaStar } from "react-icons/fa";
-
 const stories = [
   {
     name: "Anjali Sharma",
-    country: "India",
     result: "B1 → C1 in 6 Months",
-    text: "I could barely speak English before joining. Now I confidently give presentations at work.",
-    img: "/students/anjali.jpg",
+    video: "/students/anjali.mp4",
+    thumbnail: "/students/anjali.jpg",
   },
   {
     name: "Rahul Mehta",
-    country: "India",
     result: "IELTS 7.5 Score",
-    text: "Structured speaking practice helped me achieve my dream IELTS score.",
-    img: "/students/rahul.jpg",
+    video: "/students/rahul.mp4",
+    thumbnail: "/students/rahul.jpg",
   },
   {
     name: "Sofia Martin",
-    country: "France",
     result: "Fluent Conversation Level",
-    text: "Live classes made me confident speaking with people worldwide.",
-    img: "/students/sofia.jpg",
+    video: "/students/anjali.mp4",
+    thumbnail: "/students/anjali.jpg",
   },
 ];
 
 export default function SuccessStories() {
+
+const [activeVideo, setActiveVideo] = useState(null);
   return (
-    <section className="relative bg-white text-slate-900 py-28 overflow-hidden">
+    <section className="relative overflow-hidden bg-white  text-slate-900">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(214,69,27,0.06),transparent_60%)]" />
 
-      {/* soft cinematic glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(99,102,241,0.06),transparent_60%)]" />
-
-      <div className="relative max-w-6xl mx-auto px-6">
-
-        {/* HEADER */}
-        <div className="text-center mb-20">
+      <div className="relative mx-auto max-w-6xl px-6">
+        {/* Header */}
+        <div className="mb-20 text-center">
           <div className="text-[10px] tracking-[0.35em] text-slate-400">
             REAL TRANSFORMATIONS
           </div>
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold leading-tight">
+          <h2 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">
             Stories of{" "}
-            <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
               real change
             </span>
           </h2>
 
-          <p className="mt-5 text-slate-600 max-w-2xl mx-auto">
+          <div className="mx-auto mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-[#D6451B] to-[#7BC3D7]" />
+
+          <p className="mx-auto mt-5 max-w-2xl text-slate-600">
             These are not testimonials. These are transformations of real people
             who learned to speak confidently in real life.
           </p>
         </div>
-
-        {/* STORY LAYOUT (NOT GRID CARDS) */}
-     <div className="grid lg:grid-cols-3 gap-6">
-
-  {/* BIG STORY */}
-  <div className="lg:col-span-2 relative group overflow-hidden rounded-2xl h-[500px]">
-
-    <img
-      src="/students/anjali.jpg"
-      className="h-full w-full object-cover group-hover:scale-110 transition duration-700"
-    />
-
-    {/* cinematic overlay */}
-    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-    <div className="absolute bottom-6 left-6 text-white space-y-2">
-      <div className="text-xs tracking-[0.3em] text-white/60">
-        B1 → C1 IN 6 MONTHS
-      </div>
-
-      <div className="text-2xl font-bold">
-        Anjali Sharma
-      </div>
-
-      <p className="text-sm text-white/80 max-w-md">
-        “I could barely speak English before. Now I give presentations at work confidently.”
-      </p>
-    </div>
-
-    <div className="absolute top-4 left-4 bg-white/90 text-black text-xs px-3 py-1 rounded-full">
-      TOP TRANSFORMATION
-    </div>
+<div className="mb-20 grid grid-cols-3 gap-6">
+  <div className="rounded-2xl border border-slate-200 p-5 text-center">
+    <div className="text-2xl font-bold">12K+</div>
+    <div className="text-sm text-slate-500">Students</div>
   </div>
 
-  {/* SIDE STORIES */}
-  <div className="space-y-6">
+  <div className="rounded-2xl border border-slate-200 p-5 text-center">
+    <div className="text-2xl font-bold">98%</div>
+    <div className="text-sm text-slate-500">Success Rate</div>
+  </div>
 
-    {[
-      {
-        name: "Rahul Mehta",
-        img: "/students/rahul.jpg",
-        result: "IELTS 7.5",
-      },
-      {
-        name: "Sofia Martin",
-        img: "/students/sofia.jpg",
-        result: "Fluent Speaker",
-      },
-    ].map((item, i) => (
+  <div className="rounded-2xl border border-slate-200 p-5 text-center">
+    <div className="text-2xl font-bold">25+</div>
+    <div className="text-sm text-slate-500">Countries</div>
+  </div>
+</div>
+        {/* Stories */}
+   
+<div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+  {stories.map((story, i) => (
+    <motion.div
+      key={story.name}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: i * 0.1 }}
+      className="group mx-auto w-full max-w-[340px]"
+    >
       <div
-        key={i}
-        className="relative group overflow-hidden rounded-2xl h-[240px]"
+        onClick={() => setActiveVideo(story)}
+        className="relative cursor-pointer overflow-hidden rounded-[32px] border border-slate-200 bg-black shadow-xl"
       >
-
+        {/* Thumbnail */}
         <img
-          src={item.img}
-          className="h-full w-full object-cover group-hover:scale-110 transition duration-700"
+          src={story.thumbnail}
+          alt={story.name}
+          className="aspect-[9/16] w-full object-cover transition duration-700 group-hover:scale-105"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10" />
 
-        <div className="absolute bottom-4 left-4 text-white">
-          <div className="text-sm font-semibold">{item.name}</div>
-          <div className="text-xs text-white/70">{item.result}</div>
+        {/* Play Button */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-md transition group-hover:scale-110">
+            <svg
+              viewBox="0 0 24 24"
+              fill="white"
+              className="ml-1 h-8 w-8"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
         </div>
 
+        {/* Content */}
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur">
+            Student Success
+          </div>
+
+          <h4 className="mt-4 text-xl font-bold text-white">
+            {story.name}
+          </h4>
+
+          <p className="mt-1 text-sm text-[#7BC3D7]">
+            {story.result}
+          </p>
+        </div>
       </div>
-    ))}
-
-  </div>
-
+    </motion.div>
+  ))}
 </div>
-
         {/* CTA */}
         <div className="mt-28 text-center">
           <h3 className="text-2xl font-semibold">
@@ -137,12 +135,38 @@ export default function SuccessStories() {
             Join learners who turned hesitation into confidence.
           </p>
 
-          <button className="mt-6 rounded-full bg-slate-900 px-8 py-3 text-white hover:scale-105 transition">
+          <button className="mt-6 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
             Start Your Journey
           </button>
         </div>
-
       </div>
+      {activeVideo && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+    onClick={() => setActiveVideo(null)}
+  >
+    <div
+      className="relative w-full max-w-sm"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={() => setActiveVideo(null)}
+        className="absolute -top-12 right-0 text-3xl text-white"
+      >
+        ×
+      </button>
+
+      <video
+        controls
+        autoPlay
+        playsInline
+        className="w-full rounded-3xl"
+      >
+        <source src={activeVideo.video} type="video/mp4" />
+      </video>
+    </div>
+  </div>
+)}
     </section>
   );
 }

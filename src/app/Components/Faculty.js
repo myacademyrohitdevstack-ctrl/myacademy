@@ -41,122 +41,124 @@ export default function Faculty() {
   const mentor = faculty[active];
 
   return (
-    <section className="relative bg-white text-slate-900 py-28 overflow-hidden">
+    <section className="relative overflow-hidden bg-white py-28 text-slate-900">
+      {/* Brand Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.06),transparent_60%)]" />
 
-      {/* background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.06),transparent_60%)]" />
-
-      <div className="relative max-w-6xl mx-auto px-6">
-
-        {/* HEADER */}
-        <div className="text-center mb-20">
+      <div className="relative mx-auto max-w-6xl px-6">
+        {/* Header */}
+        <div className="mb-20 text-center">
           <div className="text-[10px] tracking-[0.35em] text-slate-400">
             EXPERT LANGUAGE TRAINERS
           </div>
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold">
+          <h2 className="mt-4 text-4xl font-bold sm:text-5xl">
             Meet your{" "}
-            <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
               mentors
             </span>
           </h2>
 
-          <p className="mt-5 text-slate-600 max-w-2xl mx-auto">
+          <div className="mx-auto mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-[#D6451B] to-[#7BC3D7]" />
+
+          <p className="mx-auto mt-5 max-w-2xl text-slate-600">
             Learn from real experts who guide your fluency journey personally.
           </p>
         </div>
 
-        {/* MAIN LAYOUT */}
-        <div className="grid lg:grid-cols-3 gap-10 items-start">
-
-          {/* LEFT SELECTOR */}
+        {/* Main Layout */}
+        <div className="grid items-start gap-10 lg:grid-cols-3">
+          {/* Mentor Selector */}
           <div className="space-y-4">
             {faculty.map((item, i) => (
               <button
                 key={item.name}
                 onClick={() => setActive(i)}
-                className={`w-full text-left p-4 rounded-xl border transition ${
+                className={`w-full rounded-2xl border p-5 text-left transition-all duration-300 ${
                   active === i
-                    ? "border-blue-500 bg-blue-50"
+                    ? "border-[#D6451B] bg-[#D6451B]/5 shadow-sm"
                     : "border-slate-100 hover:bg-slate-50"
                 }`}
               >
-                <div className="font-semibold">{item.name}</div>
-                <div className="text-xs text-slate-500">{item.role}</div>
+                <div className="font-semibold text-slate-900">
+                  {item.name}
+                </div>
+
+                <div className="mt-1 text-xs text-slate-500">
+                  {item.role}
+                </div>
+
+                {active === i && (
+                  <div className="mt-3 h-1 w-12 rounded-full bg-gradient-to-r from-[#D6451B] to-[#7BC3D7]" />
+                )}
               </button>
             ))}
           </div>
 
-          {/* CENTER FEATURED IMAGE */}
+          {/* Featured Mentor */}
           <motion.div
             key={mentor.name}
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="lg:col-span-2 relative"
+            className="relative lg:col-span-2"
           >
-
-            {/* IMAGE WRAPPER */}
-            <div className="relative rounded-2xl overflow-hidden h-[420px]">
-
+            <div className="relative h-[420px] overflow-hidden rounded-3xl">
               <img
                 src={mentor.img}
                 alt={mentor.name}
-                className="h-full w-full object-cover scale-105 hover:scale-110 transition duration-700"
+                className="h-full w-full object-cover transition duration-700 hover:scale-110"
               />
 
-              {/* cinematic overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
 
-              {/* glowing aura */}
-              <div className="absolute inset-0 bg-blue-500/10 mix-blend-overlay" />
+              {/* Brand Overlay */}
+              <div className="absolute inset-0 bg-[#D6451B]/10 mix-blend-overlay" />
 
-              {/* TEXT OVER IMAGE */}
-              <div className="absolute bottom-6 left-6 text-white space-y-2">
-
+              {/* Content */}
+              <div className="absolute bottom-6 left-6 text-white">
                 <div className="text-xs tracking-[0.3em] text-white/60">
                   FEATURED MENTOR
                 </div>
 
-                <div className="text-3xl font-bold">
+                <h3 className="mt-2 text-3xl font-bold">
                   {mentor.name}
-                </div>
+                </h3>
 
-                <div className="text-sm text-white/80">
+                <p className="mt-1 text-sm text-white/80">
                   {mentor.role}
-                </div>
+                </p>
 
-                <p className="text-sm text-white/70 max-w-md">
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70">
                   {mentor.desc}
                 </p>
 
-                {/* focus badge */}
-                <div className="mt-3 inline-flex items-center gap-2 text-xs bg-white/10 px-3 py-1 rounded-full backdrop-blur">
-                  <FaChalkboardTeacher className="text-blue-300" />
+                <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs backdrop-blur-sm">
+                  <FaChalkboardTeacher className="text-[#7BC3D7]" />
                   {mentor.focus}
                 </div>
-
               </div>
-
             </div>
 
-            {/* TRUST STRIP */}
-            <div className="mt-6 flex gap-6 text-xs text-slate-500">
-
-              <span className="flex items-center gap-1">
-                <FaCertificate className="text-blue-500" />
+            {/* Trust Strip */}
+            <div className="mt-6 flex flex-wrap gap-6 text-xs text-slate-500">
+              <span className="flex items-center gap-2">
+                <FaCertificate className="text-[#D6451B]" />
                 Certified Trainer
               </span>
 
-              <span className="flex items-center gap-1">
-                <FaGlobe className="text-blue-500" />
+              <span className="flex items-center gap-2">
+                <FaGlobe className="text-[#D6451B]" />
                 Global Experience
               </span>
 
+              <span className="flex items-center gap-2">
+                <FaChalkboardTeacher className="text-[#D6451B]" />
+                {mentor.experience}
+              </span>
             </div>
-
           </motion.div>
-
         </div>
 
         {/* CTA */}
@@ -169,11 +171,10 @@ export default function Faculty() {
             Real guidance from real professionals.
           </p>
 
-          <button className="mt-6 rounded-full bg-slate-900 px-8 py-3 text-white hover:scale-105 transition">
+          <button className="mt-6 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
             Book a Session
           </button>
         </div>
-
       </div>
     </section>
   );

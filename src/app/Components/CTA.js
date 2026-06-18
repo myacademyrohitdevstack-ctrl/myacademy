@@ -7,24 +7,24 @@ export default function CTA() {
   return (
     <section className="relative py-28 overflow-hidden bg-white text-slate-900">
 
-      {/* background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.10),transparent_60%)]" />
+      {/* Logo-inspired glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.12),transparent_60%)]" />
 
       <div className="relative max-w-6xl mx-auto px-6">
 
         {/* GRID LAYOUT */}
         <div className="grid lg:grid-cols-2 gap-16 items-center">
 
-          {/* LEFT: EMOTIONAL STORY */}
+          {/* LEFT CONTENT */}
           <div>
 
-            <div className="text-xs tracking-[0.35em] text-slate-400">
+            <div className="text-xs tracking-[0.35em] text-slate-500">
               START YOUR TRANSFORMATION
             </div>
 
             <h2 className="mt-5 text-4xl sm:text-5xl font-bold leading-tight">
               Speak English with{" "}
-              <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
+              <span className="bg-gradient-to-r from-amber-500 to-yellow-400 text-transparent bg-clip-text">
                 confidence in real life
               </span>
             </h2>
@@ -34,7 +34,7 @@ export default function CTA() {
               practice, real conversations, and guided fluency training.
             </p>
 
-            {/* trust bullets */}
+            {/* Trust Bullets */}
             <div className="mt-8 space-y-3 text-sm text-slate-700">
 
               {[
@@ -42,23 +42,23 @@ export default function CTA() {
                 "Correct pronunciation in real time",
                 "Global speaking community access",
               ].map((t, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <FaCheckCircle className="text-blue-500" />
+                <div key={i} className="flex items-center gap-3">
+                  <FaCheckCircle className="text-amber-500" />
                   {t}
                 </div>
               ))}
 
             </div>
 
-            {/* buttons */}
+            {/* Buttons */}
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
 
-              <button className="group flex items-center justify-center gap-2 rounded-full bg-slate-900 px-8 py-3 text-white hover:scale-105 transition">
+              <button className="group flex items-center justify-center gap-2 rounded-full bg-[#0F172A] px-8 py-3 text-white transition hover:-translate-y-1">
                 Start Learning Now
-                <FaArrowRight className="group-hover:translate-x-1 transition" />
+                <FaArrowRight className="transition group-hover:translate-x-1" />
               </button>
 
-              <button className="rounded-full border border-slate-300 px-8 py-3 text-slate-700 hover:bg-slate-100 transition">
+              <button className="rounded-full border border-amber-200 px-8 py-3 text-slate-700 hover:bg-amber-50 transition">
                 Watch Demo Class
               </button>
 
@@ -66,11 +66,10 @@ export default function CTA() {
 
           </div>
 
-          {/* RIGHT: LIVE SOCIAL PROOF PANEL */}
+          {/* RIGHT SIDE */}
           <div className="relative">
 
-            {/* glow card */}
-            <div className="rounded-2xl p-8 bg-gradient-to-br from-blue-50 to-violet-50 border border-slate-100">
+            <div className="rounded-3xl border border-amber-100 bg-gradient-to-br from-amber-50 to-yellow-50 p-8">
 
               <div className="text-xs tracking-[0.35em] text-slate-500">
                 LIVE ACTIVITY
@@ -88,18 +87,19 @@ export default function CTA() {
                     key={i}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-2 text-sm text-slate-700"
                   >
-                    <span className="text-green-500">●</span>
+                    <span className="text-amber-500">●</span>
                     {item}
                   </motion.div>
                 ))}
 
               </div>
 
-              {/* urgency badge */}
-              <div className="mt-8 inline-flex items-center gap-2 text-xs bg-white px-3 py-1 rounded-full border">
+              {/* Badge */}
+              <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white px-4 py-2 text-xs text-amber-700">
                 🔥 127 students joined today
               </div>
 
@@ -109,9 +109,9 @@ export default function CTA() {
 
         </div>
 
-        {/* bottom trust strip */}
-        <div className="mt-20 text-center text-xs tracking-[0.35em] text-slate-400">
-          12K+ STUDENTS • LIVE PRACTICE • REAL RESULTS
+        {/* Bottom Trust Strip */}
+        <div className="mt-20 text-center text-xs tracking-[0.35em] text-slate-500">
+          12K+ STUDENTS • GLOBAL COMMUNITY • CERTIFIED TRAINERS
         </div>
 
       </div>
