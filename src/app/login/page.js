@@ -2,15 +2,66 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   FaEnvelope,
   FaLock,
   FaGoogle,
   FaArrowRight,
+  FaSpinner,
 } from "react-icons/fa";
+import { useLoginMutation } from "../mutations/AuthenticationMutations";
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
+
+   const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  // const { handleError } = useContext(AuthContext);
+  const loginMutation = useLoginMutation();
+
+  const handleChange = ({ target: { name, value } }) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const emailRegex = /^\S+@\S+\.\S+$/;
+
+  const validate = () => {
+    if (!formData.email.trim()) {
+      return "Email Cannot be Empty";
+    }
+    if (!emailRegex.test(formData.email.trim())) {
+      return "Enter a valid Email";
+    }
+    if (!formData.password) {
+      return "Password Cannot be empty";
+    }
+    if (formData.password.length < 8) {
+      return "Password length cannot be less than 8";
+    }
+
+    return null;
+  };
+
+  const isFormValid = formData.email.trim() && formData.password;
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    const error = validate();
+
+    if (error) {
+      toast.error(error); 
+      return;
+    }
+
+    loginMutation.mutate({
+      email: formData.email.trim(),
+      password: formData.password,
+    });
+  };
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-white py-20">
@@ -51,6 +102,10 @@ export default function LoginPage() {
 
               <input
                 type="email"
+                name="email"
+             onChange={handleChange}
+              id="login-email"
+              autoComplete="email"
                 placeholder="Email Address"
                 className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
               />
@@ -63,6 +118,10 @@ export default function LoginPage() {
               <input
                 type="password"
                 placeholder="Password"
+                name="password"
+                onChange={handleChange}
+                id="login-password"
+                 autoComplete="current-password"
                 className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
               />
             </div>
@@ -76,11 +135,12 @@ export default function LoginPage() {
 
             {/* Submit */}
             <button
-              onClick={() => setLoading(true)}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90"
+            disabled={!isFormValid || loginMutation.isPending}
+              onClick={handleLogin}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-30"
             >
-              {loading ? "Logging in..." : "Login"}
-              <FaArrowRight />
+              {loginMutation.isPending ?<FaSpinner className="text-white animate-spin"></FaSpinner>: "Login"}
+             
             </button>
 
             {/* Divider */}

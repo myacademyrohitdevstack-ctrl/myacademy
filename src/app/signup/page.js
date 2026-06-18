@@ -8,13 +8,89 @@ import {
   FaLock,
   FaGoogle,
   FaArrowRight,
+  FaSpinner,
 } from "react-icons/fa";
+import { useSendOtpMutation, useSignUpMutation, useVerifyOtpMutation } from "../mutations/AuthenticationMutations";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
   const [role, setRole] = useState("student");
-  const [email, setEmail] = useState("");
 const [otpSent, setOtpSent] = useState(false);
 const [otp, setOtp] = useState("");
+const [emailVerified,setEmailVerified]=useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+  });
+
+  const signUpMutation = useSignUpMutation();
+  const sendOtpMuatation=useSendOtpMutation(setOtpSent)
+  const verifyOtpMutation=useVerifyOtpMutation(setOtpSent,setEmailVerified)
+  const handleChange = ({ target: { name, value } }) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  const nameRegex = /^[A-Za-z\s'-]{2,50}$/;
+
+  const validate = () => {
+    if (!nameRegex.test(formData.name.trim())) {
+      return "Enter a valid Name";
+    }
+    if (!emailRegex.test(formData.email.trim())) {
+      return "Enter a valid Email";
+    }
+    if (formData.password.length < 8) {
+      return "Password Length must be more than 8";
+    }
+
+    return null;
+  };
+
+  const isFormValid =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.password;
+
+const sendOpt=()=>{
+   if (!emailRegex.test(formData.email.trim())) {
+      toast.error("Enter a valid Email");
+      return
+    }
+    sendOtpMuatation.mutate({email:formData.email.trim(),purpose:"register"})
+  
+
+}
+const verifyOtp=()=>{
+   if (!otp.trim() || otp.trim().length!==6) {
+      toast.error("Enter a valid otp");
+      return
+    }
+    verifyOtpMutation.mutate({email:formData.email.trim(),purpose:"register",otp})
+
+
+}
+  const handleSignUp = (e) => {
+    e.preventDefault();
+
+    const error = validate();
+
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
+    const data = {
+      fullName: formData.name.trim(),
+      email: formData.email.trim(),
+      role,
+      verificationToken:localStorage.getItem("verificationToken"),
+      password: formData.password,
+    };
+
+    signUpMutation.mutate(data);
+  };
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-white py-20">
@@ -90,6 +166,10 @@ const [otp, setOtp] = useState("");
 
                 <input
                   placeholder="Full Name"
+                  name="name"
+                  autoComplete="name"
+                  id="signup-name"
+                  onChange={handleChange}
                   className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
                 />
               </div>
@@ -98,30 +178,41 @@ const [otp, setOtp] = useState("");
   <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
   <input
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
+    
+    name="email"
+autoComplete="email"
+id="signup-email"
+    onChange={handleChange}
     placeholder="Email Address"
     className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-32 outline-none focus:border-[#D6451B]"
   />
 
-  {!otpSent && (
+  {!otpSent && !emailVerified && (
     <button
       type="button"
-      onClick={() => setOtpSent(true)}
-      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[#D6451B] px-3 py-2 text-xs text-white hover:opacity-90"
+      onClick={sendOpt}
+      className="absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[#D6451B] px-3 py-2 text-xs text-white hover:opacity-90"
     >
-      Send OTP
+     {sendOtpMuatation.isPending?<FaSpinner className="text-white animate-spin"></FaSpinner>:"Send OTP"} 
     </button>
   )}
 </div>
 {otpSent && (
   <div className="relative">
     <input
-      value={otp}
       onChange={(e) => setOtp(e.target.value)}
       placeholder="Enter OTP"
       className="w-full rounded-2xl border border-slate-200 py-3.5 px-4 outline-none focus:border-[#D6451B]"
     />
+     
+    <button
+      type="button"
+      onClick={verifyOtp}
+      className="absolute cursor-pointer right-2 top-1/2 -translate-y-5/6 rounded-xl bg-[#D6451B] px-3 py-2 text-xs text-white hover:opacity-90"
+    >
+    {verifyOtpMutation.isPending?<FaSpinner className="text-white animate-spin"></FaSpinner>:"Verify OTP"} 
+    </button>
+  
 
     <button
       type="button"
@@ -139,6 +230,9 @@ const [otp, setOtp] = useState("");
                 <input
                   type="password"
                   placeholder="Password"
+                  name="password"
+                  id="signup-password"
+                  onChange={handleChange}
                   className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
                 />
               </div>
@@ -164,8 +258,8 @@ const [otp, setOtp] = useState("");
             </div>
 
             {/* Submit */}
-            <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90">
-              Create Account
+            <button  disabled={!isFormValid || signUpMutation.isPending} onClick={handleSignUp} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90 disabled:opacity-30 ">
+              {signUpMutation.isPending?<FaSpinner className="text-white animate-spin"></FaSpinner>:"Create Account"}
               <FaArrowRight />
             </button>
 

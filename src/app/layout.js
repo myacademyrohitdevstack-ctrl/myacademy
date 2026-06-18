@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./Components/Navbar";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +27,30 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <Navbar></Navbar>
-        {children}</body>
+       
+
+
+<ReactQueryProvider>
+        {children}
+        
+        </ReactQueryProvider>
+        <Toaster
+  position="bottom-right"
+  richColors
+  closeButton
+  expand
+  duration={3000}
+  toastOptions={{
+    className:
+      "!rounded-2xl !border !border-orange-100 !bg-white !text-slate-800 !shadow-2xl",
+    style: {
+      fontSize: "14px",
+      fontWeight: 500,
+      padding: "16px",
+    },
+  }}
+/>
+        </body>
     </html>
   );
 }
