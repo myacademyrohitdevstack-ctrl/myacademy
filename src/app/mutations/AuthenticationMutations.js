@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import queryClient from '@/lib/queryClient';
 import { loginApi,sendOtp,signUpApi, verifyOtp } from '../api/AuthApi';
+import { useRouter } from 'next/navigation';
 export const useLoginMutation=()=>{
     
     // const navigate=useNavigate()
@@ -24,7 +25,7 @@ export const useLoginMutation=()=>{
         }
     })
 }
-export const useSendOtpMutation=(setOtpSent)=>{
+export const useSendOtpMutation=(setOtpSent,setTimer)=>{
     
     // const navigate=useNavigate()
     return useMutation({
@@ -41,13 +42,14 @@ export const useSendOtpMutation=(setOtpSent)=>{
 //   queryClient.invalidateQueries({
 //   queryKey: ["Me"]
 // })
+setTimer(data.resendAfter)
      toast.success("Otp sent Successlly ")
       setOtpSent(true)
     //  navigate('/home')
         }
     })
 }
-export const useVerifyOtpMutation=(setOtpSent,setEmailVerified)=>{
+export const useVerifyOtpMutation=(setOtpSent,setEmailVerified,setVerificationToken)=>{
     
     // const navigate=useNavigate()
     return useMutation({
@@ -65,7 +67,7 @@ export const useVerifyOtpMutation=(setOtpSent,setEmailVerified)=>{
 //   queryKey: ["Me"]
 // })
 
-   localStorage.setItem("verificationToken",data.verificationToken)
+   setVerificationToken(data.verificationToken)
      toast.success("Otp verified  Successlly ")
      setOtpSent(false)
      setEmailVerified(true)
@@ -74,8 +76,9 @@ export const useVerifyOtpMutation=(setOtpSent,setEmailVerified)=>{
     })
 }
 
-export const useSignUpMutation=()=>{
-    // const navigate=useNavigate()
+export const useSignUpMutation=(resetForm)=>{
+   
+    const router=useRouter()
     return useMutation({
         mutationFn:async(data)=>{
          return await signUpApi(data)
@@ -83,8 +86,9 @@ export const useSignUpMutation=()=>{
          retry:false,
         // onError:(error)=>handleError(error),
          onSuccess:()=>{
+            resetForm()
+            router.push('/login')
      toast.success("Your Account created successfully ")
-    //  navigate('/login')
         }
     })
 }

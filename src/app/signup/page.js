@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   FaUser,
@@ -17,22 +17,39 @@ export default function SignUpPage() {
   const [role, setRole] = useState("student");
 const [otpSent, setOtpSent] = useState(false);
 const [otp, setOtp] = useState("");
+const [timer, setTimer] = useState(0);
 const [emailVerified,setEmailVerified]=useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
   });
+const [verificationToken, setVerificationToken] = useState("");
+const resetForm = () => {
+  setFormData({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const signUpMutation = useSignUpMutation();
-  const sendOtpMuatation=useSendOtpMutation(setOtpSent)
-  const verifyOtpMutation=useVerifyOtpMutation(setOtpSent,setEmailVerified)
+  setRole("student");
+  setOtp("");
+  setOtpSent(false);
+  setEmailVerified(false);
+  setVerificationToken("");
+  setTimer(0);
+};
+  const signUpMutation = useSignUpMutation(resetForm);
+  const sendOtpMuatation=useSendOtpMutation(setOtpSent,setTimer)
+  const verifyOtpMutation=useVerifyOtpMutation(setOtpSent,setEmailVerified,setVerificationToken)
   const handleChange = ({ target: { name, value } }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const emailRegex = /^\S+@\S+\.\S+$/;
   const nameRegex = /^[A-Za-z\s'-]{2,50}$/;
+  const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&]).{8,}$/;
 
   const validate = () => {
     if (!nameRegex.test(formData.name.trim())) {
@@ -41,9 +58,9 @@ const [emailVerified,setEmailVerified]=useState(false)
     if (!emailRegex.test(formData.email.trim())) {
       return "Enter a valid Email";
     }
-    if (formData.password.length < 8) {
-      return "Password Length must be more than 8";
-    }
+   if (!passwordRegex.test(formData.password)) {
+  return "Password must contain uppercase, lowercase, number and special character.";
+}
 
     return null;
   };
@@ -71,6 +88,15 @@ const verifyOtp=()=>{
 
 
 }
+useEffect(() => {
+  if (!timer) return;
+
+  const interval = setInterval(() => {
+    setTimer((prev) => prev - 1);
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [timer]);
   const handleSignUp = (e) => {
     e.preventDefault();
 
@@ -85,7 +111,7 @@ const verifyOtp=()=>{
       fullName: formData.name.trim(),
       email: formData.email.trim(),
       role,
-      verificationToken:localStorage.getItem("verificationToken"),
+      verificationToken,
       password: formData.password,
     };
 
@@ -167,6 +193,7 @@ const verifyOtp=()=>{
                 <input
                   placeholder="Full Name"
                   name="name"
+                  value={formData.name}
                   autoComplete="name"
                   id="signup-name"
                   onChange={handleChange}
@@ -182,6 +209,8 @@ const verifyOtp=()=>{
     name="email"
 autoComplete="email"
 id="signup-email"
+value={formData.email}
+disabled={emailVerified}
     onChange={handleChange}
     placeholder="Email Address"
     className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-32 outline-none focus:border-[#D6451B]"
@@ -197,13 +226,20 @@ id="signup-email"
     </button>
   )}
 </div>
-{otpSent && (
+{otpSent && !emailVerified && (
   <div className="relative">
     <input
-      onChange={(e) => setOtp(e.target.value)}
+       value={otp}
+  maxLength={6}
+  inputMode="numeric"
+  autoComplete="one-time-code"
+  onChange={(e) =>
+    setOtp(e.target.value.replace(/\D/g, ""))
+  }
       placeholder="Enter OTP"
       className="w-full rounded-2xl border border-slate-200 py-3.5 px-4 outline-none focus:border-[#D6451B]"
     />
+ 
      
     <button
       type="button"
@@ -214,16 +250,40 @@ id="signup-email"
     </button>
   
 
-    <button
-      type="button"
-      className="mt-2 text-xs font-medium text-[#D6451B] hover:underline"
-      onClick={() => setOtpSent(false)}
-    >
-      Change Email
-    </button>
+  <div className="mt-3 flex items-center justify-between">
+  <button
+    type="button"
+  onClick={() => {
+  setOtpSent(false);
+  setEmailVerified(false);
+  setVerificationToken("");
+  setOtp("");
+}}
+    className="text-xs font-medium text-[#D6451B] hover:underline"
+  >
+    Change Email
+  </button>
+
+  <button
+    type="button"
+    disabled={timer > 0 || sendOtpMuatation.isPending}
+    onClick={sendOpt}
+    className="text-xs font-medium text-[#D6451B] hover:underline disabled:text-gray-400 disabled:no-underline"
+  >
+    {sendOtpMuatation.isPending
+      ? "Sending..."
+      : timer > 0
+      ? `Resend OTP (${timer}s)`
+      : "Resend OTP"}
+  </button>
+</div>
   </div>
 )}
-
+{emailVerified && (
+  <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-medium text-green-700">
+    ✅ Email verified successfully
+  </div>
+)}
               <div className="relative">
                 <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
@@ -231,6 +291,7 @@ id="signup-email"
                   type="password"
                   placeholder="Password"
                   name="password"
+                  value={formData.password}
                   id="signup-password"
                   onChange={handleChange}
                   className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
@@ -258,7 +319,7 @@ id="signup-email"
             </div>
 
             {/* Submit */}
-            <button  disabled={!isFormValid || signUpMutation.isPending} onClick={handleSignUp} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90 disabled:opacity-30 ">
+            <button  disabled={!emailVerified || !isFormValid || signUpMutation.isPending} onClick={handleSignUp} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90 disabled:opacity-30 ">
               {signUpMutation.isPending?<FaSpinner className="text-white animate-spin"></FaSpinner>:"Create Account"}
               <FaArrowRight />
             </button>
