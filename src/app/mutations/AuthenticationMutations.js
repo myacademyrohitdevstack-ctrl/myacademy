@@ -1,12 +1,14 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import queryClient from '@/lib/queryClient';
-import { loginApi,sendOtp,signUpApi, verifyOtp } from '../api/AuthApi';
+
+import { loginApi,logoutApi,sendOtp,signUpApi, verifyOtp } from '../api/AuthApi';
 import { useRouter } from 'next/navigation';
 import handleError from '@/Utils/handleError';
+import useAuthStore from '@/store/authStore';
+import queryClient from '@/lib/queryClient';
 export const useLoginMutation=()=>{
-    
-    // const navigate=useNavigate()
+    const login=useAuthStore((state)=>state.login)
+    const router=useRouter()
     return useMutation({
         mutationFn:async (data)=>{
            const response=await loginApi(data);
@@ -16,11 +18,13 @@ export const useLoginMutation=()=>{
        onError:(error)=>handleError(error),
         onSuccess:(data)=>{
      
-//   queryClient.invalidateQueries({
-//   queryKey: ["Me"]
-// })
+
+  login({user:data.user,accessToken:data.accessToken})
      toast.success("You Logged in Successlly ")
-    //  navigate('/home')
+     if(data.user.role==="student"){
+    router.push('/student-profile')
+     }
+
         }
     })
 }
@@ -91,34 +95,27 @@ export const useSignUpMutation=(resetForm)=>{
         }
     })
 }
-// export const useLogoutMutation=(handleError)=>{
-//     const queryClient=useQueryClient()
-//     const navigate=useNavigate()
-//     return useMutation({
-//         mutationFn:async (data)=>{
-//            const response=await logoutApi();
-//            return response.data
-//         },
-//         retry:false,
-//         onError:(error)=>handleError(error),
-//         onSuccess:(data)=>{
-//             toast.info("You have been loggout out successfully")
-//             navigate('/home')
-//   queryClient.removeQueries({
-//   queryKey: ["Me"]
-// })
+export const useLogoutMutation=()=>{
 
-// queryClient.removeQueries({
-//   queryKey: ["user-likedRecipes"]
-// })
-// queryClient.removeQueries({
-//   queryKey: ["user-recipes"]
-// })
-//   localStorage.removeItem("accessToken")
+  const router=useRouter()
+    return useMutation({
+        mutationFn:async ()=>{
+           const response=await logoutApi();
+           return response.data
+        },
+        retry:false,
+        onError:(error)=>handleError(error),
+        onSuccess:()=>{
+            router.replace('/')
+            toast.info("You have been loggout out successfully")
+  queryClient.removeQueries({
+  queryKey: ["Me"]
+})
+ useAuthStore.getState().logout();
 
-//         }
-//     })
-// }
+        }
+    })
+}
 // export const useForgetPasswordMutation=(handleError)=>{
 //     const navigate=useNavigate()
 //     return useMutation({

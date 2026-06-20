@@ -1,5 +1,6 @@
 "use client";
 
+import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { motion } from "framer-motion";
 import {
   FaBookOpen,
@@ -54,7 +55,7 @@ const announcements = [
   "🏖 Holiday on Monday",
 ];
 
-export default function Dashboard() {
+export default function Dashboard({user}) {
   return (
     <div className="space-y-8">
 
@@ -68,7 +69,7 @@ export default function Dashboard() {
 
           <div>
             <h1 className="text-4xl font-bold">
-              Welcome Back, Anjali 👋
+              Welcome Back, {capitalizeFirstLetter(user?.fullName)} 👋
             </h1>
 
             <p className="mt-4 max-w-xl text-orange-100">

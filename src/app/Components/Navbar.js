@@ -17,22 +17,19 @@ import {
   FaInfoCircle,
   FaPhoneAlt,
 } from "react-icons/fa";
+import useAuthStore from "@/store/authStore";
+import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
+import {  useLogoutMutation } from "../mutations/AuthenticationMutations";
 
 export default function Navbar() {
+  const logoutMutation=useLogoutMutation()
 
   const [open, setOpen] = useState(false);
 
   const [profileOpen, setProfileOpen] = useState(false);
 
   const profileRef = useRef(null);
-
-  // Temporary User
-  const user = {
-    fullName: "Rohit Sharma",
-    email: "rohit@gmail.com",
-    role: "student",
-    profileImage: "",
-  };
+ const user=useAuthStore((state)=>state.user)
 
 const links = [
   { name: "Home", path: "/", icon: FaHome },
@@ -66,9 +63,9 @@ useEffect(() => {
 
 }, []);
 const dashboardPath =
-  user.role === "admin"
+  user?.role === "admin"
     ? "/admin/dashboard"
-    : user.role === "teacher"
+    : user?.role === "teacher"
     ? "/teacher/dashboard"
     : "/student/dashboard";
 
@@ -81,22 +78,37 @@ const profileItems = [
   {
     title: "My Profile",
     icon: FaUserCircle,
-    href: "/student-profile",
+    href: "/student-profile/profile",
   },
   {
     title: "My Courses",
     icon: FaBookOpen,
-    href: "/student/courses",
+    href: "/student-profile/courses",
   },
   {
     title: "Live Classes",
     icon: FaVideo,
-    href: "/student/liveclasses",
+    href: "/student-profile/classes",
+  },
+  {
+    title: "Batches",
+    icon: FaVideo,
+    href: "/student-profile/batches",
+  },
+  {
+    title: "Announcements",
+    icon: FaVideo,
+    href: "/student-profile/announcements",
+  },
+  {
+    title: "Certificates",
+    icon: FaVideo,
+    href: "/student-profile/certificates",
   },
   {
     title: "Settings",
     icon: FaCog,
-    href: "/student/settings",
+    href: "/student-profile/settings",
   },
 ];
 const ProfileItem = ({
@@ -116,6 +128,9 @@ const ProfileItem = ({
   </Link>
 );
 
+const handleLogout=()=>{
+logoutMutation.mutate()
+}
   return (
 <header
   className={`fixed top-0 left-0 z-50 w-full border-b border-slate-200/60 transition-all ${
@@ -199,13 +214,13 @@ const ProfileItem = ({
           />
         ) : (
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-[#D6451B] to-orange-500 text-lg font-bold text-white">
-            {user.fullName.charAt(0)}
+            {user.fullName.charAt(0).toUpperCase()}
           </div>
         )}
 
         <div className="hidden text-left xl:block">
           <h3 className="text-sm font-semibold text-slate-900">
-            {user.fullName}
+            {capitalizeFirstLetter(user?.fullName)}
           </h3>
 
           <p className="text-xs capitalize text-slate-500">
@@ -293,11 +308,12 @@ const ProfileItem = ({
 <div className="border-t border-slate-100 p-3">
 
   <button
+  onClick={handleLogout}
     className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-red-600 transition hover:bg-red-50"
   >
     <FaSignOutAlt />
 
-    <span className="font-medium">
+    <span  className="font-medium">
       Logout
     </span>
 
@@ -483,7 +499,7 @@ const ProfileItem = ({
   <div className="border-t border-slate-200 bg-white p-6">
 
     {user ? (
-      <button className="flex w-full items-center justify-center gap-3 rounded-2xl border border-red-200 py-4 font-semibold text-red-600 transition hover:bg-red-50">
+      <button onClick={handleLogout} className="flex w-full items-center justify-center gap-3 rounded-2xl border border-red-200 py-4 font-semibold text-red-600 transition hover:bg-red-50">
         <FaSignOutAlt />
         Logout
       </button>

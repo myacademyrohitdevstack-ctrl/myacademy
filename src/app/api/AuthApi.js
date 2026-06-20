@@ -12,4 +12,7 @@ export  function sendOtp(data){
 export  function verifyOtp(data){
     return api.post('/auth/verify-otp',data)
 }
+export  function logoutApi(){
+    return api.post('/auth/logout')
+}
 

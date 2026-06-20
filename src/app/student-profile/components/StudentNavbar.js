@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   FaHome,
   FaUser,
@@ -55,24 +56,25 @@ const navItems = [
   },
 ];
 
-export default function StudentNavbar({ page, setPage }) {
+export default function StudentNavbar({ section }) {
+  const router=useRouter()
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="sticky top-20 z-30 mt-6"
+      className="sticky top-24 z-30 mt-6"
     >
       <div className="overflow-x-auto scrollbar-hide">
         <div className="inline-flex min-w-max gap-2 rounded-[28px] border border-slate-200 bg-white p-2 shadow-lg">
 
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = page === item.id;
+            const active = section === item.id;
 
             return (
               <button
                 key={item.id}
-                onClick={() => setPage(item.id)}
+                onClick={()=>{router.push(`/student-profile/${item.id}`)}}
                 className={`relative flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium transition-all duration-300 ${
                   active
                     ? "text-white"

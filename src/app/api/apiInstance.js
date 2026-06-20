@@ -1,3 +1,4 @@
+import useAuthStore from "@/store/authStore";
 import axios from "axios";
 // import { queryClient } from "./queryClient";
 
@@ -8,13 +9,15 @@ const api = axios.create({
 });
 
 // REQUEST interceptor
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("accessToken");
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+api.interceptors.request.use((config) => {
+
+  const token = useAuthStore.getState().accessToken;;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 // RESPONSE interceptor
 // api.interceptors.response.use(
 //   (response) => response,
@@ -55,9 +58,6 @@ const api = axios.create({
 // );
 
 
-const handleLogout = () => {
-  localStorage.removeItem("accessToken");
-//   queryClient.clear(); 
-};
+
 
 export default api;
