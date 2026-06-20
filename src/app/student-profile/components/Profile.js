@@ -297,6 +297,10 @@
 //     </div>
 //   );
 // }
+
+
+
+
 "use client";
 
 import { useEffect } from "react";
@@ -312,6 +316,7 @@ import GuardianSection from "./profile/GuardianSection";
 import EmergencySection from "./profile/EmergencySection";
 import { toast } from "sonner";
 import { useProfileUpdateMutation } from "@/app/mutations/studentMutation";
+import { useProfileImageMutation } from "@/app/mutations/userMutation";
 
 
 export default function Profile({ user, profile }) {
@@ -363,6 +368,12 @@ export default function Profile({ user, profile }) {
       },
     },
   });
+
+  const {
+  mutate: uploadImage,
+  isPending: isUploading,
+} = useProfileImageMutation();
+
 
   // Populate form when profile loads
   useEffect(() => {
@@ -487,16 +498,13 @@ export default function Profile({ user, profile }) {
     });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    console.log(file);
-
-    // TODO:
-    // uploadProfileImage(file)
-  };
+ const handleImageUpload = (file, done) => {
+  uploadImage(file, {
+    onSuccess: () => {
+      done();
+    },
+  });
+};
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -521,11 +529,12 @@ export default function Profile({ user, profile }) {
       >
         {/* Sidebar */}
 
-        <ProfileSidebar
-          user={user}
-          profile={profile}
-          onImageChange={handleImageChange}
-        />
+       <ProfileSidebar
+  user={user}
+  profile={profile}
+  onImageUpload={handleImageUpload}
+  isUploading={isUploading}
+/>
 
         {/* Form */}
 

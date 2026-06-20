@@ -11,8 +11,10 @@ import {
   FaSignOutAlt,
   FaUserShield,
 } from "react-icons/fa";
+import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
 
 export default function Settings() {
+  const logoutMutation=useLogoutMutation()
   const [settings, setSettings] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -25,6 +27,9 @@ export default function Settings() {
       [field]: !prev[field],
     }));
   };
+  const handleLogout=()=>{
+logoutMutation.mutate()
+  }
 
   return (
     <div className="space-y-8">
@@ -211,7 +216,7 @@ export default function Settings() {
             Save Settings
           </button>
 
-          <button className="flex items-center gap-2 rounded-2xl border border-red-200 px-6 py-3 text-red-600 hover:bg-red-50">
+          <button onClick={handleLogout} className="flex items-center gap-2 rounded-2xl border border-red-200 px-6 py-3 text-red-600 hover:bg-red-50">
             <FaSignOutAlt />
             Logout
           </button>

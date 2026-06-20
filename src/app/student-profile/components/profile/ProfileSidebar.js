@@ -1,13 +1,64 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FaCamera } from "react-icons/fa";
+import {
+  FaCamera,
+  FaCheck,
+  FaTimes,
+  FaSpinner,
+} from "react-icons/fa";
 
 export default function ProfileSidebar({
   user,
   profile,
-  onImageChange,
+  onImageUpload,
+  isUploading,
 }) {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState("");
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreview("");
+      return;
+    }
+
+    const url = URL.createObjectURL(selectedFile);
+    setPreview(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [selectedFile]);
+
+  const handleChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB");
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleCancel = () => {
+    setSelectedFile(null);
+    setPreview("");
+  };
+
+  const handleUpload = () => {
+    if (!selectedFile) return;
+ 
+    onImageUpload(selectedFile, () => {
+      setSelectedFile(null);
+      setPreview("");
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -15 }}
@@ -17,25 +68,52 @@ export default function ProfileSidebar({
       {/* Profile Image */}
       <div className="relative mx-auto w-fit">
         <img
-          src={user?.profileImage || "/student.jpg"}
+          src={preview || user?.profileImage?.url || "/student.jpg"}
           alt={user?.fullName}
           className="h-40 w-40 rounded-full border-4 border-orange-100 object-cover"
         />
 
-        <label
-          htmlFor="profileImage"
-          className="absolute bottom-2 right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#D6451B] text-white shadow-lg transition hover:scale-105"
-        >
-          <FaCamera />
-        </label>
+        {!selectedFile ? (
+          <>
+            <label
+              htmlFor="profileImage"
+              className="absolute bottom-2 right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#D6451B] text-white shadow-lg transition hover:scale-105"
+            >
+              <FaCamera />
+            </label>
 
-        <input
-          id="profileImage"
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={onImageChange}
-        />
+            <input
+              id="profileImage"
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleChange}
+            />
+          </>
+        ) : (
+          <div className="absolute bottom-2 right-2 flex gap-2">
+            <button
+              onClick={handleUpload}
+              disabled={isUploading}
+              type="button"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-green-600 text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
+            >
+              {isUploading ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                <FaCheck />
+              )}
+            </button>
+
+            <button
+              onClick={handleCancel}
+              disabled={isUploading}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition hover:scale-105"
+            >
+              <FaTimes />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Name */}
@@ -93,9 +171,7 @@ export default function ProfileSidebar({
 function Info({ title, value }) {
   return (
     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-      <p className="text-sm text-slate-500">
-        {title}
-      </p>
+      <p className="text-sm text-slate-500">{title}</p>
 
       <h3 className="mt-1 font-semibold text-slate-800">
         {value}

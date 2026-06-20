@@ -208,7 +208,7 @@ logoutMutation.mutate()
       >
         {user.profileImage ? (
           <img
-            src={user.profileImage}
+            src={user.profileImage.url}
             alt={user.fullName}
             className="h-11 w-11 rounded-full object-cover"
           />
@@ -265,9 +265,9 @@ logoutMutation.mutate()
 
   <div className="flex items-center gap-4">
 
-    {user.profileImage ? (
+    {user.profileImage.url ? (
       <img
-        src={user.profileImage}
+        src={user.profileImage.url}
         className="h-16 w-16 rounded-full border-2 border-white object-cover"
       />
     ) : (
@@ -389,9 +389,9 @@ logoutMutation.mutate()
 
       <div className="flex items-center gap-4">
 
-        {user.profileImage ? (
+        {user.profileImage.url ? (
           <img
-            src={user.profileImage}
+            src={user.profileImage.url}
             className="h-16 w-16 rounded-full border-2 border-white object-cover"
           />
         ) : (

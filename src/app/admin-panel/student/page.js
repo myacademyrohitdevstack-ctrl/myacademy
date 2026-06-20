@@ -13,6 +13,7 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
+import { useAdminStudent } from "@/Hooks/useAdminStudents";
 
 const students = [
   {
@@ -54,10 +55,12 @@ const students = [
 ];
 
 export default function Students() {
+  const [page,setPage]=useState(0)
+  const {data:users,isLoading}=useAdminStudent(page)
   const [search, setSearch] = useState("");
-
+if(isLoading) return
   return (
-    <div className="space-y-8 mx-auto max-w-7xl py-20">
+    <div className="space-y-8 mx-auto max-w-7xl py-24">
 
       {/* Hero */}
 
@@ -205,7 +208,7 @@ export default function Students() {
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Showing {students.length} students
+              Showing {users?.length} students
             </p>
 
           </div>
@@ -256,15 +259,15 @@ export default function Students() {
 
             <tbody>
 
-              {students
+              {users
                 .filter((student) =>
-                  student.name
+                  student.fullName
                     .toLowerCase()
                     .includes(search.toLowerCase())
                 )
                 .map((student) => (
                   <motion.tr
-                    key={student.id}
+                    key={student._id}
                     whileHover={{ backgroundColor: "#fff7f4" }}
                     className="border-b border-slate-100 last:border-none"
                   >
@@ -277,18 +280,18 @@ export default function Students() {
 
                         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6451B]/10 text-lg font-bold text-[#D6451B]">
 
-                          {student.name.charAt(0)}
+                          {student.fullName.charAt(0)}
 
                         </div>
 
                         <div>
 
                           <h3 className="font-semibold text-slate-900">
-                            {student.name}
+                            {student.fullName}
                           </h3>
 
                           <p className="text-sm text-slate-500">
-                            ID #{student.id.toString().padStart(4, "0")}
+                            ID #{student._id.toString().padStart(4, "0")}
                           </p>
 
                         </div>
@@ -314,7 +317,7 @@ export default function Students() {
                     {/* Course */}
 
                     <td className="px-6 py-5">
-                      {student.course}
+                      {/* {student.course} */}
                     </td>
 
                     {/* Batch */}
@@ -323,7 +326,7 @@ export default function Students() {
 
                       <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-[#D6451B]">
 
-                        {student.batch}
+                        {/* {student.batch} */}
 
                       </span>
 
@@ -377,6 +380,129 @@ export default function Students() {
                 ))}
 
             </tbody>
+            {/* <tbody>
+
+              {students
+                .filter((student) =>
+                  student.name
+                    .toLowerCase()
+                    .includes(search.toLowerCase())
+                )
+                .map((student) => (
+                  <motion.tr
+                    key={student.id}
+                    whileHover={{ backgroundColor: "#fff7f4" }}
+                    className="border-b border-slate-100 last:border-none"
+                  >
+
+               
+
+                    <td className="px-6 py-5">
+
+                      <div className="flex items-center gap-4">
+
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6451B]/10 text-lg font-bold text-[#D6451B]">
+
+                          {student.name.charAt(0)}
+
+                        </div>
+
+                        <div>
+
+                          <h3 className="font-semibold text-slate-900">
+                            {student.name}
+                          </h3>
+
+                          <p className="text-sm text-slate-500">
+                            ID #{student.id.toString().padStart(4, "0")}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                    </td>
+
+               
+
+                    <td className="px-6 py-5">
+
+                      <p className="font-medium">
+                        {student.email}
+                      </p>
+
+                      <p className="mt-1 text-sm text-slate-500">
+                        {student.phone}
+                      </p>
+
+                    </td>
+
+                 
+
+                    <td className="px-6 py-5">
+                      {student.course}
+                    </td>
+
+                  
+
+                    <td className="px-6 py-5">
+
+                      <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-[#D6451B]">
+
+                        {student.batch}
+
+                      </span>
+
+                    </td>
+
+                  
+
+                    <td className="px-6 py-5">
+
+                      <span
+                        className={`rounded-full px-4 py-2 text-sm font-medium ${
+                          student.status === "Active"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {student.status}
+                      </span>
+
+                    </td>
+
+              
+
+                    <td className="px-6 py-5">
+
+                      <div className="flex justify-end gap-3">
+
+                        <button className="rounded-xl bg-blue-50 p-3 text-blue-600 transition hover:scale-105">
+
+                          <FaEye />
+
+                        </button>
+
+                        <button className="rounded-xl bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
+
+                          <FaEdit />
+
+                        </button>
+
+                        <button className="rounded-xl bg-red-50 p-3 text-red-600 transition hover:scale-105">
+
+                          <FaTrash />
+
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </motion.tr>
+                ))}
+
+            </tbody> */}
 
           </table>
 
@@ -475,7 +601,7 @@ export default function Students() {
 
         <p className="text-sm text-slate-500">
           Showing <span className="font-semibold">1-10</span> of{" "}
-          <span className="font-semibold">{students.length}</span> students
+          <span className="font-semibold">{users?.length}</span> students
         </p>
 
         {/* Pagination */}

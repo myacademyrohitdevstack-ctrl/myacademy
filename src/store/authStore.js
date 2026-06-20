@@ -4,29 +4,46 @@ const useAuthStore = create((set) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
-  profile:null,
+  isInitialized: false,
+  profile: null,
 
   login: ({ user, accessToken }) =>
     set({
       user,
       accessToken,
       isAuthenticated: true,
-       profile:null,
+      isInitialized: true,
+      profile: null,
     }),
-   
+
   setAccessToken: (accessToken) =>
-    set({ accessToken }),
-  setProfile: (profile) =>
-    set({ profile }),
+    set({
+      accessToken,
+      isAuthenticated: !!accessToken,
+    }),
+
   setUser: (user) =>
-    set({ user }),
- 
+    set({
+      user,
+    }),
+
+  setProfile: (profile) =>
+    set({
+      profile,
+    }),
+
+  setInitialized: () =>
+    set({
+      isInitialized: true,
+    }),
+
   logout: () =>
     set({
       user: null,
       accessToken: null,
       isAuthenticated: false,
-      profile:null,
+      isInitialized: true,
+      profile: null,
     }),
 }));
 

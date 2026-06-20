@@ -1,16 +1,15 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useAuthStore from "@/store/authStore";
 import StudentLoading from "../student-profile/components/StudentLoading";
 
-
 export default function AuthProvider({ children }) {
-  const setAccessToken = useAuthStore(
-    (state) => state.setAccessToken
-  );
-  const setUser = useAuthStore(
-    (state) => state.setUser
+  const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
+  const setInitialized = useAuthStore(
+    (state) => state.setInitialized
   );
 
   const [loading, setLoading] = useState(true);
@@ -23,11 +22,15 @@ export default function AuthProvider({ children }) {
           {},
           { withCredentials: true }
         );
-        setAccessToken(res.data.accessToken);
-        setUser(res.data.user);
-      } catch (error) {
-        console.log("Not logged in");
+
+        login({
+          user: res.data.user,
+          accessToken: res.data.accessToken,
+        });
+      } catch (err) {
+        logout();
       } finally {
+        setInitialized();
         setLoading(false);
       }
     };
@@ -35,7 +38,9 @@ export default function AuthProvider({ children }) {
     refresh();
   }, []);
 
-  if (loading) return <StudentLoading></StudentLoading>;
+  if (loading) {
+    return <StudentLoading />;
+  }
 
   return children;
 }

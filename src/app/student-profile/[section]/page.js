@@ -1,9 +1,11 @@
 import React from 'react'
 import StudentPortala from './StudentClient'
+import ProtectedRoute from '@/lib/ProtectedRoutes'
 
 export default async function page({params}) {
   const {section}=await params
   return (
-   <StudentPortala section={section}></StudentPortala>
+    <ProtectedRoute><StudentPortala section={section}></StudentPortala></ProtectedRoute>
+   
   )
 }
