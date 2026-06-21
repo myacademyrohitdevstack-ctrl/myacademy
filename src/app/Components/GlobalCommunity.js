@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import Link from "next/link";
+import { useRef } from "react";
 import { FaGlobe, FaUsers, FaComments, FaVideo } from "react-icons/fa";
 
 const communityStats = [
@@ -31,6 +33,8 @@ const communityStats = [
 ];
 
 export default function GlobalCommunity() {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true });
   return (
     <section className="relative overflow-hidden bg-white py-28 text-slate-900">
       {/* Brand Background */}
@@ -114,7 +118,8 @@ export default function GlobalCommunity() {
             </p>
 
             <button className="mt-4 flex items-center gap-2 border-b border-[#D6451B]/30 pb-1 font-medium text-[#D6451B]">
-              Join Community <span>→</span>
+            <Link href='/signup'>   Join Community <span>→</span></Link>
+           
             </button>
           </div>
 

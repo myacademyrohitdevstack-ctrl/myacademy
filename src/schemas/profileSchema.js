@@ -19,6 +19,7 @@ export const profileSchema = z.object({
   dateOfBirth: z.string().optional(),
 
   gender: z.enum(["male", "female", "other"]).optional(),
+  role: z.enum(["student", "teacher"]).optional(),
 
   languageLevel: z.enum([
     "Beginner",
@@ -26,7 +27,7 @@ export const profileSchema = z.object({
     "Intermediate",
     "Upper Intermediate",
     "Advanced",
-  ]),
+  ]).optional(),
 
   address: z.object({
     street: z.string().optional(),
@@ -34,7 +35,7 @@ export const profileSchema = z.object({
     state: z.string().optional(),
     country: z.string().optional(),
     postalCode: z.string().optional(),
-  }),
+  }).optional(),
 
   guardian: z.object({
     fatherName: z.string().optional(),
@@ -43,11 +44,11 @@ export const profileSchema = z.object({
     relationship: z.string().optional(),
     phone: z.string().optional(),
     email: z.string().email().optional().or(z.literal("")),
-  }),
+  }).optional(),
 
   emergencyContact: z.object({
     name: z.string().optional(),
     phone: z.string().optional(),
     relation: z.string().optional(),
-  }),
+  }).optional(),
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { FaArrowRight, FaCheckCircle } from "react-icons/fa";
 
 export default function CTA() {
@@ -54,12 +55,13 @@ export default function CTA() {
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
 
               <button className="group flex items-center justify-center gap-2 rounded-full bg-[#0F172A] px-8 py-3 text-white transition hover:-translate-y-1">
-                Start Learning Now
-                <FaArrowRight className="transition group-hover:translate-x-1" />
+                <Link href='/login'> Start Learning Now</Link>
+               
               </button>
 
               <button className="rounded-full border border-amber-200 px-8 py-3 text-slate-700 hover:bg-amber-50 transition">
-                Watch Demo Class
+                <Link href='/courses'>    Watch Demo Class</Link>
+            
               </button>
 
             </div>

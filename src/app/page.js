@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Hero from "./Components/Hero";
-import LanguagePathways from "./Components/LanguagePathways";
+
 import GlobalCommunity from "./Components/GlobalCommunity";
 import WhyChooseUs from "./Components/WhyChooseUs";
 import Programs from "./Components/Programs";
@@ -14,7 +14,6 @@ export default function Home() {
   return (
 <>
 <Hero></Hero>
-<LanguagePathways></LanguagePathways>
 <WhyChooseUs></WhyChooseUs>
 <GlobalCommunity></GlobalCommunity>
 <Programs></Programs>

@@ -12,7 +12,7 @@ const  useMe=()=>{
     queryFn:async()=>{
     const {data} =await getLoggedUserApi()
       setProfile(data.student)
-      console.log(data.student)
+    
       return data.student
     },
       retry: false,

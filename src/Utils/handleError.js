@@ -7,7 +7,7 @@ import { toast } from "sonner";
   }
   const status = error.response?.status;
    if(status>=500){
-    setIsServerDown(true) 
+    // setIsServerDown(true) 
    }
    else if(status === 401){
    toast.error(error.response?.data?.message ||"Session expired. Please Login again")

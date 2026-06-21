@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   FaSearch,
@@ -14,53 +14,31 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { useAdminStudent } from "@/Hooks/useAdminStudents";
-
-const students = [
-  {
-    id: 1,
-    name: "Anjali Sharma",
-    email: "anjali@gmail.com",
-    phone: "+91 9876543210",
-    course: "General English",
-    batch: "Morning",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Rahul Verma",
-    email: "rahul@gmail.com",
-    phone: "+91 9876543211",
-    course: "IELTS",
-    batch: "Evening",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    name: "Priya Singh",
-    email: "priya@gmail.com",
-    phone: "+91 9876543212",
-    course: "Business English",
-    batch: "Weekend",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Amit Kumar",
-    email: "amit@gmail.com",
-    phone: "+91 9876543213",
-    course: "Spoken English",
-    batch: "Morning",
-    status: "Active",
-  },
-];
+import useDebounce from "@/Hooks/useDebounce";
+import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
+import { useRouter } from "next/navigation";
 
 export default function Students() {
-  const [page,setPage]=useState(0)
-  const {data:users,isLoading}=useAdminStudent(page)
+  const router=useRouter()
+  const [page,setPage]=useState(1)
   const [search, setSearch] = useState("");
-if(isLoading) return
+const [filters, setFilters] = useState({
+  search: "",
+  status: "",
+  approvalStatus: "",
+  role:""
+});
+  const debouncedSearch = useDebounce(search, 500);
+  const {data,isLoading}=useAdminStudent(page,filters.search,filters.status,filters.approvalStatus,filters.role)
+  const users=data?.users || []
+  const pagination=data?.pagination || {}
+useEffect(() => {
+  setFilters(prev=>({...prev,search:debouncedSearch}))
+}, [debouncedSearch]);
+
+  if(isLoading) return
   return (
-    <div className="space-y-8 mx-auto max-w-7xl py-24">
+    <div className="space-y-8 mx-auto max-w-7xl py-24 px-4 md:px-0">
 
       {/* Hero */}
 
@@ -177,15 +155,51 @@ if(isLoading) return
 
           </select>
 
-          <select className="rounded-2xl border border-slate-200 p-3 outline-none">
-
-            <option>All Status</option>
-
-            <option>Active</option>
-
-            <option>Pending</option>
+          <select className="rounded-2xl border border-slate-200 p-3 outline-none"
+ value={filters.status}
+  onChange={(e) =>
+    setFilters((prev) => ({
+      ...prev,
+      status: e.target.value,
+    }))
+  }
+>
+  <option value="all">All Status</option>
+  <option value="active">Active</option>
+  <option value="blocked">Blocked</option>
+  <option value="pending">Pending</option>
 
           </select>
+          <select
+          className="rounded-2xl border border-slate-200 p-3 outline-none"
+  value={filters.approvalStatus}
+  onChange={(e) =>
+    setFilters((prev) => ({
+      ...prev,
+      approvalStatus: e.target.value,
+    }))
+  }
+>
+  <option value="all">All Approval Status</option>
+  <option value="pending">Pending</option>
+  <option value="approved">Approved</option>
+  <option value="rejected">Rejected</option>
+</select>
+          <select
+          className="rounded-2xl border border-slate-200 p-3 outline-none"
+  value={filters.role}
+  onChange={(e) =>
+    setFilters((prev) => ({
+      ...prev,
+      role: e.target.value,
+    }))
+  }
+>
+  <option value="all">All</option>
+  <option value="teacher">Teacher</option>
+  <option value="student">Student</option>
+=
+</select>
 
         </div>
 
@@ -244,10 +258,14 @@ if(isLoading) return
                 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
                   Batch
                 </th>
+<th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
+  Approval
+</th>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-                  Status
-                </th>
+<th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
+  Status
+</th>
+              
 
                 <th className="px-6 py-4 text-right text-sm font-semibold text-slate-600">
                   Actions
@@ -260,11 +278,6 @@ if(isLoading) return
             <tbody>
 
               {users
-                .filter((student) =>
-                  student.fullName
-                    .toLowerCase()
-                    .includes(search.toLowerCase())
-                )
                 .map((student) => (
                   <motion.tr
                     key={student._id}
@@ -287,7 +300,7 @@ if(isLoading) return
                         <div>
 
                           <h3 className="font-semibold text-slate-900">
-                            {student.fullName}
+                            {student.fullName}{` (${capitalizeFirstLetter(student.role)})`}
                           </h3>
 
                           <p className="text-sm text-slate-500">
@@ -306,11 +319,13 @@ if(isLoading) return
 
                       <p className="font-medium">
                         {student.email}
+                      
                       </p>
 
                       <p className="mt-1 text-sm text-slate-500">
                         {student.phone}
                       </p>
+                   
 
                     </td>
 
@@ -331,16 +346,30 @@ if(isLoading) return
                       </span>
 
                     </td>
-
+<td className="px-6 py-5">
+  <span
+    className={`rounded-full px-4 py-2 text-sm font-medium ${
+      student.approvalStatus === "approved"
+        ? "bg-green-100 text-green-700"
+        : student.approvalStatus === "pending"
+        ? "bg-yellow-100 text-yellow-700"
+        : "bg-red-100 text-red-700"
+    }`}
+  >
+    {student.approvalStatus}
+  </span>
+</td>
                     {/* Status */}
 
                     <td className="px-6 py-5">
 
                       <span
                         className={`rounded-full px-4 py-2 text-sm font-medium ${
-                          student.status === "Active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
+                          student.status === "active"
+                            ? "bg-green-100 text-green-700":
+                            student.status === "pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            :"bg-red-100 text-red-700"
                         }`}
                       >
                         {student.status}
@@ -354,13 +383,8 @@ if(isLoading) return
 
                       <div className="flex justify-end gap-3">
 
-                        <button className="rounded-xl bg-blue-50 p-3 text-blue-600 transition hover:scale-105">
 
-                          <FaEye />
-
-                        </button>
-
-                        <button className="rounded-xl bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
+                        <button onClick={()=>{router.push(`/admin-panel/user/${student._id}`)}} className="rounded-xl bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
 
                           <FaEdit />
 
@@ -380,129 +404,7 @@ if(isLoading) return
                 ))}
 
             </tbody>
-            {/* <tbody>
-
-              {students
-                .filter((student) =>
-                  student.name
-                    .toLowerCase()
-                    .includes(search.toLowerCase())
-                )
-                .map((student) => (
-                  <motion.tr
-                    key={student.id}
-                    whileHover={{ backgroundColor: "#fff7f4" }}
-                    className="border-b border-slate-100 last:border-none"
-                  >
-
-               
-
-                    <td className="px-6 py-5">
-
-                      <div className="flex items-center gap-4">
-
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6451B]/10 text-lg font-bold text-[#D6451B]">
-
-                          {student.name.charAt(0)}
-
-                        </div>
-
-                        <div>
-
-                          <h3 className="font-semibold text-slate-900">
-                            {student.name}
-                          </h3>
-
-                          <p className="text-sm text-slate-500">
-                            ID #{student.id.toString().padStart(4, "0")}
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                    </td>
-
-               
-
-                    <td className="px-6 py-5">
-
-                      <p className="font-medium">
-                        {student.email}
-                      </p>
-
-                      <p className="mt-1 text-sm text-slate-500">
-                        {student.phone}
-                      </p>
-
-                    </td>
-
-                 
-
-                    <td className="px-6 py-5">
-                      {student.course}
-                    </td>
-
-                  
-
-                    <td className="px-6 py-5">
-
-                      <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-[#D6451B]">
-
-                        {student.batch}
-
-                      </span>
-
-                    </td>
-
-                  
-
-                    <td className="px-6 py-5">
-
-                      <span
-                        className={`rounded-full px-4 py-2 text-sm font-medium ${
-                          student.status === "Active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {student.status}
-                      </span>
-
-                    </td>
-
-              
-
-                    <td className="px-6 py-5">
-
-                      <div className="flex justify-end gap-3">
-
-                        <button className="rounded-xl bg-blue-50 p-3 text-blue-600 transition hover:scale-105">
-
-                          <FaEye />
-
-                        </button>
-
-                        <button className="rounded-xl bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
-
-                          <FaEdit />
-
-                        </button>
-
-                        <button className="rounded-xl bg-red-50 p-3 text-red-600 transition hover:scale-105">
-
-                          <FaTrash />
-
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </motion.tr>
-                ))}
-
-            </tbody> */}
+         
 
           </table>
 
@@ -512,16 +414,11 @@ if(isLoading) return
 
         <div className="space-y-5 p-5 lg:hidden">
 
-          {students
-            .filter((student) =>
-              student.name
-                .toLowerCase()
-                .includes(search.toLowerCase())
-            )
+          {users
             .map((student) => (
 
               <div
-                key={student.id}
+                key={student._id}
                 className="rounded-3xl border border-slate-200 p-5"
               >
 
@@ -529,52 +426,70 @@ if(isLoading) return
 
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6451B]/10 font-bold text-[#D6451B]">
 
-                    {student.name.charAt(0)}
+                    {student?.fullName.charAt(0)}
 
                   </div>
 
                   <div>
 
                     <h3 className="font-semibold">
-                      {student.name}
+                      {student?.fullName}
                     </h3>
 
-                    <p className="text-sm text-slate-500">
-                      {student.course}
-                    </p>
+                    {/* <p className="text-sm text-slate-500">
+                      {student?.course}
+                    </p> */}
 
                   </div>
 
                 </div>
 
-                <div className="mt-5 space-y-2 text-sm">
+             <div className="mt-5 space-y-2 text-sm">
+  <p>
+    <span className="font-semibold">Email:</span>{" "}
+    {student?.email}
+  </p>
 
-                  <p>
-                    <span className="font-semibold">Email:</span>{" "}
-                    {student.email}
-                  </p>
+  <p>
+    <span className="font-semibold">Phone:</span>{" "}
+    {student?.phone}
+  </p>
 
-                  <p>
-                    <span className="font-semibold">Phone:</span>{" "}
-                    {student.phone}
-                  </p>
+  {/* <p>
+    <span className="font-semibold">Batch:</span>{" "}
+    {student?.batch}
+  </p> */}
 
-                  <p>
-                    <span className="font-semibold">Batch:</span>{" "}
-                    {student.batch}
-                  </p>
+  <div className="flex flex-wrap gap-2 pt-2">
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-medium ${
+        student.approvalStatus === "approved"
+          ? "bg-green-100 text-green-700"
+          : student.approvalStatus === "pending"
+          ? "bg-yellow-100 text-yellow-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {student.approvalStatus}
+    </span>
 
-                </div>
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-medium ${
+        student.status === "active"
+          ? "bg-blue-100 text-blue-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {student.status}
+    </span>
+  </div>
+</div>
 
                 <div className="mt-5 flex gap-3">
 
-                  <button className="flex-1 rounded-xl bg-blue-50 py-3 text-blue-600">
+                
 
-                    <FaEye className="mx-auto" />
-
-                  </button>
-
-                  <button className="flex-1 rounded-xl bg-orange-50 py-3 text-[#D6451B]">
+                  <button onClick={()=>{router.push(`/admin-panel/user/${student._id}`)}} className="flex-1 rounded-xl bg-orange-50 py-3 text-[#D6451B]">
 
                     <FaEdit className="mx-auto" />
 
@@ -597,44 +512,73 @@ if(isLoading) return
       </motion.div>
             {/* Footer */}
 
-      <div className="flex flex-col items-center justify-between gap-5 rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg md:flex-row">
+    {users.length !== 0 &&  <div className="flex flex-col items-center justify-between gap-5 rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg md:flex-row">
 
-        <p className="text-sm text-slate-500">
-          Showing <span className="font-semibold">1-10</span> of{" "}
-          <span className="font-semibold">{users?.length}</span> students
-        </p>
+     <p className="text-sm text-slate-500">
+  Showing{" "}
+  <span className="font-semibold">
+    {(pagination.page - 1) * pagination.limit + 1}
+  </span>
+  -
+  <span className="font-semibold">
+    {Math.min(
+      pagination.page * pagination.limit,
+      pagination.total
+    )}
+  </span>{" "}
+  of{" "}
+  <span className="font-semibold">
+    {pagination.total}
+  </span>{" "}
+  students
+</p>
 
         {/* Pagination */}
 
         <div className="flex items-center gap-2">
 
-          <button className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
-            Previous
-          </button>
+        <button
+  disabled={!pagination.hasPreviousPage}
+  onClick={() => setPage((prev) => prev - 1)}
+  className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
+>
+  Previous
+</button>
 
-          <button className="h-10 w-10 rounded-xl bg-[#D6451B] text-white">
-            1
-          </button>
+         {Array.from(
+  { length: pagination.totalPages },
+  (_, i) => i + 1
+).map((pageNumber) => (
+  <button
+    key={pageNumber}
+    onClick={() => setPage(pageNumber)}
+    className={`h-10 w-10 rounded-xl ${
+      page === pageNumber
+        ? "bg-[#D6451B] text-white"
+        : "border border-slate-200 hover:bg-slate-50"
+    }`}
+  >
+    {pageNumber}
+  </button>
+))}
 
-          <button className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50">
-            2
-          </button>
+      <button
+  disabled={!pagination.hasNextPage}
+  onClick={() => setPage((prev) => prev + 1)}
+  className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
+>
+  Next
+</button>
 
-          <button className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50">
-            3
-          </button>
-
-          <button className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
-            Next
-          </button>
+          
 
         </div>
 
-      </div>
+      </div>}
 
       {/* Empty State */}
 
-      {students.length === 0 && (
+      {users.length === 0 && (
 
         <motion.div
           initial={{ opacity: 0 }}

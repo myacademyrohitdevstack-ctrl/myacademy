@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   FaChalkboardTeacher,
   FaGlobe,
@@ -127,7 +128,8 @@ export default function WhyChooseUs() {
           </p>
 
           <button className="mt-6 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
-            Get Started
+            <Link href='/courses'>  Get Started</Link>
+          
           </button>
         </div>
       </div>

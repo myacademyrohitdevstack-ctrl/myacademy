@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   FaComments,
   FaVideo,
@@ -164,7 +165,8 @@ export default function LearningExperience() {
           </p>
 
           <button className="mt-6 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
-            Start Learning
+           <Link href='/login'>Start Learning</Link>
+            
           </button>
         </div>
       </div>

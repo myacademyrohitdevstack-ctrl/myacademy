@@ -8,8 +8,17 @@ import {
   FaPhone,
   FaEnvelope,
   FaMapMarkerAlt,
+  FaHome,
+  FaBookOpen,
+  FaInfoCircle,
+  FaPhoneAlt
 } from "react-icons/fa";
-
+const links = [
+  { name: "Home", path: "/", icon: FaHome },
+  { name: "Courses", path: "/courses", icon: FaBookOpen },
+  { name: "About", path: "/about", icon: FaInfoCircle },
+  { name: "Contact", path: "/contact", icon: FaPhoneAlt },
+];
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden bg-white border-t border-slate-100">
@@ -72,10 +81,20 @@ export default function Footer() {
             </h4>
 
             <div className="mt-5 flex flex-col gap-3 text-sm text-slate-600">
-              <Link href="/">Home</Link>
-              <Link href="/about">About</Link>
-              <Link href="/courses">Courses</Link>
-              <Link href="/contact">Contact</Link>
+             {links.map((item) => {
+  const Icon = item.icon;
+
+  return (
+    <Link
+      key={item.name}
+      href={item.path}
+      className="flex items-center gap-4 rounded-2xl px-4 py-1 "
+    >
+      <Icon className="text-[#D6451B]" />
+      {item.name}
+    </Link>
+  );
+})}
             </div>
           </div>
 

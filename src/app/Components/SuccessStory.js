@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import CountUp from "react-countup";
+import Link from "next/link";
 const stories = [
   {
     name: "Anjali Sharma",
@@ -24,6 +26,8 @@ const stories = [
 ];
 
 export default function SuccessStories() {
+    const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
 const [activeVideo, setActiveVideo] = useState(null);
   return (
@@ -52,19 +56,26 @@ const [activeVideo, setActiveVideo] = useState(null);
             who learned to speak confidently in real life.
           </p>
         </div>
-<div className="mb-20 grid grid-cols-3 gap-6">
-  <div className="rounded-2xl border border-slate-200 p-5 text-center">
-    <div className="text-2xl font-bold">12K+</div>
+<div className="mb-20 grid grid-cols-3 gap-6" >
+  <div className="rounded-2xl border border-slate-200 p-5 text-center" ref={ref}>
+    <div className="text-2xl font-bold">
+    {isInView && <CountUp end={12} duration={2} delay={1}></CountUp>}
+      K+
+      </div>
     <div className="text-sm text-slate-500">Students</div>
   </div>
 
   <div className="rounded-2xl border border-slate-200 p-5 text-center">
-    <div className="text-2xl font-bold">98%</div>
+    <div className="text-2xl font-bold">
+       {isInView && <CountUp end={98} duration={2} delay={1} ></CountUp>}
+      %</div>
     <div className="text-sm text-slate-500">Success Rate</div>
   </div>
 
   <div className="rounded-2xl border border-slate-200 p-5 text-center">
-    <div className="text-2xl font-bold">25+</div>
+    <div className="text-2xl font-bold">
+       {isInView && <CountUp end={25} duration={2} delay={1} ></CountUp>}
+      +</div>
     <div className="text-sm text-slate-500">Countries</div>
   </div>
 </div>
@@ -136,7 +147,8 @@ const [activeVideo, setActiveVideo] = useState(null);
           </p>
 
           <button className="mt-6 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
-            Start Your Journey
+            <Link href='/courses'>  Start Your Journey</Link>
+          
           </button>
         </div>
       </div>

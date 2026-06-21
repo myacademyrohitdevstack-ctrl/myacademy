@@ -1,7 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import CountUp from "react-countup";
 import { FaArrowRight } from "react-icons/fa";
 
 const words = [
@@ -25,7 +27,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen overflow-hidden bg-black pt-10 "
+      className="relative min-h-screen overflow-hidden bg-black pt-20 "
     >
       {/* Mobile Background */}
       <div className="absolute inset-0 lg:hidden">
@@ -124,7 +126,8 @@ function HeroContent({ index, desktop = false }) {
 
       <div className="mt-10 flex flex-wrap gap-4">
         <button className="rounded-full bg-[#D6451B] px-7 py-3 font-medium text-white transition hover:opacity-90">
-          Explore Programs
+          <Link href='/courses'>Explore Programs</Link>
+          
         </button>
 
         <button
@@ -132,7 +135,7 @@ function HeroContent({ index, desktop = false }) {
             desktop ? "text-slate-700" : "text-white"
           }`}
         >
-          Learn More
+          <Link href='/about'>Learn More</Link>
           <FaArrowRight size={12} />
         </button>
       </div>
@@ -144,21 +147,22 @@ function HeroContent({ index, desktop = false }) {
       >
         <div>
           <div className="text-2xl font-bold text-[#D6451B]">
-            5000+
+            <CountUp end={5000} duration={2}></CountUp>+
+          
           </div>
           <div className="text-sm">Learners</div>
         </div>
 
         <div>
           <div className="text-2xl font-bold text-[#D6451B]">
-            50+
+             <CountUp end={50} duration={2}></CountUp>+
           </div>
           <div className="text-sm">Educators</div>
         </div>
 
         <div>
           <div className="text-2xl font-bold text-[#D6451B]">
-            98%
+             <CountUp end={98} duration={2}></CountUp>%
           </div>
           <div className="text-sm">Success Rate</div>
         </div>

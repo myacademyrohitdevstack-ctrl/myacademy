@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { useState } from "react";
 import {
   FaChalkboardTeacher,
@@ -172,7 +173,8 @@ export default function Faculty() {
           </p>
 
           <button className="mt-6 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
-            Book a Session
+           <Link href='/contact'>  Book a Session</Link>
+          
           </button>
         </div>
       </div>

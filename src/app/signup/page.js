@@ -299,23 +299,7 @@ disabled={emailVerified}
                 />
               </div>
 
-              {role === "teacher" && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="space-y-4"
-                >
-                  <input
-                    placeholder="Specialization"
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 outline-none focus:border-[#D6451B]"
-                  />
-
-                  <input
-                    placeholder="Years of Experience"
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 outline-none focus:border-[#D6451B]"
-                  />
-                </motion.div>
-              )}
+         
 
             </div>
 
