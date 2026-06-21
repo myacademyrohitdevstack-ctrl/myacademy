@@ -19,43 +19,42 @@ api.interceptors.request.use((config) => {
   return config;
 });
 // RESPONSE interceptor
-// api.interceptors.response.use(
-//   (response) => response,
+api.interceptors.response.use(
+  (response) => response,
 
-//   async (error) => {
-//     const originalRequest = error.config;
+  async (error) => {
+    const originalRequest = error.config;
 
   
-//     if (
-//       error.response?.status === 401 &&
-//       !originalRequest._retry &&
-//       originalRequest.url !== "/auth/refresh"
-//     ) {
-//       originalRequest._retry = true;
+    if (
+      error.response?.status === 403 &&
+      error.response?.data.code==="TOKEN-EXPIRE"&&
+      !originalRequest._retry &&
+      originalRequest.url !== "/auth/refresh-token"
+    ) {
+      originalRequest._retry = true;
+      const login=useAuthStore.getState().login
+      const logout=useAuthStore.getState().logout
+      try {
+        const res = await api.post("/auth/refresh-token");
 
-//       try {
-//         const res = await api.post("/auth/refresh");
+      login({
+          user: res.data.user,
+          accessToken: res.data.accessToken,
+        });
 
-//         const newToken = res.data.accessToken;
-//         localStorage.setItem("accessToken", newToken);
+        originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
 
-//         originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (err) {
+        logout();
+        return Promise.reject(err);
+      }
+    }
 
-//         return api(originalRequest);
-//       } catch (err) {
-//         handleLogout();
-//         return Promise.reject(err);
-//       }
-//     }
-
-   
-//     if (error.response?.data?.code === "RefreshToken-Error") {
-//       handleLogout();
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
+    return Promise.reject(error);
+  }
+);
 
 
 
