@@ -1,14 +1,18 @@
 "use client";
 
+import { useStudentsAllAnnouncements } from "@/Hooks/useStudentAllAnnoucements";
+import { useStudentsAllClasses } from "@/Hooks/useStudentAllClasses";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
+import { formatISTDateTime } from "@/Utils/formatDate";
 import { motion } from "framer-motion";
 import {
   FaBookOpen,
   FaChartLine,
   FaCertificate,
-  FaCalendarAlt,
   FaFire,
   FaArrowRight,
+  FaBullhorn,
+  FaVideo,
 } from "react-icons/fa";
 
 const stats = [
@@ -49,15 +53,14 @@ const upcomingClasses = [
   },
 ];
 
-const announcements = [
-  "🎉 Speaking Competition this Saturday",
-  "📚 New Grammar Module Released",
-  "🏖 Holiday on Monday",
-];
+
 
 export default function Dashboard({user}) {
+  const {data:announcements}=useStudentsAllAnnouncements()
+  const {data:classes}=useStudentsAllClasses()
   return (
-    <div className="space-y-8">
+    <div className="py-10">
+    <div className="space-y-8 max-w-6xl mx-auto px-2 ">
 
       {/* Hero */}
       <motion.div
@@ -192,10 +195,10 @@ export default function Dashboard({user}) {
           <h2 className="text-2xl font-bold">
             Upcoming Classes
           </h2>
-
+{classes?.length> 0?
           <div className="mt-6 space-y-4">
 
-            {upcomingClasses.map((item) => (
+            {classes?.map((item) => (
               <div
                 key={item.title}
                 className="flex items-center justify-between rounded-2xl border border-slate-200 p-4 hover:border-[#D6451B]"
@@ -206,17 +209,27 @@ export default function Dashboard({user}) {
                   </h3>
 
                   <p className="text-sm text-slate-500">
-                    {item.time}
+                    {formatISTDateTime(item.meetingDate)}
                   </p>
                 </div>
 
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B]">
-                  <FaCalendarAlt />
-                </div>
+                <a href={item?.meetingLink} target="_blank" className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl bg-orange-50 text-[#D6451B]">
+                  <FaVideo />
+                </a>
               </div>
             ))}
 
-          </div>
+          </div>:    <div className="flex flex-col items-center justify-center py-10">
+        <FaVideo className="text-4xl text-slate-300" />
+
+        <h3 className="mt-3 font-semibold text-slate-700">
+          No Classes
+        </h3>
+
+        <p className="mt-1 text-sm text-slate-500">
+          You're all caught up for now.
+        </p>
+      </div>}
         </motion.div>
 
       </div>
@@ -254,27 +267,97 @@ export default function Dashboard({user}) {
         </div>
 
         {/* Announcements */}
-        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg">
-          <h2 className="text-2xl font-bold">
-            Latest Announcements
-          </h2>
+     <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg">
+  <div className="flex items-center justify-between">
+    <div>
+      <h2 className="text-2xl font-bold">
+        Latest Announcements
+      </h2>
 
-          <div className="mt-6 space-y-4">
+      <p className="mt-1 text-sm text-slate-500">
+        Important updates from your academy
+      </p>
+    </div>
 
-            {announcements.map((item) => (
-              <div
-                key={item}
-                className="rounded-2xl bg-slate-50 p-4"
-              >
-                {item}
+    <div className="rounded-2xl bg-orange-50 px-4 py-2 text-sm font-medium text-[#D6451B]">
+      {announcements?.length || 0} Updates
+    </div>
+  </div>
+
+  <div className="mt-6 space-y-4">
+    {announcements?.length > 0 ? (
+      announcements.map((item) => (
+        <div
+          key={item._id}
+          className="
+            group rounded-3xl border border-slate-200
+            bg-gradient-to-r from-white to-orange-50/30
+            p-5 transition-all duration-300
+            hover:border-[#D6451B]
+            hover:shadow-md
+          "
+        >
+          <div className="flex gap-4">
+            <div
+              className="
+                flex h-12 w-12 shrink-0
+                items-center justify-center
+                rounded-2xl bg-orange-100
+                text-[#D6451B]
+              "
+            >
+              <FaBullhorn />
+            </div>
+
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {item.pinned && (
+                  <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-700">
+                    📌 Pinned
+                  </span>
+                )}
+
+                <span className="text-xs text-slate-500">
+                  {formatISTDateTime(item.createdAt)}
+                </span>
               </div>
-            ))}
 
+              <h3 className="mt-2 text-lg font-semibold text-slate-900">
+                {item.title}
+              </h3>
+
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                {item.message}
+              </p>
+
+              <div className="mt-3 text-xs text-slate-500">
+                Posted by{" "}
+                <span className="font-medium">
+                  {item.createdBy?.fullName || "Admin"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+      ))
+    ) : (
+      <div className="flex flex-col items-center justify-center py-10">
+        <FaBullhorn className="text-4xl text-slate-300" />
+
+        <h3 className="mt-3 font-semibold text-slate-700">
+          No Announcements
+        </h3>
+
+        <p className="mt-1 text-sm text-slate-500">
+          You're all caught up for now.
+        </p>
+      </div>
+    )}
+  </div>
+</div>
 
       </div>
 
-    </div>
+    </div></div>
   );
 }

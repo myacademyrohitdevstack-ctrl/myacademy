@@ -43,3 +43,11 @@ export  function adminUpdateBatchApi(id,data){
 export  function adminGetBatchByIdApi(id){
     return api.get(`/batches/${id}/byId`)
 }
+
+//announcements
+export  function adminCreateAnnouncementApi(data){
+    return api.post(`/announcements/create`,data)
+}
+export  function adminDeleteAnnouncementApi(id){
+    return api.delete(`/announcements/${id}/delete`)
+}

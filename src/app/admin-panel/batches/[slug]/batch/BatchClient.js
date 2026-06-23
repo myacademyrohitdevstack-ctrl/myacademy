@@ -13,6 +13,7 @@ import {
   FaExternalLinkAlt,
   FaFilePdf,
   FaSpinner,
+  FaBullhorn,
 } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAdminGetAllNotes } from "@/Hooks/useAdminGetNotes";
@@ -25,6 +26,8 @@ import { useDeleteClassLinkMutation } from "@/app/mutations/classLinkMutation";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { useAdminGetAllBatches } from "@/Hooks/useAdminGetBatches";
 import { useAdminGetBatche } from "@/Hooks/useAdminGetBatch";
+import { useAnnouncementByBatchId } from "@/Hooks/useAnnouncementByBatchId";
+import { useDeleteAnnouncementtMutation } from "@/app/mutations/AnnouncementMutation";
 
 export default function BatchDetailsPage() {
     const searchParams=useSearchParams()
@@ -32,12 +35,14 @@ export default function BatchDetailsPage() {
     const {data:notes,isLoading}=useAdminGetAllNotes(batchId)
     const {data:classLinks}=useAdminGetAllLinks(batchId)
   const {data:batch}=useAdminGetBatche(batchId)
+  const {data:announcements}=useAnnouncementByBatchId(batchId)
     const [pdfOpen,setPdfOpen]=useState(false)
     const [pdfUrl,setPdfUrl]=useState("")
     const [activeTab, setActiveTab] = useState("notes");
     const router=useRouter()
     const deleteNoteMutation=usedeleteNotesMutation()
     const deleteClassLinkMutation=useDeleteClassLinkMutation()
+    const deleteAnnoucementMutation=useDeleteAnnouncementtMutation()
  if(!batchId || isLoading) return 
 
 
@@ -110,6 +115,12 @@ export default function BatchDetailsPage() {
           icon={<FaLink />}
           color="bg-orange-50 text-[#D6451B]"
         />
+        <StatCard
+  title="Announcements"
+  value={announcements?.length || 0}
+  icon={<FaBullhorn />}
+  color="bg-purple-50 text-purple-600"
+/>
       </div>
 
       {/* Tabs */}
@@ -142,6 +153,19 @@ export default function BatchDetailsPage() {
         >
           Class Links
         </button>
+        <button
+  onClick={() => setActiveTab("announcements")}
+  className={`
+    rounded-2xl px-6 py-3 font-medium transition
+    ${
+      activeTab === "announcements"
+        ? "bg-[#D6451B] text-white"
+        : "bg-white border border-slate-200"
+    }
+  `}
+>
+  Announcements
+</button>
       </div>
 
       {/* Notes */}
@@ -580,6 +604,190 @@ export default function BatchDetailsPage() {
           </div>
         </div>
       )}
+{activeTab === "announcements" && (
+  <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg">
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="text-3xl font-bold">
+          Announcements
+        </h2>
+
+        <p className="mt-2 text-slate-500">
+          Important updates, notices and reminders for students
+        </p>
+      </div>
+
+      <button
+        onClick={() =>
+          router.push(
+            `/admin-panel/add-announcement?batchId=${batchId}`
+          )
+        }
+        className="
+          flex items-center gap-2
+          rounded-2xl
+          bg-[#D6451B]
+          px-5 py-3
+          text-white
+          transition
+          hover:opacity-90
+        "
+      >
+        <FaPlus />
+        Add Announcement
+      </button>
+    </div>
+
+    {announcements?.length > 0 ? (
+      <div className="mt-8 space-y-4">
+        {announcements?.map((announcement) => (
+          <div
+            key={announcement._id}
+            className="
+              group relative overflow-hidden
+              rounded-3xl border border-slate-200
+              bg-white p-5 shadow-sm
+              transition-all duration-300
+              hover:border-[#D6451B]
+              hover:shadow-lg
+            "
+          >
+            {/* Left Accent */}
+            <div className="absolute left-0 top-0 h-full w-1 bg-[#D6451B]" />
+
+            <div className="flex gap-4">
+              {/* Icon */}
+              <div
+                className="
+                  flex h-14 w-14 shrink-0
+                  items-center justify-center
+                  rounded-2xl bg-orange-100
+                  text-[#D6451B]
+                "
+              >
+                <FaBullhorn className="text-xl" />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                {/* Top Row */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {announcement?.pinned && (
+                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                      📌 Pinned
+                    </span>
+                  )}
+
+                  <span
+                    className={`
+                      rounded-full px-3 py-1 text-xs font-semibold
+                      ${
+                        announcement?.type === "system"
+                          ? "bg-purple-100 text-purple-700"
+                          : announcement?.type === "course"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }
+                    `}
+                  >
+                    {announcement?.type}
+                  </span>
+
+                  <span className="text-xs text-slate-500">
+                    {formatISTDateTime(
+                      announcement?.createdAt
+                    )}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3 className="mt-3 text-xl font-bold text-slate-900">
+                  {announcement?.title}
+                </h3>
+
+                {/* Message */}
+                <p className="mt-3 whitespace-pre-wrap leading-relaxed text-slate-600">
+                  {announcement?.message}
+                </p>
+
+                {/* Footer */}
+                <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                  <div>
+                    <p className="text-xs text-slate-500">
+                      Posted By
+                    </p>
+
+                    <p className="font-medium text-slate-700">
+                      {announcement?.createdBy
+                        ?.fullName || "Admin"}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      className="
+                        flex h-10 w-10 items-center justify-center
+                        rounded-xl bg-orange-50
+                        text-[#D6451B]
+                        transition hover:bg-orange-100
+                      "
+                    >
+                      <FaEdit />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        deleteAnnoucementMutation.mutate(
+                          announcement._id
+                        )
+                      }
+                      disabled={
+                        deleteAnnoucementMutation.isPending
+                      }
+                      className="
+                        flex h-10 w-10 items-center justify-center
+                        rounded-xl bg-red-50
+                        text-red-600
+                        transition hover:bg-red-100
+                      "
+                    >
+                      {deleteAnnoucementMutation.isPending &&
+                      deleteAnnoucementMutation.variables ===
+                        announcement._id ? (
+                        <FaSpinner className="animate-spin" />
+                      ) : (
+                        <FaTrash />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="flex flex-col items-center justify-center py-16">
+        <div
+          className="
+            flex h-20 w-20 items-center justify-center
+            rounded-full bg-orange-100
+          "
+        >
+          <FaBullhorn className="text-3xl text-[#D6451B]" />
+        </div>
+
+        <h3 className="mt-5 text-xl font-semibold text-slate-700">
+          No Announcements Yet
+        </h3>
+
+        <p className="mt-2 text-center text-slate-500">
+          Create your first announcement to notify students.
+        </p>
+      </div>
+    )}
+  </div>
+)}
     </div>
     <Modal
      isOpen={pdfOpen}

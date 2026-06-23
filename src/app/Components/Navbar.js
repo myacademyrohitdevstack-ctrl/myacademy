@@ -37,7 +37,7 @@ const links = [
   { name: "Home", path: "/", icon: FaHome },
   { name: "Courses", path: "/courses", icon: FaBookOpen },
   { name: "About", path: "/about", icon: FaInfoCircle },
-  { name: "Contact", path: "/contact", icon: FaPhoneAlt },
+  // { name: "Contact", path: "/contact", icon: FaPhoneAlt },
 ];
 useEffect(() => {
 
@@ -97,11 +97,7 @@ const profileItems = [
         }
       ]
     : []),
-  {
-    title: "Announcements",
-    icon: FaBullhorn,
-    href: `/${path}/announcements`,
-  },
+ 
   {
     title: "Settings",
     icon: FaCog,

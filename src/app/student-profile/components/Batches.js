@@ -5,38 +5,11 @@ import { formatISTDateTime } from "@/Utils/formatDate";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  FaUsers,
-  FaUserTie,
-  FaClock,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaCheckCircle,
+
+  FaEye,
 } from "react-icons/fa";
 
-const batches = [
-  {
-    id: 1,
-    name: "Morning English Batch",
-    trainer: "John Smith",
-    timing: "9:00 AM - 10:30 AM",
-    days: "Mon • Wed • Fri",
-    room: "Classroom A",
-    students: 18,
-    attendance: "92%",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "IELTS Evening Batch",
-    trainer: "Emma Johnson",
-    timing: "6:00 PM - 7:30 PM",
-    days: "Tue • Thu • Sat",
-    room: "Classroom B",
-    students: 22,
-    attendance: "85%",
-    status: "Upcoming",
-  },
-];
+
 
 export default function Batches() {
   const {data:batches,isLoading}=useGetStudentBatches()
@@ -64,91 +37,168 @@ export default function Batches() {
 
       {/* Cards */}
 
-      <div className="grid gap-6">
-
-        {batches?.map((batch, index) => (
-          <motion.div
-            key={batch._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -5 }}
-            className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-lg"
-          >
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-
-              <div>
-
-                <div className="flex items-center gap-3">
-
-                  <h2 className="text-2xl font-bold">
-                    {batch.name}
-                  </h2>
-
-                  <span
-                    className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                      batch.status === "active"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-orange-100 text-[#D6451B]"
-                    }`}
-                  >
-                    {batch.status}
-                  </span>
-
-                </div>
-
-                <div className="mt-8 grid gap-6 md:grid-cols-3">
-
-                  <Info
-                    icon={<FaUserTie />}
-                    title="Trainer"
-                    value={batch?.trainers?.length}
-                  />
-
-                  <Info
-                    icon={<FaClock />}
-                    title="Timing"
-                    value={batch?.timing || "Not Avilable"}
-                  />
-
-                  <Info
-                    icon={<FaCalendarAlt />}
-                    title="Start Date"
-                    value={formatISTDateTime(batch.startDate).split(",")[0]}
-                  />
-
-                  <Info
-                    icon={<FaCalendarAlt />}
-                    title="End Date"
-                    value={formatISTDateTime(batch.endDate).split(",")[0]}
-                  />
-
-                  <Info
-                    icon={<FaUsers />}
-                    title="Students"
-                    value={batch?.students?.length}
-                  />
-
-                  <Info
-                    icon={<FaCheckCircle />}
-                    title="Attendance"
-                    value={batch?.attendance || "Not Avilable"}
-                  />
-
-                </div>
-
-              </div>
-
-              <button onClick={()=>{router.push(`/student-profile/classes?batchId=${batch._id}`)}} className="rounded-2xl bg-[#D6451B] px-6 py-3 font-medium text-white hover:opacity-90">
-                View Batch
-              </button>
-
-            </div>
-
-          </motion.div>
-        ))}
-
+      <div className="grid gap-7 lg:grid-cols-2 xl:grid-cols-3">
+          
+            {batches
+              ?.map((batch) => (
+    
+              <motion.div
+      key={batch._id}
+      whileHover={{ y: -4 }}
+      className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-xl"
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-xl font-bold text-slate-900">
+            {batch.name}
+          </h2>
+    
+          <p className="mt-1 text-sm text-slate-500">
+            {batch.course?.title}
+          </p>
+        </div>
+    
+        <span
+          className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+            batch.status === "active"
+              ? "bg-green-100 text-green-700"
+              : batch.status === "completed"
+              ? "bg-blue-100 text-blue-700"
+              : batch.status === "cancelled"
+              ? "bg-red-100 text-red-700"
+              : "bg-yellow-100 text-yellow-700"
+          }`}
+        >
+          {batch.status}
+        </span>
       </div>
+    
+      {/* Enrollment */}
+      <div className="mt-3">
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-medium ${
+            batch.enrollmentOpen
+              ? "bg-blue-100 text-blue-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          {batch.enrollmentOpen
+            ? "Enrollment Open"
+            : "Enrollment Closed"}
+        </span>
+      </div>
+    
+      {/* Description */}
+      <p className="mt-4 line-clamp-2 text-sm text-slate-500">
+        {batch.description ||
+          "No description available"}
+      </p>
+    
+      {/* Stats */}
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <div className="rounded-2xl bg-slate-50 p-3">
+          <p className="text-xs text-slate-500">
+            Students
+          </p>
+    
+          <p className="mt-1 font-semibold text-slate-900">
+            {batch.students?.length || 0}/
+            {batch.maxStudents}
+          </p>
+        </div>
+    
+        <div className="rounded-2xl bg-slate-50 p-3">
+          <p className="text-xs text-slate-500">
+            Trainers
+          </p>
+    
+          <p className="mt-1 font-semibold text-slate-900">
+            {batch.trainers?.length || 0}
+          </p>
+        </div>
+      </div>
+    
+      {/* Dates */}
+      <div className="mt-4 flex justify-between rounded-2xl bg-slate-50 p-3">
+        <div>
+          <p className="text-xs text-slate-500">
+            Start Date
+          </p>
+    
+          <p className="mt-1 text-sm font-medium">
+            {formatISTDateTime(batch.startDate).split(",")[0]}
+          </p>
+        </div>
+    
+        <div className="text-right">
+          <p className="text-xs text-slate-500">
+            End Date
+          </p>
+    
+          <p className="mt-1 text-sm font-medium">
+          {formatISTDateTime(batch.endDate).split(",")[0]}
+          </p>
+        </div>
+      </div>
+    
+      {/* Schedule */}
+      <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+        <p className="text-xs text-slate-500">
+          Schedule
+        </p>
+    
+        <p className="mt-1 font-medium text-slate-900">
+          {batch?.schedule?.days?.length
+            ? batch.schedule.days.join(", ")
+            : "Schedule Not Set"}
+        </p>
+    
+        <p className="mt-2 text-sm text-slate-500">
+          {batch?.schedule?.startTime || "--"}
+          {" - "}
+          {batch?.schedule?.endTime || "--"}
+        </p>
+    
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-xs text-slate-500">
+            Platform
+          </span>
+    
+          <span className="rounded-lg bg-white px-2 py-1 text-sm font-medium capitalize">
+            {batch.meetingPlatform}
+          </span>
+        </div>
+      </div>
+    
+      {/* Actions */}
+      <div className="mt-5 border-t border-slate-100 pt-4">
+  <button
+    onClick={() =>
+      router.push(
+        `/student-profile/classes?batchId=${batch._id}`
+      )
+    }
+    className="
+      flex w-full items-center justify-center gap-2
+      rounded-xl
+      bg-blue-50
+      py-3
+      font-medium
+      text-blue-600
+      transition
+      hover:bg-blue-100
+    "
+  >
+    <FaEye />
+    View Batch
+  </button>
+</div>
+    </motion.div>
+    
+              ))}
+    
+          </div>
 
     </div></div>
   );

@@ -15,9 +15,9 @@ export default function page() {
   <>
 <Hero></Hero>
 <CourseCategories></CourseCategories>
-<FeaturedPrograms></FeaturedPrograms>
-<LearningRoadmap></LearningRoadmap>
-<CourseComparison></CourseComparison>
+{/* <FeaturedPrograms></FeaturedPrograms> */}
+{/* <LearningRoadmap></LearningRoadmap> */}
+{/* <CourseComparison></CourseComparison> */}
 <LearningExperience></LearningExperience>
 <StudentSuccess></StudentSuccess>
 <FAQs></FAQs>

@@ -98,7 +98,7 @@ const quickActions=[
   {action:"Create Batch",path:"/admin-panel/add-course"},
   {action:"Add Student",path:""},
   {action:"Add Trainer",path:""},
-  {action:" Announcement",path:"/admin-panel/add-course"},
+  {action:" Announcement",path:"/admin-panel/add-announcement"},
   {action:" ClassLink",path:"/admin-panel/add-classLink"},
   {action:"Add Material",path:"/admin-panel/add-notes"},
 ]

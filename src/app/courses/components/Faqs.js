@@ -1,33 +1,61 @@
 "use client";
 
 import { useState } from "react";
-import { FaPlus, FaMinus, FaHeadset } from "react-icons/fa";
+import {
+  FaPlus,
+  FaMinus,
+  FaHeadset,
+  FaWhatsapp,
+} from "react-icons/fa";
 
 const faqs = [
   {
-    question: "Do I need any prior knowledge to join?",
+    question:
+      "Who can join your courses?",
     answer:
-      "No. Our programs are designed for complete beginners as well as advanced learners. We'll assess your level and place you in the right pathway.",
+      "We offer English Speaking, IELTS, PTE, French Language, and academic classes for students from 6th to 12th grade. Both beginners and advanced learners are welcome.",
   },
   {
-    question: "Are classes live or pre-recorded?",
+    question:
+      "Are the classes live or recorded?",
     answer:
-      "Most learning happens through live interactive sessions with trainers, speaking practice rooms, and guided activities.",
+      "All classes are conducted live by experienced trainers. Students can interact, ask questions, and participate in activities during every session.",
   },
   {
-    question: "Will I receive a certificate?",
+    question:
+      "Do you provide IELTS and PTE preparation?",
     answer:
-      "Yes. Students receive completion certificates after successfully finishing their program and assessments.",
+      "Yes. We provide complete IELTS and PTE preparation including speaking practice, mock tests, writing evaluation, and personalized feedback.",
   },
   {
-    question: "Can I attend classes from anywhere?",
+    question:
+      "Can school students join online tuition classes?",
     answer:
-      "Absolutely. Our academy is fully online, allowing students from different countries to learn together.",
+      "Yes. We offer subject-specific coaching and academic support for students from classes 6th to 12th.",
   },
   {
-    question: "How long does it take to become fluent?",
+    question:
+      "Do I get certificates after completing a course?",
     answer:
-      "It depends on your starting level and consistency. Most learners notice significant improvement within 3–6 months.",
+      "Yes. Students receive completion certificates after successfully finishing their course requirements.",
+  },
+  {
+    question:
+      "How are French language classes conducted?",
+    answer:
+      "French classes focus on speaking, listening, reading, writing, grammar, and DELF exam preparation through live interactive sessions.",
+  },
+  {
+    question:
+      "Can I attend classes from anywhere?",
+    answer:
+      "Absolutely. Our academy is fully online, allowing students to learn from anywhere in India and around the world.",
+  },
+  {
+    question:
+      "How do I enroll?",
+    answer:
+      "Simply contact our team through WhatsApp or phone. We will guide you in selecting the right course and batch.",
   },
 ];
 
@@ -35,57 +63,97 @@ export default function FAQs() {
   const [active, setActive] = useState(0);
 
   return (
-    <section className="relative py-28 bg-slate-50 overflow-hidden">
+    <section className="bg-slate-50 py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.06),transparent_60%)]" />
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
 
-      <div className="relative max-w-7xl mx-auto px-6">
+          {/* Left Side */}
 
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-16">
-
-          {/* LEFT */}
           <div className="lg:sticky lg:top-24 h-fit">
 
-            <p className="text-xs tracking-[0.35em] text-slate-400">
-              FREQUENTLY ASKED QUESTIONS
-            </p>
+            <span
+              className="
+                rounded-full
+                bg-[#D6451B]/10
+                px-4 py-2
+                text-xs
+                font-semibold
+                uppercase
+                tracking-[0.25em]
+                text-[#D6451B]
+              "
+            >
+              Frequently Asked Questions
+            </span>
 
-            <h2 className="mt-4 text-4xl sm:text-5xl font-bold leading-tight">
-              Everything you need
-              <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
-                {" "}to know
+            <h2 className="mt-6 text-4xl font-bold text-slate-900 md:text-5xl">
+              Everything You
+              <span className="block text-[#D6451B]">
+                Need To Know
               </span>
             </h2>
 
-            <p className="mt-5 text-slate-600 max-w-md">
-              Have questions about our courses, learning process,
-              certifications, or community? Find answers below.
+            <p className="mt-5 text-lg text-slate-600">
+              Find answers about English Speaking,
+              IELTS, PTE, French Language courses,
+              and academic coaching programs.
             </p>
 
             {/* Support Card */}
-            <div className="mt-10 rounded-3xl bg-white border border-slate-200 p-6">
 
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+            <div
+              className="
+                mt-10
+                rounded-[32px]
+                bg-white
+                border border-slate-200
+                p-6
+                shadow-sm
+              "
+            >
+              <div
+                className="
+                  flex h-14 w-14
+                  items-center justify-center
+                  rounded-2xl
+                  bg-[#D6451B]/10
+                  text-[#D6451B]
+                "
+              >
                 <FaHeadset />
               </div>
 
-              <h3 className="mt-4 text-lg font-semibold">
-                Still have questions?
+              <h3 className="mt-5 text-xl font-bold">
+                Need Help Choosing?
               </h3>
 
-              <p className="mt-2 text-sm text-slate-600">
-                Our advisors can help you choose the right learning pathway.
+              <p className="mt-2 text-slate-600">
+                Speak with our advisors and find the
+                perfect course or batch for your goals.
               </p>
 
-              <button className="mt-5 rounded-full bg-slate-900 px-6 py-3 text-white hover:scale-105 transition">
-                Talk to Advisor
+              <button
+                className="
+                  mt-5
+                  flex items-center gap-2
+                  rounded-2xl
+                  bg-[#D6451B]
+                  px-5 py-3
+                  text-white
+                  transition
+                  hover:scale-105
+                "
+              >
+                <FaWhatsapp />
+                Chat on WhatsApp
               </button>
-
             </div>
 
           </div>
 
-          {/* RIGHT */}
+          {/* FAQ List */}
+
           <div className="space-y-4">
 
             {faqs.map((faq, index) => {
@@ -94,38 +162,73 @@ export default function FAQs() {
               return (
                 <div
                   key={index}
-                  className="rounded-3xl border border-slate-200 bg-white overflow-hidden"
+                  className="
+                    overflow-hidden
+                    rounded-3xl
+                    border border-slate-200
+                    bg-white
+                    transition
+                    hover:border-[#D6451B]
+                  "
                 >
-
                   <button
                     onClick={() =>
-                      setActive(isOpen ? null : index)
+                      setActive(
+                        isOpen ? null : index
+                      )
                     }
-                    className="w-full flex items-center justify-between text-left p-6"
+                    className="
+                      flex w-full
+                      items-center
+                      justify-between
+                      p-5
+                      text-left
+                    "
                   >
-
-                    <span className="font-semibold text-slate-900">
+                    <span
+                      className="
+                        pr-4
+                        font-semibold
+                        text-slate-900
+                      "
+                    >
                       {faq.question}
                     </span>
 
-                    <div className="text-slate-500">
-                      {isOpen ? <FaMinus /> : <FaPlus />}
+                    <div
+                      className="
+                        flex h-10 w-10
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-slate-100
+                        text-[#D6451B]
+                      "
+                    >
+                      {isOpen ? (
+                        <FaMinus />
+                      ) : (
+                        <FaPlus />
+                      )}
                     </div>
-
                   </button>
 
                   <div
-                    className={`transition-all duration-300 overflow-hidden ${
-                      isOpen
-                        ? "max-h-40 pb-6 px-6"
-                        : "max-h-0"
-                    }`}
+                    className={`
+                      overflow-hidden
+                      transition-all
+                      duration-300
+                      ${
+                        isOpen
+                          ? "max-h-48 px-5 pb-5"
+                          : "max-h-0"
+                      }
+                    `}
                   >
-                    <p className="text-slate-600 leading-relaxed">
+                    <p className="leading-relaxed text-slate-600">
                       {faq.answer}
                     </p>
                   </div>
-
                 </div>
               );
             })}
@@ -133,7 +236,6 @@ export default function FAQs() {
           </div>
 
         </div>
-
       </div>
     </section>
   );

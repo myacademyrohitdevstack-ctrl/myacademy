@@ -15,6 +15,15 @@ export  function getStudentNotesApi(id){
 export  function getStudentClassLinksApi(id){
     return api.get(`/student/${id}/class-links`)
 }
+export  function getStudentBatchByIdApi(id){
+    return api.get(`/student/${id}/batch`)
+}
+export  function getStudentAllAnnocemntsApi(){
+    return api.get(`/student/announcements`)
+}
+export  function getStudentAllClassesApi(){
+    return api.get(`/student/classes`)
+}
 
 
 export const updateProfileImageApi = (file) => {

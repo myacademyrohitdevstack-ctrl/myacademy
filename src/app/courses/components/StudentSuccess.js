@@ -1,137 +1,244 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import {
+  FaStar,
+  FaQuoteLeft,
+  FaGraduationCap,
+} from "react-icons/fa";
+
 const students = [
   {
-    name: "Anjali Sharma",
-    image: "/students/student1.jpg",
-    result: "B1 → C1",
-    achievement: "Promoted to Team Lead",
-    quote:
-      "I went from avoiding meetings to leading presentations confidently.",
-  },
-  {
-    name: "Rahul Mehta",
-    image: "/students/student2.jpg",
+    name: "Priya Sharma",
     result: "IELTS 7.5",
-    achievement: "Study Visa Approved",
+    achievement: "Canada Study Visa",
     quote:
-      "The speaking sessions helped me achieve my target score in just 4 months.",
+      "The speaking practice and mock tests helped me achieve my target band score and secure admission abroad.",
   },
   {
-    name: "Sofia Martin",
-    image: "/students/student3.jpg",
-    result: "Fluent Speaker",
-    achievement: "International Career",
+    name: "Arjun Verma",
+    result: "English Fluency",
+    achievement: "Confident Public Speaker",
     quote:
-      "I can now communicate naturally with colleagues from different countries.",
+      "Earlier I was afraid to speak English. Now I confidently communicate during interviews and presentations.",
+  },
+  {
+    name: "Simran Kaur",
+    result: "92%",
+    achievement: "Class 10 Excellence",
+    quote:
+      "The personalized guidance improved my academic performance and boosted my confidence in school.",
   },
 ];
 
 export default function StudentSuccess() {
+  const router=useRouter()
   return (
-    <section className="relative py-28 bg-white overflow-hidden">
-
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="bg-white py-20 md:py-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
 
-          <p className="text-xs tracking-[0.35em] text-slate-400">
-            REAL STUDENT RESULTS
-          </p>
+        <div className="mx-auto mb-16 max-w-3xl text-center">
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold">
-            Success stories that
-            <span className="bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text">
-              {" "}inspire
+          <span
+            className="
+              rounded-full
+              bg-[#D6451B]/10
+              px-4 py-2
+              text-xs
+              font-semibold
+              tracking-[0.3em]
+              text-[#D6451B]
+              uppercase
+            "
+          >
+            Student Success Stories
+          </span>
+
+          <h2 className="mt-6 text-4xl font-bold text-slate-900 md:text-5xl">
+            Real Results.
+            <span className="block text-[#D6451B]">
+              Real Transformations.
             </span>
           </h2>
 
-          <p className="mt-5 text-slate-600">
-            Real learners. Real transformations. Real outcomes.
+          <p className="mt-5 text-lg text-slate-600">
+            Thousands of students have improved their English,
+            cracked IELTS exams, mastered French, and achieved
+            academic success through our programs.
           </p>
 
         </div>
 
-        {/* Masonry Layout */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* Testimonials */}
+
+        <div className="grid gap-6 lg:grid-cols-3">
 
           {students.map((student) => (
             <div
               key={student.name}
-              className="group relative h-[500px] rounded-3xl overflow-hidden"
+              className="
+                group
+                rounded-[32px]
+                border border-slate-200
+                bg-white
+                p-8
+                shadow-sm
+                transition-all
+                hover:-translate-y-2
+                hover:border-[#D6451B]
+                hover:shadow-xl
+              "
             >
+              {/* Badge */}
 
-              {/* Image */}
-              <img
-                src={student.image}
-                alt={student.name}
-                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
-              />
+              <div className="flex items-center justify-between">
 
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <span
+                  className="
+                    rounded-full
+                    bg-[#D6451B]/10
+                    px-4 py-2
+                    text-sm
+                    font-semibold
+                    text-[#D6451B]
+                  "
+                >
+                  {student.result}
+                </span>
 
-              {/* Result Badge */}
-              <div className="absolute top-5 left-5 rounded-full bg-white/90 backdrop-blur px-4 py-2 text-sm font-semibold">
-                {student.result}
+                <FaQuoteLeft className="text-2xl text-[#D6451B]/20" />
+
               </div>
 
               {/* Content */}
-              <div className="absolute bottom-0 p-8 text-white">
 
-                <div className="text-xs tracking-[0.3em] text-white/60">
-                  ACHIEVEMENT
+              <h3 className="mt-6 text-2xl font-bold text-slate-900">
+                {student.achievement}
+              </h3>
+
+              <p className="mt-4 leading-relaxed text-slate-600">
+                "{student.quote}"
+              </p>
+
+              {/* Rating */}
+
+              <div className="mt-6 flex gap-1 text-[#D6451B]">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} />
+                ))}
+              </div>
+
+              {/* Footer */}
+
+              <div className="mt-8 flex items-center gap-4 border-t border-slate-100 pt-6">
+
+                <div
+                  className="
+                    flex h-14 w-14
+                    items-center justify-center
+                    rounded-2xl
+                    bg-[#D6451B]
+                    text-lg
+                    font-bold
+                    text-white
+                  "
+                >
+                  {student.name.charAt(0)}
                 </div>
 
-                <h3 className="mt-2 text-2xl font-bold">
-                  {student.achievement}
-                </h3>
-
-                <p className="mt-4 text-white/80 leading-relaxed">
-                  "{student.quote}"
-                </p>
-
-                <div className="mt-6 border-t border-white/20 pt-4">
-                  <div className="font-semibold">
+                <div>
+                  <h4 className="font-semibold text-slate-900">
                     {student.name}
-                  </div>
+                  </h4>
 
-                  <div className="text-sm text-white/60">
+                  <p className="text-sm text-slate-500">
                     Student
-                  </div>
+                  </p>
                 </div>
 
               </div>
-
             </div>
           ))}
 
         </div>
 
-        {/* Bottom Impact Stats */}
-        <div className="mt-24 grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats */}
+
+        <div className="mt-20 grid grid-cols-2 gap-4 lg:grid-cols-4">
 
           {[
-            ["12K+", "Students Trained"],
-            ["98%", "Success Rate"],
-            ["25+", "Countries"],
+            ["5000+", "Students Trained"],
+            ["95%", "Success Rate"],
+            ["100+", "Live Batches"],
             ["4.9★", "Average Rating"],
           ].map(([value, label]) => (
             <div
               key={label}
-              className="rounded-2xl border border-slate-200 p-8 text-center"
+              className="
+                rounded-3xl
+                border border-slate-200
+                bg-slate-50
+                p-6
+                text-center
+                transition
+                hover:border-[#D6451B]
+              "
             >
-              <div className="text-4xl font-bold text-slate-900">
+              <div className="text-3xl font-bold text-[#D6451B]">
                 {value}
               </div>
 
-              <div className="mt-2 text-slate-500">
+              <div className="mt-2 text-sm text-slate-500">
                 {label}
               </div>
             </div>
           ))}
 
+        </div>
+
+        {/* Bottom CTA */}
+
+        <div
+          className="
+            mt-20
+            rounded-[32px]
+            bg-gradient-to-r
+            from-[#D6451B]
+            to-orange-500
+            p-10
+            text-center
+            text-white
+          "
+        >
+          <FaGraduationCap className="mx-auto text-5xl" />
+
+          <h3 className="mt-5 text-3xl font-bold">
+            Become Our Next Success Story
+          </h3>
+
+          <p className="mt-3 text-orange-100 max-w-2xl mx-auto">
+            Join live classes for English Speaking, IELTS, French,
+            and Academic Excellence. Start your learning journey today.
+          </p>
+
+          <button
+           onClick={()=>{router.push('/login')}}
+            className="
+              mt-6
+              rounded-2xl
+              bg-white
+              px-6
+              py-3
+              font-semibold
+              text-[#D6451B]
+              transition
+              hover:scale-105
+            "
+          >
+            Enroll Now
+          </button>
         </div>
 
       </div>

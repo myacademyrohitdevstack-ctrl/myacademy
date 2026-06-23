@@ -1,109 +1,293 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { FaArrowRight } from "react-icons/fa";
+import { useState } from "react";
+import {
+FaPhoneAlt,
+FaUserGraduate,
+FaLanguage,
+FaSchool,
+FaCheckCircle,
+} from "react-icons/fa";
 
 export default function Hero() {
-  return (
-    <section className="relative min-h-screen overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img
-          src="/classroom.jpg"
-          alt="Students learning languages"
-          className="h-full w-full object-cover"
-        />
+const [form, setForm] = useState({
+name: "",
+phone: "",
+course: "english",
+});
 
-        {/* Overlays */}
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
-      </div>
+const handleSubmit = (e) => {
+e.preventDefault();
 
-      {/* Content */}
-      <div className="relative z-10 flex min-h-screen items-center py-24 lg:py-20">
-        <div className="max-w-7xl mx-auto w-full px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-4xl"
-          >
-            {/* Label */}
-            <div className="text-[10px] tracking-[0.35em] text-white/60">
-              ABOUT OUR ACADEMY
-            </div>
+```
+console.log(form);
 
-            {/* Heading */}
-            <h1 className="mt-6 text-5xl sm:text-6xl lg:text-8xl font-bold leading-[0.95] text-white">
-              Transforming
-              <span className="block bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-                Confidence
-              </span>
-              Through Language
-            </h1>
+// API Call Here
+```
 
-            {/* Description */}
-            <p className="mt-8 max-w-2xl text-base sm:text-lg text-white/75 leading-relaxed">
-              For over a decade, we have helped students,
-              professionals, and future immigrants master
-              English and French through immersive learning,
-              real conversations, and practical fluency
-              development.
+};
+
+return ( <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-50 py-20 lg:py-28">
+{/* Background Shapes */}
+
+  <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-[#D6451B]/10 blur-3xl" />
+
+  <div className="absolute -right-20 bottom-10 h-80 w-80 rounded-full bg-orange-200/30 blur-3xl" />
+
+  <div className="mx-auto max-w-7xl px-6">
+    <div className="grid items-center gap-14 lg:grid-cols-2">
+      {/* Left Content */}
+
+      <div>
+        <span
+          className="
+            inline-flex items-center gap-2
+            rounded-full
+            bg-orange-100
+            px-4 py-2
+            text-sm font-medium
+            text-[#D6451B]
+          "
+        >
+          <FaCheckCircle />
+          Free Demo Classes Available
+        </span>
+
+        <h1 className="mt-6 text-5xl font-bold leading-tight text-slate-900 md:text-6xl">
+          Learn
+          <span className="text-[#D6451B]">
+            {" "}
+            English,
+          </span>
+
+          <span className="block text-[#D6451B]">
+            French & School Subjects
+          </span>
+
+          With Expert Teachers
+        </h1>
+
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
+          Join live interactive classes for Spoken English,
+          IELTS Preparation, French Language, and School
+          Tuition from Class 1st to 12th.
+        </p>
+
+        {/* Features */}
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+            <FaLanguage className="text-[#D6451B]" />
+
+            <span className="font-medium">
+              English & French
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+            <FaUserGraduate className="text-[#D6451B]" />
+
+            <span className="font-medium">
+              IELTS Preparation
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+            <FaSchool className="text-[#D6451B]" />
+
+            <span className="font-medium">
+              Classes 1st–12th
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+            <FaCheckCircle className="text-[#D6451B]" />
+
+            <span className="font-medium">
+              Live Interactive Classes
+            </span>
+          </div>
+        </div>
+
+        {/* Stats */}
+
+        <div className="mt-10 flex flex-wrap gap-8">
+          <div>
+            <h3 className="text-3xl font-bold text-[#D6451B]">
+              500+
+            </h3>
+
+            <p className="text-slate-500">
+              Students
             </p>
+          </div>
 
-            {/* CTA */}
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <button className="rounded-full bg-white px-7 py-3 font-medium text-slate-900 transition hover:scale-105">
-                Explore Programs
-              </button>
+          <div>
+            <h3 className="text-3xl font-bold text-[#D6451B]">
+              20+
+            </h3>
 
-              <button className="flex items-center gap-2 text-white">
-                Our Story
-                <FaArrowRight size={14} />
-              </button>
-            </div>
+            <p className="text-slate-500">
+              Teachers
+            </p>
+          </div>
 
-            {/* Stats */}
-            <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-8 border-t border-white/15 pt-8 max-w-5xl">
-              <div>
-                <div className="text-3xl font-bold text-white">
-                  12K+
-                </div>
-                <div className="mt-1 text-sm text-white/60">
-                  Students Trained
-                </div>
-              </div>
+          <div>
+            <h3 className="text-3xl font-bold text-[#D6451B]">
+              95%
+            </h3>
 
-              <div>
-                <div className="text-3xl font-bold text-white">
-                  25+
-                </div>
-                <div className="mt-1 text-sm text-white/60">
-                  Countries
-                </div>
-              </div>
-
-              <div>
-                <div className="text-3xl font-bold text-white">
-                  98%
-                </div>
-                <div className="mt-1 text-sm text-white/60">
-                  Success Rate
-                </div>
-              </div>
-
-              <div>
-                <div className="text-3xl font-bold text-white">
-                  10+
-                </div>
-                <div className="mt-1 text-sm text-white/60">
-                  Years Experience
-                </div>
-              </div>
-            </div>
-          </motion.div>
+            <p className="text-slate-500">
+              Success Rate
+            </p>
+          </div>
         </div>
       </div>
-    </section>
-  );
+
+      {/* Right Form */}
+
+      <div>
+        <div
+          className="
+            rounded-[32px]
+            border border-slate-200
+            bg-white
+            p-8
+            shadow-xl
+          "
+        >
+          <h2 className="text-3xl font-bold text-slate-900">
+            Register For Free Demo
+          </h2>
+
+          <p className="mt-2 text-slate-500">
+            Book your free class and speak with our
+            academic advisors.
+          </p>
+
+          <form
+            onSubmit={handleSubmit}
+            className="mt-8 space-y-5"
+          >
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter your name"
+                value={form.name}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    name: e.target.value,
+                  })
+                }
+                className="
+                  w-full rounded-2xl
+                  border border-slate-300
+                  px-4 py-3
+                  outline-none
+                  focus:border-[#D6451B]
+                "
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Phone Number
+              </label>
+
+              <input
+                type="tel"
+                placeholder="9876543210"
+                value={form.phone}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    phone: e.target.value,
+                  })
+                }
+                className="
+                  w-full rounded-2xl
+                  border border-slate-300
+                  px-4 py-3
+                  outline-none
+                  focus:border-[#D6451B]
+                "
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Interested In
+              </label>
+
+              <select
+                value={form.course}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    course: e.target.value,
+                  })
+                }
+                className="
+                  w-full rounded-2xl
+                  border border-slate-300
+                  px-4 py-3
+                  outline-none
+                  focus:border-[#D6451B]
+                "
+              >
+                <option value="english">
+                  Spoken English
+                </option>
+
+                <option value="ielts">
+                  IELTS Preparation
+                </option>
+
+                <option value="french">
+                  French Language
+                </option>
+
+                <option value="school">
+                  School Classes (1st-12th)
+                </option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              className="
+                w-full rounded-2xl
+                bg-[#D6451B]
+                px-6 py-4
+                font-semibold
+                text-white
+                transition
+                hover:bg-[#bf3b14]
+              "
+            >
+              Book Free Demo Class
+            </button>
+
+            <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+              <FaPhoneAlt />
+
+              Call / WhatsApp:
+              <span className="font-semibold text-slate-900">
+                +91 XXXXX XXXXX
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+);
 }

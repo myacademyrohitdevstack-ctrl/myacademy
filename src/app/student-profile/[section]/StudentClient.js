@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 
-import StudentNavbar from "../components/StudentNavbar";
+
 import Dashboard from "../components/Dashboard";
 
 import Courses from "../components/Courses";
 import LiveClasses from "../components/LiveClasses";
 import Batches from "../components/Batches";
-import Announcements from "../components/Announcment";
+
 import Certificates from "../components/Certificates";
 import Settings from "../components/Settings";
 import useMe from "@/Hooks/useMe";
@@ -40,7 +40,7 @@ export default  function StudentPortala({section}) {
         {section=== "classes" && <LiveClasses />}
          {section=== "batches" && <Batches />}
 
-        {section=== "announcements" && <Announcements />}
+     
               {section=== "certificates" && <Certificates />}
 
         {section=== "settings" && <Settings />} 

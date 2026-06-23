@@ -7,9 +7,12 @@ import {
   FaCheckCircle,
   FaBookOpen,
   FaClock,
+  FaEye,
+  FaEdit,
 } from "react-icons/fa";
 import { useState } from "react";
 import { useGetStudentBatches } from "@/Hooks/useGetStudentBatches";
+import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 
 
 export default function Courses() {
@@ -19,7 +22,7 @@ export default function Courses() {
 
 if(isLoading) return
   return (
- <div className="  max-w-6xl mx-auto">
+ <div className="  max-w-6xl mx-auto py-10">
 
     <div className="space-y-8 px-2">
 
@@ -53,120 +56,158 @@ if(isLoading) return
       </div>
 
       {/* Cards */}
-      <div className="grid  gap-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
         {batches?.map(({course}) => (
-          <motion.div
-            whileHover={{ y: -4 }}
-            key={course._id}
-            className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg"
-          >
-            <div className="grid lg:grid-cols-[280px_1fr]">
+           <motion.div
+  key={course._id}
+  whileHover={{ y: -5 }}
+  transition={{ duration: 0.25 }}
+  className="
+    overflow-hidden
+    rounded-3xl
+    border border-slate-200
+    bg-white
+    shadow-sm
+    transition-all
+    hover:shadow-xl
+  "
+>
+  {/* Thumbnail */}
 
-              {/* Image */}
-              <img
-                src={course?.thumbnail?.url}
-                alt={course.title}
-                className="h-full w-full object-cover"
-              />
+  <div className="relative h-52 overflow-hidden bg-gradient-to-br from-[#D6451B] to-orange-500">
+    {course?.thumbnail?.url ? (
+      <img
+        src={course.thumbnail.url}
+        alt={course.title}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <div className="flex h-full items-center justify-center">
+        <FaBookOpen className="text-6xl text-white/60" />
+      </div>
+    )}
 
-              {/* Content */}
-              <div className="p-8">
+    {/* Category */}
 
-                <div className="flex flex-wrap items-center justify-between gap-4">
+    <span
+      className="
+        absolute left-4 top-4
+        rounded-full bg-white
+        px-3 py-1
+        text-xs font-semibold
+        text-[#D6451B]
+      "
+    >
+      {course?.category || "Course"}
+    </span>
 
-                  <div>
-                    <h2 className="text-3xl font-bold">
-                      {course.title}
-                    </h2>
+    {/* Enrollment */}
 
-                    <p className="mt-2 text-slate-500">
-                      {course.level}
-                    </p>
-                  </div>
+    <span
+      className={`
+        absolute right-4 top-4
+        rounded-full px-3 py-1
+        text-xs font-semibold
+        ${
+          course?.enrollmentOpen
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
+        }
+      `}
+    >
+      {course?.enrollmentOpen
+        ? "Open"
+        : "Closed"}
+    </span>
+  </div>
 
-                  <span
-                    className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                      course.status === "Completed"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-orange-100 text-[#D6451B]"
-                    }`}
-                  >
-                    {course.status}
-                  </span>
+  {/* Content */}
 
-                </div>
+  <div className="p-5">
+    {/* Title */}
 
-                <div className="mt-8 grid gap-6 md:grid-cols-3">
+    <h2 className="line-clamp-2 text-xl font-bold text-slate-900">
+      {capitalizeFirstLetter(course?.title)}
+    </h2>
 
-                  {/* <div className="flex items-center gap-3">
+    {/* Description */}
 
-                    <FaBookOpen className="text-[#D6451B]" />
+    <p className="mt-3 min-h-15 line-clamp-3 text-sm text-slate-500">
+      {course?.shortDescription}
+    </p>
 
-                    <div>
-                      <p className="text-sm text-slate-500">
-                        Batch
-                      </p>
+    {/* Stats */}
 
-                      <h3 className="font-semibold">
-                        {course.completedLessons} / {course.lessons}
-                      </h3>
-                    </div>
+    <div className="mt-5 grid grid-cols-2 gap-3">
+      <div className="rounded-2xl bg-slate-50 p-3">
+        <p className="text-xs text-slate-500">
+          Price
+        </p>
 
-                  </div> */}
+        <p className="mt-1 font-bold text-[#D6451B]">
+          ₹{course?.price}
+        </p>
+      </div>
 
-                  <div className="flex items-center gap-3">
+      <div className="rounded-2xl bg-slate-50 p-3">
+        <p className="text-xs text-slate-500">
+          Duration
+        </p>
 
-                    <FaClock className="text-[#D6451B]" />
+        <p className="mt-1 font-semibold">
+          {course?.durationInMonths} Months
+        </p>
+      </div>
+    </div>
 
-                    <div>
-                      <p className="text-sm text-slate-500">
-                        Duration
-                      </p>
+    {/* Meta */}
 
-                      <h3 className="font-semibold">
-                        {course.durationInMonths + " Months"}
-                      </h3>
-                    </div>
+    <div className="mt-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-slate-500">
+          Level
+        </span>
 
-                  </div>
+        <span className="rounded-lg bg-orange-50 px-3 py-1 text-sm font-medium text-[#D6451B] capitalize">
+          {course?.level}
+        </span>
+      </div>
 
-                  {/* <div>
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-slate-500">
+          Language
+        </span>
 
-                    <p className="text-sm text-slate-500">
-                      Progress
-                    </p>
+        <span className="font-medium">
+          {course?.language}
+        </span>
+      </div>
 
-                    <h3 className="font-semibold">
-                      {course.progress}%
-                    </h3>
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-slate-500">
+          Status
+        </span>
 
-                  </div> */}
+        <span
+          className={`
+            rounded-lg px-3 py-1 text-sm font-medium capitalize
+            ${
+              course?.status === "published"
+                ? "bg-green-100 text-green-700"
+                : course?.status === "draft"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-slate-100 text-slate-700"
+            }
+          `}
+        >
+          {course?.status}
+        </span>
+      </div>
+    </div>
 
-                </div>
-
-               
-
-                <div className="mt-8">
-
-                  {course.progress === 100 ? (
-                    <button className="flex items-center gap-3 rounded-2xl bg-green-600 px-6 py-3 font-medium text-white">
-                      <FaCheckCircle />
-                      View Certificate
-                    </button>
-                  ) : (
-                    <button className="flex items-center gap-3 rounded-2xl bg-[#D6451B] px-6 py-3 font-medium text-white hover:opacity-90">
-                      <FaPlay />
-                      Continue Learning
-                    </button>
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
-          </motion.div>
+  </div>
+</motion.div>
         ))}
 
       </div>

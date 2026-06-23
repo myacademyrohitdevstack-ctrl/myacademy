@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   FaVideo,
   FaMicrophone,
@@ -11,121 +12,152 @@ import {
 const journey = [
   {
     step: "01",
-    title: "Attend Live Interactive Class",
+    title: "Join Live Classes",
     icon: <FaVideo />,
-    desc: "Join expert-led live sessions designed around real communication situations.",
+    desc: "Attend interactive online classes for English, French, IELTS, PTE, and school subjects with experienced instructors.",
   },
   {
     step: "02",
-    title: "Practice Speaking",
+    title: "Practice & Participate",
     icon: <FaMicrophone />,
-    desc: "Participate in guided speaking activities and conversation exercises.",
+    desc: "Engage in speaking sessions, quizzes, assignments, and classroom discussions to strengthen learning.",
   },
   {
     step: "03",
-    title: "Receive Personal Feedback",
+    title: "Get Expert Feedback",
     icon: <FaChartLine />,
-    desc: "Get corrections on pronunciation, grammar, and fluency in real time.",
+    desc: "Receive personalized feedback on pronunciation, grammar, communication skills, and academic performance.",
   },
   {
     step: "04",
-    title: "Connect With Community",
+    title: "Learn With Community",
     icon: <FaUsers />,
-    desc: "Practice with learners from different countries and cultures.",
+    desc: "Collaborate with fellow students, participate in group activities, and improve confidence together.",
   },
   {
     step: "05",
-    title: "Track Progress & Earn Certificates",
+    title: "Achieve Your Goals",
     icon: <FaCertificate />,
-    desc: "Monitor improvement and unlock certificates as you advance.",
+    desc: "Earn certificates, improve grades, crack language exams, and unlock better opportunities.",
   },
 ];
 
 export default function LearningExperience() {
+  const router=useRouter()
   return (
-    <section className="relative py-28 bg-slate-50 overflow-hidden">
+    <section className="relative overflow-hidden bg-slate-50 py-20 md:py-28">
+      {/* Background Glow */}
+      <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-[#D6451B]/10 blur-3xl" />
+      <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
 
-      <div className="max-w-7xl mx-auto px-6">
-
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
 
-          <p className="text-xs tracking-[0.35em] text-slate-400">
-            HOW LEARNING WORKS
-          </p>
+        <div className="mx-auto mb-16 max-w-3xl text-center">
+          <span className="rounded-full bg-[#D6451B]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-[#D6451B]">
+            How Learning Works
+          </span>
 
-          <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-slate-900">
-            Your learning experience
+          <h2 className="mt-6 text-4xl font-bold text-slate-900 md:text-5xl">
+            A Simple Path To
+            <span className="block text-[#D6451B]">
+              Learning Success
+            </span>
           </h2>
 
-          <p className="mt-5 text-slate-600">
-            Every lesson follows a structured process that transforms
-            knowledge into real-world communication skills.
+          <p className="mt-5 text-lg text-slate-600">
+            Whether you're preparing for IELTS, learning French,
+            improving English fluency, or excelling in school studies,
+            our structured learning process ensures measurable progress.
           </p>
-
         </div>
 
-        {/* Journey */}
-        <div className="relative">
+        {/* Timeline */}
 
-          {/* Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-slate-200 hidden md:block" />
+        <div className="relative mx-auto max-w-5xl">
+          {/* Vertical Line */}
 
-          <div className="space-y-12">
+          <div className="absolute left-7 top-0 hidden h-full w-1 rounded-full bg-orange-100 md:block" />
 
+          <div className="space-y-8 md:space-y-10">
             {journey.map((item) => (
               <div
                 key={item.step}
-                className="relative flex flex-col md:flex-row gap-6 md:gap-10 items-start"
+                className="
+                  group relative
+                  rounded-3xl
+                  border border-slate-200
+                  bg-white
+                  p-6 md:p-8
+                  shadow-sm
+                  transition-all
+                  hover:-translate-y-1
+                  hover:border-[#D6451B]
+                  hover:shadow-xl
+                "
               >
+                <div className="flex flex-col gap-5 md:flex-row md:items-start">
+                  {/* Icon */}
 
-                {/* Step */}
-                <div className="relative z-10 flex-shrink-0">
-
-                  <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-blue-600 text-xl shadow-sm">
-                    {item.icon}
+                  <div className="relative z-10 flex-shrink-0">
+                    <div
+                      className="
+                        flex h-16 w-16 items-center justify-center
+                        rounded-2xl
+                        bg-[#D6451B]
+                        text-xl text-white
+                        shadow-lg
+                      "
+                    >
+                      {item.icon}
+                    </div>
                   </div>
 
-                </div>
+                  {/* Content */}
 
-                {/* Content */}
-                <div className="flex-1 pb-10">
+                  <div className="flex-1">
+                    <div className="text-sm font-bold tracking-[0.25em] text-[#D6451B]">
+                      STEP {item.step}
+                    </div>
 
-                  <div className="text-xs tracking-[0.3em] text-blue-600">
-                    STEP {item.step}
+                    <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-3 leading-relaxed text-slate-600">
+                      {item.desc}
+                    </p>
                   </div>
-
-                  <h3 className="mt-2 text-2xl font-semibold text-slate-900">
-                    {item.title}
-                  </h3>
-
-                  <p className="mt-3 text-slate-600 max-w-xl">
-                    {item.desc}
-                  </p>
-
                 </div>
-
               </div>
             ))}
-
           </div>
-
         </div>
 
-        {/* Bottom Stats */}
-        <div className="mt-24 grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats */}
 
+        <div className="mt-20 grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            ["95%", "Speaking Confidence"],
-            ["12K+", "Active Students"],
-            ["25+", "Countries"],
+            ["5000+", "Students Trained"],
+            ["95%", "Success Rate"],
+            ["100+", "Live Batches"],
             ["4.9/5", "Student Rating"],
           ].map(([value, label]) => (
             <div
               key={label}
-              className="bg-white rounded-2xl border border-slate-200 p-6 text-center"
+              className="
+                rounded-3xl
+                border border-slate-200
+                bg-white
+                p-6
+                text-center
+                shadow-sm
+                transition
+                hover:border-[#D6451B]
+                hover:shadow-lg
+              "
             >
-              <div className="text-3xl font-bold text-slate-900">
+              <div className="text-3xl font-bold text-[#D6451B]">
                 {value}
               </div>
 
@@ -134,11 +166,48 @@ export default function LearningExperience() {
               </div>
             </div>
           ))}
-
         </div>
 
-      </div>
+        {/* CTA */}
 
+        <div
+          className="
+            mt-20
+            rounded-[32px]
+            bg-gradient-to-r
+            from-[#D6451B]
+            to-orange-500
+            p-8 md:p-12
+            text-center
+            text-white
+          "
+        >
+          <h3 className="text-3xl font-bold">
+            Ready to Start Learning?
+          </h3>
+
+          <p className="mt-3 text-orange-100">
+            Join live classes, learn from experts, and achieve your
+            academic and language goals with confidence.
+          </p>
+
+          <button
+           onClick={()=>{router.push('/login')}}
+            className="
+              mt-6
+              rounded-2xl
+              bg-white
+              px-6 py-3
+              font-semibold
+              text-[#D6451B]
+              transition
+              hover:scale-105
+            "
+          >
+            Enroll Now
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
