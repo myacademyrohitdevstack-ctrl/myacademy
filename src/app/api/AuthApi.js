@@ -15,4 +15,7 @@ export  function verifyOtp(data){
 export  function logoutApi(){
     return api.post('/auth/logout')
 }
+export  function updatePasswordApi(data){
+    return api.patch('/auth/update-password',data)
+}
 

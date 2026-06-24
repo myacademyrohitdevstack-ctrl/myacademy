@@ -8,9 +8,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  FaBookOpen,
-  FaChartLine,
-  FaCertificate,
+
   FaFire,
   FaArrowRight,
   FaBullhorn,
@@ -23,16 +21,13 @@ import {
 } from "react-icons/fa";
 import { useStudentStatics } from "@/Hooks/useStudentsStatics";
 import CommingSoon from "@/app/Components/ui/CommingSoon";
-
-
-
-
+import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
 
 
 export default function Dashboard({user}) {
-  const {data:announcements}=useStudentsAllAnnouncements()
-  const {data:classes}=useStudentsAllClasses()
-  const {data:statics}=useStudentStatics()
+  const {data:announcements,isLoading:announcementsLoading}=useStudentsAllAnnouncements()
+  const {data:classes,isLoading:classesLoading}=useStudentsAllClasses()
+  const {data:statics,isLoading:staticsLoading}=useStudentStatics()
   const router=useRouter()
   
 const stats = [
@@ -57,6 +52,7 @@ const stats = [
     icon: <FaFilePdf />,
   },
 ];
+if(announcementsLoading || classesLoading || staticsLoading) return <DashboardSkeleton></DashboardSkeleton>
   return (
   <div className="py-4 md:py-8 lg:py-10">
   <div className="mx-auto max-w-7xl space-y-4 px-3 sm:px-4 md:space-y-6 lg:space-y-8">

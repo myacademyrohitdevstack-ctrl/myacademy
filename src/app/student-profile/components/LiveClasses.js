@@ -21,19 +21,24 @@ import { formatISTDateTime } from "@/Utils/formatDate";
 import { useGetStudentBatchById } from "@/Hooks/useGetStudentBatchById";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { useAnnouncementByBatchId } from "@/Hooks/useAnnouncementByBatchId";
+import Loading from "@/app/Components/ui/Loading";
+import { NotesSkeleton } from "@/app/Skeletons/NotesSkeleton";
+import { ClassLinksSkeleton } from "@/app/Skeletons/ClassesSkeleton";
+import { AnnouncementsSkeleton } from "@/app/Skeletons/AnnouncementSkeleton";
 
 
 export default function LiveClasses() {
   const searchParams=useSearchParams()
+    const [activeTab,setActiveTab]=useState("notes")
   const batchId=searchParams.get("batchId")
-  const {data:classLinks,isLoading:classLoading}=useGetStudentClassLInks(batchId)
-  const {data:notes,isLoading:notesLoading}=useGetStudentNotes(batchId)
-  const {data:batch}=useGetStudentBatchById(batchId)
-    const {data:announcements}=useAnnouncementByBatchId(batchId)
+  const {data:classLinks,isLoading:classLoading}=useGetStudentClassLInks(batchId,activeTab)
+  const {data:notes,isLoading:notesLoading}=useGetStudentNotes(batchId,activeTab)
+  const {data:batch,isLoading:batchLoading}=useGetStudentBatchById(batchId)
+    const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
    const [pdfOpen,setPdfOpen]=useState(false)
     const [pdfUrl,setPdfUrl]=useState("")
-  const [activeTab,setActiveTab]=useState("links")
-  if(notesLoading || classLoading) return
+
+if(batchLoading) return <Loading></Loading>
   return (
 <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
   <div className="space-y-6 sm:space-y-8">
@@ -159,7 +164,7 @@ export default function LiveClasses() {
 
     </div>
       {/* Schedule */}
- {activeTab === "notes" && (
+ {!notesLoading && activeTab === "notes" && (
   <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
 
     {/* Header */}
@@ -326,11 +331,11 @@ export default function LiveClasses() {
     )}
 
   </div>
-)}
+)} {notesLoading && <NotesSkeleton></NotesSkeleton>}
  
        {/* Class Links */}
  
-  {activeTab === "links" && (
+  {!classLoading && activeTab === "links" && (
   <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
 
     {/* Header */}
@@ -520,8 +525,8 @@ export default function LiveClasses() {
     )}
 
   </div>
-)}
-   {activeTab === "announcements" && (
+)} {classLoading && <ClassLinksSkeleton></ClassLinksSkeleton>}
+   { !annoucementLoading && activeTab === "announcements" && (
   <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
 
     {/* Header */}
@@ -678,7 +683,7 @@ export default function LiveClasses() {
     )}
 
   </div>
-)}
+)} { annoucementLoading && <AnnouncementsSkeleton></AnnouncementsSkeleton>}
 
     </div>
      <Modal

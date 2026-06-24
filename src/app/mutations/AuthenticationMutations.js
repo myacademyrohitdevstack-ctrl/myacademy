@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { loginApi,logoutApi,sendOtp,signUpApi, verifyOtp } from '../api/AuthApi';
+import { loginApi,logoutApi,sendOtp,signUpApi, updatePasswordApi, verifyOtp } from '../api/AuthApi';
 import { useRouter } from 'next/navigation';
 import handleError from '@/Utils/handleError';
 import useAuthStore from '@/store/authStore';
@@ -133,18 +133,18 @@ export const useLogoutMutation=()=>{
 //         }
 //     })
 // }
-// export const useChangePasswordMutation=(handleError)=>{
-//     return useMutation({
-//         mutationFn:async(data)=>{
-//          return await changePasswordApi(data)
-//         },
-//          retry:false,
-//         onError:(error)=>handleError(error),
-//          onSuccess:()=>{
-//      toast.success("Your Password Changed successfully ")
-//         }
-//     })
-// }
+export const useUpdatePasswordMutation=()=>{
+    return useMutation({
+        mutationFn:async(data)=>{
+         return await updatePasswordApi(data)
+        },
+         retry:false,
+        onError:(error)=>handleError(error),
+         onSuccess:()=>{
+     toast.success("Your Password Changed successfully ")
+        }
+    })
+}
 // export const useProfileUpdateMutation=(handleError)=>{
 //     const queryClient = useQueryClient()
 //     return useMutation({

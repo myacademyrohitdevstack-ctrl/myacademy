@@ -32,7 +32,7 @@ export const createCourseSchema = z.object({
   price:z.preprocess(
   (v) => (v === "" ? undefined : Number(v)),
   z.number().min(1, "Price is required")
-),
+).optional(),
 
 durationInMonths: z.preprocess(
   (v) => (v === "" ? undefined : Number(v)),

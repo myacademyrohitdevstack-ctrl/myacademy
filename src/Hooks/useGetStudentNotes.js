@@ -5,7 +5,7 @@ import useAuthStore from "@/store/authStore"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 
-export  const useGetStudentNotes=(batchId)=>{
+export  const useGetStudentNotes=(batchId,tab)=>{
     const user=useAuthStore.getState().user
     return useQuery({
         queryKey:["notes",user.id,batchId],
@@ -15,6 +15,6 @@ export  const useGetStudentNotes=(batchId)=>{
         },
         keepPreviousData:true,
         placeholderData:keepPreviousData,
-        enabled:!!user
+        enabled:!!user && tab ==="notes"
     })
 }

@@ -5,7 +5,7 @@ import useAuthStore from "@/store/authStore"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 
-export  const useGetStudentClassLInks=(batchId)=>{
+export  const useGetStudentClassLInks=(batchId,tab)=>{
     const user=useAuthStore.getState().user
     return useQuery({
         queryKey:["class-links",user.id,batchId],
@@ -15,6 +15,6 @@ export  const useGetStudentClassLInks=(batchId)=>{
         },
         keepPreviousData:true,
         placeholderData:keepPreviousData,
-        enabled:!!user
+        enabled:!!user && tab==="links"
     })
 }

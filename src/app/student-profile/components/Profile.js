@@ -15,6 +15,7 @@ import EmergencySection from "./profile/EmergencySection";
 import { toast } from "sonner";
 import { useProfileUpdateMutation } from "@/app/mutations/studentMutation";
 import { useProfileImageMutation } from "@/app/mutations/userMutation";
+import ProfileSkeleton from "@/app/Skeletons/ProfileSkeleton";
 
 
 export default function Profile({ user, profile }) {
@@ -204,6 +205,7 @@ export default function Profile({ user, profile }) {
   });
 };
 
+if(!user || !profile) return <ProfileSkeleton></ProfileSkeleton>
 return (
   <div className="min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50">
     <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">

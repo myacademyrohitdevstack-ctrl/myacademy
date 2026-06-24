@@ -13,14 +13,16 @@ import {
 import { useState } from "react";
 import { useGetStudentBatches } from "@/Hooks/useGetStudentBatches";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
+import { useRouter } from "next/navigation";
+import CoursesSkeleton from "@/app/Skeletons/CourseSkeleton";
 
 
 export default function Courses() {
   const [search, setSearch] = useState("");
   const {data:batches,isLoading}=useGetStudentBatches()
+const router=useRouter()
 
-
-if(isLoading) return
+if(isLoading) return <CoursesSkeleton></CoursesSkeleton>
   return (
 <div className="min-h-screen bg-slate-50">
   <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
@@ -257,27 +259,9 @@ p-4
         </span>
       </div>
 
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-slate-500">
-          Status
-        </span>
-
-        <span
-          className={`
-            rounded-lg px-3 py-1 text-sm font-medium capitalize
-            ${
-              course?.status === "published"
-                ? "bg-green-100 text-green-700"
-                : course?.status === "draft"
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-slate-100 text-slate-700"
-            }
-          `}
-        >
-          {course?.status}
-        </span>
-      </div>
+     
       <button
+      onClick={()=>{router.push('/student-profile/batches')}}
   className="
     mt-6
     flex

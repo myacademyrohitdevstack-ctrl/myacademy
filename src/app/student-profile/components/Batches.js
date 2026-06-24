@@ -1,5 +1,6 @@
 "use client";
 
+import BatchesSkeleton from "@/app/Skeletons/BatchSkeleton";
 import { useGetStudentBatches } from "@/Hooks/useGetStudentBatches";
 import { formatISTDateTime } from "@/Utils/formatDate";
 import { motion } from "framer-motion";
@@ -14,7 +15,7 @@ import {
 export default function Batches() {
   const {data:batches,isLoading}=useGetStudentBatches()
   const router=useRouter()
-  if(isLoading) return
+  if(isLoading) return <BatchesSkeleton></BatchesSkeleton>
   return (
   <div className="min-h-screen bg-slate-50">
   <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">

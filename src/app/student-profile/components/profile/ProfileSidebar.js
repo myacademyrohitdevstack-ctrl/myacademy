@@ -140,18 +140,7 @@ export default function ProfileSidebar({
       </span>
     </div>
 
-    {/* Quick Stats */}
-    <div className="mt-6 grid grid-cols-2 gap-3">
-      <StatCard
-        title="Batch"
-        value={profile?.batch?.name || "-"}
-      />
 
-      <StatCard
-        title="Course"
-        value={profile?.enrolledCourses?.length || 0}
-      />
-    </div>
 
     {/* Information */}
     <div className="relative mt-6 space-y-3 pb-6">

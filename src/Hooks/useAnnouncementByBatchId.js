@@ -4,7 +4,7 @@ import useAuthStore from "@/store/authStore"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 
-export  const useAnnouncementByBatchId=(batchId)=>{
+export  const useAnnouncementByBatchId=(batchId,tab)=>{
     const user=useAuthStore.getState().user
     return useQuery({
         queryKey:["Announcements",batchId],
@@ -15,6 +15,6 @@ export  const useAnnouncementByBatchId=(batchId)=>{
         },
         keepPreviousData:true,
         placeholderData:keepPreviousData,
-        enabled:!!user
+        enabled:!!user && tab === "announcements"
     })
 }
