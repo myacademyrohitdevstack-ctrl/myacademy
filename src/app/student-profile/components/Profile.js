@@ -204,65 +204,162 @@ export default function Profile({ user, profile }) {
   });
 };
 
-  return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header */}
+return (
+  <div className="min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
+      {/* Hero */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white"
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#D6451B] via-orange-500 to-orange-600 p-6 shadow-xl sm:p-8 lg:p-10"
       >
-        <h1 className="text-4xl font-bold">
-          My Profile
-        </h1>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-white blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-orange-300 blur-3xl" />
+        </div>
 
-        <p className="mt-2 text-orange-100">
-          Manage your personal information.
-        </p>
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <span className="inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-orange-100 backdrop-blur">
+              Student Portal
+            </span>
+
+            <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+              My Profile
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-orange-100 sm:text-base">
+              Manage your personal information, contact details, guardian
+              information and emergency contacts from one place.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 lg:w-[320px]">
+            <div className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+              <p className="text-xs uppercase tracking-wider text-orange-100">
+                Status
+              </p>
+
+              <h3 className="mt-2 text-lg font-semibold text-white">
+                Active
+              </h3>
+            </div>
+
+            <div className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+              <p className="text-xs uppercase tracking-wider text-orange-100">
+                Profile
+              </p>
+
+              <h3 className="mt-2 text-lg font-semibold text-white">
+                Complete
+              </h3>
+            </div>
+          </div>
+        </div>
       </motion.div>
 
+      {/* Content */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid gap-8 lg:grid-cols-[320px_1fr]"
+        className="mt-8 grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)] xl:gap-8"
       >
         {/* Sidebar */}
-
-       <ProfileSidebar
-  user={user}
-  profile={profile}
-  onImageUpload={handleImageUpload}
-  isUploading={isUploading}
-/>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="lg:sticky lg:top-24 lg:self-start"
+        >
+            <ProfileSidebar
+              user={user}
+              profile={profile}
+              onImageUpload={handleImageUpload}
+              isUploading={isUploading}
+            />
+       
+        </motion.div>
 
         {/* Form */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15 }}
+          className="space-y-6"
+        >
+        
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Personal Information
+              </h2>
 
-        <div className="space-y-8">
-          <PersonalInformation
-            register={register}
-            errors={errors}
-          />
+              <p className="mt-1 text-sm text-slate-500">
+                Update your basic personal details.
+              </p>
+            </div>
 
-          <AddressSection
-            register={register}
-            errors={errors}
-          />
+            <PersonalInformation
+              register={register}
+              errors={errors}
+            />
+      
 
-          <GuardianSection
-            register={register}
-            errors={errors}
-          />
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Address Details
+              </h2>
 
-          <EmergencySection
-            register={register}
-            profileUpdateMutation={profileUpdateMutation}
-            errors={errors}
-            isSubmitting={isSubmitting}
-            handleCancel={handleCancel}
-          />
-        </div>
+              <p className="mt-1 text-sm text-slate-500">
+                Keep your residential information updated.
+              </p>
+            </div>
+
+            <AddressSection
+              register={register}
+              errors={errors}
+            />
+        
+
+          
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Guardian Information
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Parent or guardian contact details.
+              </p>
+            </div>
+
+            <GuardianSection
+              register={register}
+              errors={errors}
+            />
+        
+
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Emergency Contact
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                We'll use this contact in case of emergency.
+              </p>
+            </div>
+
+            <EmergencySection
+              register={register}
+              profileUpdateMutation={profileUpdateMutation}
+              errors={errors}
+              isSubmitting={isSubmitting}
+              handleCancel={handleCancel}
+            />
+       
+        </motion.div>
       </form>
     </div>
-  );
+  </div>
+);
 }
 function getDirtyValues(dirtyFields, allValues) {
   if (dirtyFields === true) {

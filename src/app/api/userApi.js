@@ -24,6 +24,9 @@ export  function getStudentAllAnnocemntsApi(){
 export  function getStudentAllClassesApi(){
     return api.get(`/student/classes`)
 }
+export  function getStudentStaticsApi(){
+    return api.get(`/student/statics`)
+}
 
 
 export const updateProfileImageApi = (file) => {

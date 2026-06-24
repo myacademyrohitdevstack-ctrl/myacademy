@@ -8,6 +8,7 @@ import {
   FaTimes,
   FaSpinner,
 } from "react-icons/fa";
+import CommingSoon from "@/app/Components/ui/CommingSoon";
 
 export default function ProfileSidebar({
   user,
@@ -60,111 +61,141 @@ export default function ProfileSidebar({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -15 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="rounded-[30px] border h-fit border-slate-200 bg-white p-8 shadow-lg"
-    >
-      {/* Profile Image */}
-      <div className="relative mx-auto w-fit">
-        <img
-          src={preview || user?.profileImage?.url || "/student.jpg"}
-          alt={user?.fullName}
-          className="h-40 w-40 rounded-full border-4 border-orange-100 object-cover"
-        />
+  <motion.div
+  initial={{ opacity: 0, x: -15 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.35 }}
+  className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg"
+>
+  {/* Top Banner */}
+  <div className="relative h-28 bg-gradient-to-r from-[#D6451B] via-orange-500 to-orange-400">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,.25),transparent_55%)]" />
+  </div>
 
-        {!selectedFile ? (
-          <>
-            <label
-              htmlFor="profileImage"
-              className="absolute bottom-2 right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#D6451B] text-white shadow-lg transition hover:scale-105"
-            >
-              <FaCamera />
-            </label>
+  {/* Avatar */}
+  <div className="-mt-14 px-6">
+    <div className="relative mx-auto w-fit">
+      <img
+        src={preview || user?.profileImage?.url || "/student.jpg"}
+        alt={user?.fullName}
+        className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-xl sm:h-36 sm:w-36"
+      />
 
-            <input
-              id="profileImage"
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleChange}
-            />
-          </>
-        ) : (
-          <div className="absolute bottom-2 right-2 flex gap-2">
-            <button
-              onClick={handleUpload}
-              disabled={isUploading}
-              type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-green-600 text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
-            >
-              {isUploading ? (
-                <FaSpinner className="animate-spin" />
-              ) : (
-                <FaCheck />
-              )}
-            </button>
+      {!selectedFile ? (
+        <>
+          <label
+            htmlFor="profileImage"
+            className="absolute bottom-1 right-1 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#D6451B] text-white shadow-lg transition hover:scale-110"
+          >
+            <FaCamera />
+          </label>
 
-            <button
-              onClick={handleCancel}
-              disabled={isUploading}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition hover:scale-105"
-            >
-              <FaTimes />
-            </button>
-          </div>
-        )}
-      </div>
+          <input
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleChange}
+          />
+        </>
+      ) : (
+        <div className="absolute bottom-1 right-1 flex gap-2">
+          <button
+            type="button"
+            onClick={handleUpload}
+            disabled={isUploading}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-green-600 text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
+          >
+            {isUploading ? (
+              <FaSpinner className="animate-spin" />
+            ) : (
+              <FaCheck />
+            )}
+          </button>
 
-      {/* Name */}
-      <div className="mt-6 text-center">
-        <h2 className="text-2xl font-bold text-slate-900">
-          {user?.fullName || "Student"}
-        </h2>
+          <button
+            type="button"
+            onClick={handleCancel}
+            disabled={isUploading}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition hover:scale-105"
+          >
+            <FaTimes />
+          </button>
+        </div>
+      )}
+    </div>
 
-        <span className="mt-2 inline-flex rounded-full bg-orange-100 px-4 py-1 text-sm font-medium text-[#D6451B]">
-          {profile?.languageLevel || "Beginner"}
-        </span>
-      </div>
+    {/* Name */}
+    <div className="mt-5 text-center">
+      <h2 className="text-2xl font-bold text-slate-900">
+        {user?.fullName || "Student"}
+      </h2>
 
-      {/* Info */}
-      <div className="mt-8 space-y-4">
-        <Info
-          title="Student ID"
-          value={profile?.studentId || "Not Assigned"}
-        />
+      <p className="mt-1 text-sm text-slate-500">
+        {user?.email}
+      </p>
 
-        <Info
-          title="Current Batch"
-          value={profile?.batch?.name || "Not Assigned"}
-        />
+      <span className="mt-4 inline-flex rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-[#D6451B]">
+        {profile?.languageLevel || "Beginner"}
+      </span>
+    </div>
 
-        <Info
-          title="Current Course"
-          value={
-            profile?.enrolledCourses?.[0]?.title ||
-            "No Course"
-          }
-        />
+    {/* Quick Stats */}
+    <div className="mt-6 grid grid-cols-2 gap-3">
+      <StatCard
+        title="Batch"
+        value={profile?.batch?.name || "-"}
+      />
 
-        <Info
-          title="Trainer"
-          value={
-            profile?.batch?.teacher?.user?.fullName ||
-            "Not Assigned"
-          }
-        />
+      <StatCard
+        title="Course"
+        value={profile?.enrolledCourses?.length || 0}
+      />
+    </div>
 
-        <Info
-          title="Admission Date"
-          value={
-            profile?.admissionDate
-              ? new Date(profile.admissionDate).toLocaleDateString()
-              : "-"
-          }
-        />
-      </div>
-    </motion.div>
+    {/* Information */}
+    <div className="relative mt-6 space-y-3 pb-6">
+      <CommingSoon />
+
+      <Info
+        title="Student ID"
+        value={profile?.studentId || "Not Assigned"}
+      />
+
+      <Info
+        title="Current Batch"
+        value={profile?.batch?.name || "Not Assigned"}
+      />
+
+      <Info
+        title="Current Course"
+        value={
+          profile?.enrolledCourses?.[0]?.title ||
+          "No Course"
+        }
+      />
+
+      <Info
+        title="Trainer"
+        value={
+          profile?.batch?.teacher?.user?.fullName ||
+          "Not Assigned"
+        }
+      />
+
+      <Info
+        title="Admission Date"
+        value={
+          profile?.admissionDate
+            ? new Date(
+                profile.admissionDate
+              ).toLocaleDateString()
+            : "-"
+        }
+      />
+    </div>
+  </div>
+</motion.div>
   );
 }
 
@@ -174,6 +205,19 @@ function Info({ title, value }) {
       <p className="text-sm text-slate-500">{title}</p>
 
       <h3 className="mt-1 font-semibold text-slate-800">
+        {value}
+      </h3>
+    </div>
+  );
+}
+function StatCard({ title, value }) {
+  return (
+    <div className="rounded-2xl border border-orange-100 bg-orange-50 p-4 text-center transition hover:bg-orange-100">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        {title}
+      </p>
+
+      <h3 className="mt-2 text-lg font-bold text-[#D6451B]">
         {value}
       </h3>
     </div>

@@ -22,56 +22,116 @@ export default function Courses() {
 
 if(isLoading) return
   return (
- <div className="  max-w-6xl mx-auto py-10">
-
-    <div className="space-y-8 px-2">
+<div className="min-h-screen bg-slate-50">
+  <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="space-y-6 sm:space-y-8">
 
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white"
-      >
-        <h1 className="text-4xl font-bold">
-          My Courses
-        </h1>
+    <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4 }}
+  className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#D6451B] via-orange-500 to-orange-400 p-6 shadow-xl sm:p-8 lg:p-10"
+>
+  <div className="absolute inset-0">
+    <div className="absolute -right-10 -top-10 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
+    <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-orange-300/20 blur-3xl" />
+  </div>
 
-        <p className="mt-3 text-orange-100">
-          Continue learning and track your course progress.
+  <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-orange-100 backdrop-blur">
+        Student Portal
+      </span>
+
+      <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+        My Courses
+      </h1>
+
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-orange-100 sm:text-base">
+        Continue learning, monitor your enrolled courses and keep track of your progress.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-2 gap-3 sm:w-[320px]">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+        <p className="text-xs uppercase text-orange-100">
+          Courses
         </p>
-      </motion.div>
 
-      {/* Search */}
-      <div className="relative">
-
-        <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-
-        <input
-          placeholder="Search your courses..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-3xl border border-slate-200 bg-white py-4 pl-14 pr-5 outline-none shadow-lg focus:border-[#D6451B]"
-        />
-
+        <h3 className="mt-2 text-2xl font-bold text-white">
+          {batches?.length || 0}
+        </h3>
       </div>
 
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+        <p className="text-xs uppercase text-orange-100">
+          Active
+        </p>
+
+        <h3 className="mt-2 text-2xl font-bold text-white">
+          {
+            batches?.filter(
+              ({ course }) =>
+                course?.status === "published"
+            ).length || 0
+          }
+        </h3>
+      </div>
+    </div>
+  </div>
+</motion.div>
+
+      {/* Search */}
+   {/* <div className="relative">
+  <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+
+  <input
+    placeholder="Search your courses..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="
+      h-14
+      w-full
+      rounded-2xl
+      border
+      border-slate-200
+      bg-white
+      pl-14
+      pr-4
+      text-sm
+      shadow-sm
+      transition-all
+      focus:border-[#D6451B]
+      focus:ring-4
+      focus:ring-orange-100
+      outline-none
+    "
+  />
+</div> */}
+
       {/* Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 2xl:grid-cols-3">
 
         {batches?.map(({course}) => (
            <motion.div
   key={course._id}
   whileHover={{ y: -5 }}
   transition={{ duration: 0.25 }}
-  className="
-    overflow-hidden
-    rounded-3xl
-    border border-slate-200
-    bg-white
-    shadow-sm
-    transition-all
-    hover:shadow-xl
-  "
+className="
+group
+overflow-hidden
+rounded-3xl
+border
+border-slate-200
+bg-white
+shadow-sm
+transition-all
+duration-300
+hover:-translate-y-1
+hover:border-orange-200
+hover:shadow-xl
+"
 >
   {/* Thumbnail */}
 
@@ -80,7 +140,14 @@ if(isLoading) return
       <img
         src={course.thumbnail.url}
         alt={course.title}
-        className="h-full w-full object-cover"
+     className="
+h-full
+w-full
+object-cover
+transition-transform
+duration-500
+group-hover:scale-105
+"
       />
     ) : (
       <div className="flex h-full items-center justify-center">
@@ -124,7 +191,7 @@ if(isLoading) return
 
   {/* Content */}
 
-  <div className="p-5">
+ <div className="space-y-5 p-5 sm:p-6">
     {/* Title */}
 
     <h2 className="line-clamp-2 text-xl font-bold text-slate-900">
@@ -140,7 +207,13 @@ if(isLoading) return
     {/* Stats */}
 
     <div className="mt-5 grid grid-cols-2 gap-3">
-      <div className="rounded-2xl bg-slate-50 p-3">
+      <div className="
+rounded-2xl
+border
+border-slate-100
+bg-slate-50
+p-4
+">
         <p className="text-xs text-slate-500">
           Price
         </p>
@@ -163,7 +236,7 @@ if(isLoading) return
 
     {/* Meta */}
 
-    <div className="mt-5 space-y-3">
+  <div className="space-y-3 border-t border-slate-100 pt-5">
       <div className="flex items-center justify-between">
         <span className="text-sm text-slate-500">
           Level
@@ -204,6 +277,25 @@ if(isLoading) return
           {course?.status}
         </span>
       </div>
+      <button
+  className="
+    mt-6
+    flex
+    h-12
+    w-full
+    items-center
+    justify-center
+    rounded-2xl
+    bg-[#D6451B]
+    font-semibold
+    text-white
+    transition-all
+    hover:bg-[#b93814]
+    active:scale-[0.98]
+  "
+>
+  Continue Learning
+</button>
     </div>
 
   </div>
@@ -224,6 +316,6 @@ if(isLoading) return
         </div>
       )}
 
-    </div></div>
+    </div></div></div>
   );
 }

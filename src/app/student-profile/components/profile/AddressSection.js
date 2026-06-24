@@ -8,22 +8,30 @@ export default function AddressSection({
   errors,
 }) {
   return (
-    <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-lg">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900">
-          Address
-        </h2>
+    <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="mb-6 flex items-start gap-4 sm:mb-8">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-lg text-[#D6451B]">
+          <FaMapMarkerAlt />
+        </div>
 
-        <p className="mt-1 text-slate-500">
-          Keep your residential address up to date.
-        </p>
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
+            Address Details
+          </h2>
+
+          <p className="mt-1 text-sm leading-6 text-slate-500 sm:text-base">
+            Keep your residential address updated for communication and records.
+          </p>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Form */}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:gap-6">
         <Input
           icon={<FaMapMarkerAlt />}
-          label="Street"
-          placeholder="Street Address"
+          label="Street Address"
+          placeholder="Enter your street address"
           error={errors.address?.street}
           {...register("address.street")}
           className="md:col-span-2"
@@ -32,7 +40,7 @@ export default function AddressSection({
         <Input
           icon={<FaMapMarkerAlt />}
           label="City"
-          placeholder="City"
+          placeholder="Enter city"
           error={errors.address?.city}
           {...register("address.city")}
         />
@@ -40,7 +48,7 @@ export default function AddressSection({
         <Input
           icon={<FaMapMarkerAlt />}
           label="State"
-          placeholder="State"
+          placeholder="Enter state"
           error={errors.address?.state}
           {...register("address.state")}
         />
@@ -48,7 +56,7 @@ export default function AddressSection({
         <Input
           icon={<FaMapMarkerAlt />}
           label="Country"
-          placeholder="Country"
+          placeholder="Enter country"
           error={errors.address?.country}
           {...register("address.country")}
         />
@@ -56,7 +64,7 @@ export default function AddressSection({
         <Input
           icon={<FaMapMarkerAlt />}
           label="Postal Code"
-          placeholder="Postal Code"
+          placeholder="Enter postal code"
           error={errors.address?.postalCode}
           {...register("address.postalCode")}
         />

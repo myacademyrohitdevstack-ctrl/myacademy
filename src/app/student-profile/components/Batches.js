@@ -16,28 +16,69 @@ export default function Batches() {
   const router=useRouter()
   if(isLoading) return
   return (
-    <div className="max-w-6xl mx-auto">
-    <div className="space-y-8">
+  <div className="min-h-screen bg-slate-50">
+  <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="space-y-6 sm:space-y-8">
 
       {/* Header */}
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white shadow-xl"
-      >
-        <h1 className="text-4xl font-bold">
-          My Batches
-        </h1>
+    <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: .4 }}
+  className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#D6451B] via-orange-500 to-orange-400 p-6 shadow-xl sm:p-8 lg:p-10"
+>
+  <div className="absolute inset-0">
+    <div className="absolute -right-12 -top-12 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
+    <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-orange-300/20 blur-3xl" />
+  </div>
 
-        <p className="mt-3 text-orange-100">
-          View your assigned batches, trainers, schedules and attendance.
+  <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-orange-100 backdrop-blur">
+        Student Dashboard
+      </span>
+
+      <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+        My Batches
+      </h1>
+
+      <p className="mt-3 max-w-xl text-sm leading-7 text-orange-100 sm:text-base">
+        Access your assigned batches, schedules, trainers and class information.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-2 gap-3 sm:w-[320px]">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+        <p className="text-xs uppercase text-orange-100">
+          Batches
         </p>
-      </motion.div>
+
+        <h3 className="mt-2 text-2xl font-bold text-white">
+          {batches?.length || 0}
+        </h3>
+      </div>
+
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+        <p className="text-xs uppercase text-orange-100">
+          Active
+        </p>
+
+        <h3 className="mt-2 text-2xl font-bold text-white">
+          {
+            batches?.filter(
+              batch => batch.status === "active"
+            ).length || 0
+          }
+        </h3>
+      </div>
+    </div>
+  </div>
+</motion.div>
 
       {/* Cards */}
 
-      <div className="grid gap-7 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 2xl:grid-cols-3">
           
             {batches
               ?.map((batch) => (
@@ -45,7 +86,21 @@ export default function Batches() {
               <motion.div
       key={batch._id}
       whileHover={{ y: -4 }}
-      className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-xl"
+     className="
+group
+rounded-3xl
+border
+border-slate-200
+bg-white
+p-5
+shadow-sm
+transition-all
+duration-300
+hover:-translate-y-1
+hover:border-orange-200
+hover:shadow-xl
+sm:p-6
+"
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
@@ -60,7 +115,7 @@ export default function Batches() {
         </div>
     
         <span
-          className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+          className={`shrink-0 rounded-xl px-3 py-1 text-xs font-semibold ${
             batch.status === "active"
               ? "bg-green-100 text-green-700"
               : batch.status === "completed"
@@ -77,7 +132,7 @@ export default function Batches() {
       {/* Enrollment */}
       <div className="mt-3">
         <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
+          className={`rounded-xl px-3 py-1 text-xs font-medium ${
             batch.enrollmentOpen
               ? "bg-blue-100 text-blue-700"
               : "bg-red-100 text-red-700"
@@ -90,14 +145,20 @@ export default function Batches() {
       </div>
     
       {/* Description */}
-      <p className="mt-4 line-clamp-2 text-sm text-slate-500">
+<p className="mt-5 min-h-[48px] text-sm leading-6 text-slate-500 line-clamp-2">
         {batch.description ||
           "No description available"}
       </p>
     
       {/* Stats */}
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-slate-50 p-3">
+        <div className="
+rounded-2xl
+border
+border-slate-100
+bg-slate-50
+p-4
+">
           <p className="text-xs text-slate-500">
             Students
           </p>
@@ -120,7 +181,17 @@ export default function Batches() {
       </div>
     
       {/* Dates */}
-      <div className="mt-4 flex justify-between rounded-2xl bg-slate-50 p-3">
+      <div className="
+mt-5
+grid
+grid-cols-2
+gap-3
+rounded-2xl
+border
+border-slate-100
+bg-slate-50
+p-4
+">
         <div>
           <p className="text-xs text-slate-500">
             Start Date
@@ -143,7 +214,14 @@ export default function Batches() {
       </div>
     
       {/* Schedule */}
-      <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+      <div className="
+mt-5
+rounded-2xl
+border
+border-slate-100
+bg-slate-50
+p-5
+">
         <p className="text-xs text-slate-500">
           Schedule
         </p>
@@ -179,16 +257,22 @@ export default function Batches() {
         `/student-profile/classes?batchId=${batch._id}`
       )
     }
-    className="
-      flex w-full items-center justify-center gap-2
-      rounded-xl
-      bg-blue-50
-      py-3
-      font-medium
-      text-blue-600
-      transition
-      hover:bg-blue-100
-    "
+   className="
+mt-2
+flex
+h-12
+w-full
+items-center
+justify-center
+gap-2
+rounded-2xl
+bg-[#D6451B]
+font-semibold
+text-white
+transition-all
+hover:bg-[#b93814]
+active:scale-[0.98]
+"
   >
     <FaEye />
     View Batch
@@ -197,33 +281,21 @@ export default function Batches() {
     </motion.div>
     
               ))}
+              {batches?.length === 0 && (
+  <div className="rounded-3xl border border-slate-200 bg-white py-16 text-center shadow-sm">
+    <h2 className="text-2xl font-bold">
+      No Batches Assigned
+    </h2>
+
+    <p className="mt-2 text-slate-500">
+      Your assigned batches will appear here.
+    </p>
+  </div>
+)}
     
           </div>
 
-    </div></div>
+    </div></div></div>
   );
 }
 
-function Info({ icon, title, value }) {
-  return (
-    <div className="flex items-center gap-3">
-
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#D6451B]">
-        {icon}
-      </div>
-
-      <div>
-
-        <p className="text-sm text-slate-500">
-          {title}
-        </p>
-
-        <h3 className="font-semibold">
-          {value}
-        </h3>
-
-      </div>
-
-    </div>
-  );
-}

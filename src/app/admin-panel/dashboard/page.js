@@ -1,5 +1,6 @@
 "use client";
 
+import CommingSoon from "@/app/Components/ui/CommingSoon";
 import { useAdminGetStats } from "@/Hooks/useAdminGetStats";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -298,26 +299,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl relative"
         >
-           <div
-    className="
-      absolute inset-0 z-10
-      flex items-center justify-center
-      bg-black/60
-      rounded-xl 
-    "
-  >
-    <span
-      className="
-        rounded-full
-        bg-orange-500
-        px-4 py-2
-        text-sm font-bold
-        text-white
-      "
-    >
-      Coming Soon
-    </span>
-  </div>
+       <CommingSoon></CommingSoon>
           <div className="flex items-center justify-between">
 
             <div>
