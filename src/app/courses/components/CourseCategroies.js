@@ -6,23 +6,26 @@ const categories = [
 {
 title: "English Language",
 courses: "10+ Courses",
-image: "/categories/english.jpg",
+image: "/courses/english2.jpg",
 description:
 "Spoken English, IELTS preparation, grammar, vocabulary, communication skills, and interview training.",
+ slug: "english-speaking-mastery",
 },
 {
 title: "French Language",
 courses: "6+ Courses",
-image: "/categories/french.jpg",
+image: "/courses/french2.jpg",
 description:
 "Learn French from beginner to advanced levels with DELF, TEF, and immigration-focused preparation.",
+  slug: "french-language-program",
 },
 {
 title: "School Classes (1–12)",
 courses: "All Subjects",
-image: "/categories/classes.jpg",
+image: "/courses/academic2.png",
 description:
 "Expert coaching for students from Class 1 to 12 with personalized attention and exam preparation.",
+  slug: "academic-excellence-program",
 },
 ];
 
@@ -158,6 +161,7 @@ return ( <section className="bg-slate-50 py-24"> <div className="mx-auto max-w-7
             </p>
 
             <button
+            onClick={()=>{router.push(`/course/${category.slug}`)}}
               className="
                 mt-6
                 flex

@@ -5,53 +5,43 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FaLanguage,
   FaUserGraduate,
-  FaBriefcase,
   FaGlobe,
 } from "react-icons/fa";
 
 const programs = [
   {
     icon: <FaLanguage />,
-    title: "General English",
+    title: "English Language",
     level: "Beginner → Advanced",
-    desc: "Build real speaking confidence through daily conversation practice, not memorization.",
+    desc: "Develop speaking, listening, reading, and writing skills through personalized lessons and real-world communication practice.",
     points: [
-      "Daily speaking drills",
-      "Real-life conversation practice",
-      "Step-by-step fluency building",
+      "Speaking & pronunciation training",
+      "Everyday conversation practice",
+      "Fluency and confidence building",
     ],
   },
-  {
-    icon: <FaUserGraduate />,
-    title: "Academic English",
-    level: "IELTS / Study Abroad",
-    desc: "Master writing, essays, interviews, and structured academic communication.",
-    points: [
-      "IELTS focused training",
-      "Essay writing system",
-      "Interview preparation",
-    ],
-  },
-  {
-    icon: <FaBriefcase />,
-    title: "Business Communication",
-    level: "Professional Level",
-    desc: "Speak confidently in meetings, presentations, and workplace discussions.",
-    points: [
-      "Corporate speaking skills",
-      "Presentation mastery",
-      "Email & formal communication",
-    ],
-  },
+
   {
     icon: <FaGlobe />,
-    title: "Global Conversation Club",
-    level: "All Levels",
-    desc: "Practice with global learners in real-time speaking environments.",
+    title: "French Language",
+    level: "A1 → C2 Levels",
+    desc: "Learn French for education, work, travel, or immigration with structured lessons and interactive speaking sessions.",
     points: [
-      "Live global sessions",
-      "Native speaker interaction",
-      "Confidence building rooms",
+      "Grammar & vocabulary mastery",
+      "French conversation practice",
+      "DELF / TEF preparation support",
+    ],
+  },
+
+  {
+    icon: <FaUserGraduate />,
+    title: "Academic Programs",
+    level: "Students & Professionals",
+    desc: "Prepare for academic success with expert guidance in exams, study abroad pathways, and professional development.",
+    points: [
+      "IELTS & academic preparation",
+      "Study abroad guidance",
+      "Research, writing & presentation skills",
     ],
   },
 ];
@@ -69,25 +59,26 @@ export default function Programs() {
 
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
         {/* Header */}
-        <div className="mb-10 text-center lg:mb-16">
-          <div className="text-[10px] tracking-[0.35em] text-slate-400">
-            LEARNING PROGRAMS
-          </div>
+      <div className="mb-10 text-center lg:mb-16">
+  <div className="text-[10px] tracking-[0.35em] text-slate-400">
+    OUR PROGRAMS
+  </div>
 
-          <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            Explore your{" "}
-            <span className="bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
-              learning journey
-            </span>
-          </h2>
+  <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+    Learn without
+    <span className="bg-gradient-to-r from-[#D6451B] to-[#7BC3D7] bg-clip-text text-transparent">
+      {" "}limits
+    </span>
+  </h2>
 
-          <div className="mx-auto mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-[#D6451B] to-[#7BC3D7]" />
+  <div className="mx-auto mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-[#D6451B] to-[#7BC3D7]" />
 
-          <p className="mx-auto mt-5 max-w-2xl text-sm text-slate-600 sm:text-base">
-            One connected system designed to take you from basic communication
-            to real fluency.
-          </p>
-        </div>
+  <p className="mx-auto mt-5 max-w-2xl text-sm text-slate-600 sm:text-base">
+    Whether you're mastering English, learning French, or preparing for
+    academic success, our expert-led programs help you achieve your goals
+    with confidence.
+  </p>
+</div>
 
         {/* Program Selector */}
         <div className="mb-10 flex gap-2 overflow-x-auto pb-4 scrollbar-hide">

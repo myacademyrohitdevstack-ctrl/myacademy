@@ -8,44 +8,8 @@ import {
   FaPlayCircle,
 } from "react-icons/fa";
 
-export default function CourseModules() {
-  const [openModule, setOpenModule] =
-    useState(0)
-   const modules= [
-  {
-    title: "Introduction to Spoken English",
-    description:
-      "Build confidence with basic conversations and daily communication.",
-    lessons: [
-      "Self Introduction",
-      "Basic Greetings",
-      "Daily Vocabulary",
-      "Simple Conversations",
-    ],
-  },
-  {
-    title: "Grammar Foundations",
-    description:
-      "Learn the grammar required for accurate speaking and writing.",
-    lessons: [
-      "Tenses",
-      "Sentence Structure",
-      "Articles & Prepositions",
-      "Common Grammar Mistakes",
-    ],
-  },
-  {
-    title: "Public Speaking & Confidence",
-    description:
-      "Improve fluency and presentation skills through practical exercises.",
-    lessons: [
-      "Speech Practice",
-      "Storytelling",
-      "Presentation Skills",
-      "Confidence Building",
-    ],
-  },
-];
+export default function CourseModules({modules}) {
+  const [openModule, setOpenModule] = useState(0)
 
   return (
     <section className="py-20 bg-slate-50">

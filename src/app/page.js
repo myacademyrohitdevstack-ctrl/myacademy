@@ -9,6 +9,8 @@ import SuccessStories from "./Components/SuccessStory";
 import Faculty from "./Components/Faculty";
 import CTA from "./Components/CTA";
 import Footer from "./Components/Footer";
+import FindTutor from "./Components/FindTutor";
+import BecomeTutor from "./Components/BecomeTutor";
 
 export default function Home() {
   return (
@@ -16,7 +18,9 @@ export default function Home() {
 <Hero></Hero>
 {/* <GlobalCommunity></GlobalCommunity> */}
 <Programs></Programs>
+<FindTutor></FindTutor>
 <WhyChooseUs></WhyChooseUs>
+<BecomeTutor></BecomeTutor>
 {/* <LearningExperience></LearningExperience> */}
 <SuccessStories></SuccessStories>
 {/* <Faculty></Faculty> */}

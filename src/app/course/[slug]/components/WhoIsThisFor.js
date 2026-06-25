@@ -5,14 +5,8 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 
-export default function WhoIsThisCourseFor() {
-   const whoIsThisFor= [
-  "Students from Class 6 to 12 who want better English communication",
-  "Beginners who struggle to speak English confidently",
-  "Students preparing for IELTS or study abroad opportunities",
-  "Working professionals looking to improve workplace communication",
-  "Anyone wanting to improve grammar, vocabulary, and fluency",
-]
+export default function WhoIsThisCourseFor({whoIsThisFor}) {
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">

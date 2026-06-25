@@ -13,6 +13,7 @@ const courses = [
     certification: true,
     community: true,
     featured: true,
+     slug: "english-speaking-mastery",
   },
   {
     title: "IELTS Preparation",
@@ -22,6 +23,7 @@ const courses = [
     speaking: true,
     certification: true,
     community: true,
+ slug: "english-speaking-mastery",
   },
   {
     title: "French Language",
@@ -31,6 +33,7 @@ const courses = [
     speaking: true,
     certification: true,
     community: true,
+      slug: "french-language-program",
   },
 ];
 

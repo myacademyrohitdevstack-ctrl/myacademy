@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   FaFacebook,
   FaInstagram,
@@ -20,6 +21,7 @@ const links = [
   { name: "Contact", path: "/contact", icon: FaPhoneAlt },
 ];
 export default function Footer() {
+  const router=useRouter()
   return (
     <footer className="relative overflow-hidden bg-white border-t border-slate-100">
       {/* Brand Glow */}
@@ -139,7 +141,7 @@ export default function Footer() {
             </span>
           </h2>
 
-          <button className="mt-8 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
+          <button onClick={()=>{router.push('/find-tutor')}} className="mt-8 rounded-full bg-[#D6451B] px-8 py-3 text-white transition hover:opacity-90">
             Enroll Now
           </button>
         </div>

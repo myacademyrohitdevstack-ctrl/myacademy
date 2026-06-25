@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   FaArrowRight,
   FaPhoneAlt,
@@ -11,6 +12,7 @@ import {
 export default function CourseCTA({
   course,
 }) {
+  const router=useRouter()
   return (
     <section className="py-20">
       <div className="max-w-7xl mx-auto px-6">
@@ -61,6 +63,7 @@ export default function CourseCTA({
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
 
                 <button
+                 onClick={()=>{router.push('/find-tutor')}}
                   className="
                     flex items-center justify-center gap-3
                     rounded-2xl
@@ -77,6 +80,7 @@ export default function CourseCTA({
                 </button>
 
                 <button
+                onClick={()=>{router.push('/about')}}
                   className="
                     flex items-center justify-center gap-3
                     rounded-2xl
@@ -198,26 +202,7 @@ export default function CourseCTA({
                   </div>
                 </div>
 
-                <div
-                  className="
-                    rounded-3xl
-                    bg-white
-                    p-6
-                    text-slate-900
-                  "
-                >
-                  <p className="text-sm text-slate-500">
-                    Course Fee
-                  </p>
-
-                  <h3 className="mt-2 text-4xl font-bold text-[#D6451B]">
-                    ₹{course?.price}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-slate-500">
-                    One-time enrollment fee
-                  </p>
-                </div>
+          
 
               </div>
             </div>

@@ -89,7 +89,7 @@ export default function CourseHero({ course }) {
             </div>
 
             {/* Price */}
-            <div className="mt-8 flex items-center gap-4">
+            {/* <div className="mt-8 flex items-center gap-4">
               <span className="text-4xl font-bold text-[#D6451B]">
                 ₹{course?.price}
               </span>
@@ -97,12 +97,12 @@ export default function CourseHero({ course }) {
               <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
                 Enrollment Open
               </span>
-            </div>
+            </div> */}
 
             {/* CTA */}
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/contact"
+                href="/about"
                 className="
                   flex items-center justify-center gap-3
                   rounded-2xl
@@ -117,20 +117,7 @@ export default function CourseHero({ course }) {
                 Book Free Demo
               </Link>
 
-              <button
-                className="
-                  flex items-center justify-center gap-3
-                  rounded-2xl
-                  border border-slate-300
-                  bg-white
-                  px-8 py-4
-                  font-semibold
-                  text-slate-700
-                "
-              >
-                <FaPlay />
-                Watch Overview
-              </button>
+           
             </div>
           </div>
 

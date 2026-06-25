@@ -129,56 +129,46 @@ export default function BatchDetailsPage() {
 
       {/* Tabs */}
 
-  <div className="overflow-x-auto pb-2">
-  <div className="flex min-w-max gap-2 sm:gap-3">
-    
-    <button
-      onClick={() => setActiveTab("notes")}
-      className={`
-        whitespace-nowrap rounded-xl sm:rounded-2xl
-        px-4 py-2.5 sm:px-6 sm:py-3
-        text-sm sm:text-base font-medium transition
-        ${
+ 
+  <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
+    <div className="grid grid-cols-3 gap-1">
+
+      <button
+        onClick={() => setActiveTab("notes")}
+        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
           activeTab === "notes"
             ? "bg-[#D6451B] text-white shadow-md"
-            : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-        }
-      `}
-    >
-      Notes
-    </button>
+            : "text-slate-600 hover:bg-slate-50"
+        }`}
+      >
+        <FaBookOpen className="text-sm" />
+        <span>Notes</span>
+      </button>
 
-    <button
-      onClick={() => setActiveTab("links")}
-      className={`
-        whitespace-nowrap rounded-xl sm:rounded-2xl
-        px-4 py-2.5 sm:px-6 sm:py-3
-        text-sm sm:text-base font-medium transition
-        ${
+      <button
+        onClick={() => setActiveTab("links")}
+        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
           activeTab === "links"
             ? "bg-[#D6451B] text-white shadow-md"
-            : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-        }
-      `}
-    >
-      Class Links
-    </button>
+            : "text-slate-600 hover:bg-slate-50"
+        }`}
+      >
+        <FaLink className="text-sm" />
+        <span>Links</span>
+      </button>
 
-    <button
-      onClick={() => setActiveTab("announcements")}
-      className={`
-        whitespace-nowrap rounded-xl sm:rounded-2xl
-        px-4 py-2.5 sm:px-6 sm:py-3
-        text-sm sm:text-base font-medium transition
-        ${
+      <button
+        onClick={() => setActiveTab("announcements")}
+        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
           activeTab === "announcements"
             ? "bg-[#D6451B] text-white shadow-md"
-            : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-        }
-      `}
-    >
-      Announcements
-    </button>
+            : "text-slate-600 hover:bg-slate-50"
+        }`}
+      >
+        <FaBullhorn className="text-sm" />
+        <span>Updates</span>
+      </button>
+
 
   </div>
 </div>

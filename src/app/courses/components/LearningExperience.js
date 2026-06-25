@@ -168,45 +168,7 @@ export default function LearningExperience() {
           ))}
         </div>
 
-        {/* CTA */}
-
-        <div
-          className="
-            mt-20
-            rounded-[32px]
-            bg-gradient-to-r
-            from-[#D6451B]
-            to-orange-500
-            p-8 md:p-12
-            text-center
-            text-white
-          "
-        >
-          <h3 className="text-3xl font-bold">
-            Ready to Start Learning?
-          </h3>
-
-          <p className="mt-3 text-orange-100">
-            Join live classes, learn from experts, and achieve your
-            academic and language goals with confidence.
-          </p>
-
-          <button
-           onClick={()=>{router.push('/login')}}
-            className="
-              mt-6
-              rounded-2xl
-              bg-white
-              px-6 py-3
-              font-semibold
-              text-[#D6451B]
-              transition
-              hover:scale-105
-            "
-          >
-            Enroll Now
-          </button>
-        </div>
+     
       </div>
     </section>
   );

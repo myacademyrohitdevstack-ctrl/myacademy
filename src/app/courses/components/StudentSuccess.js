@@ -198,48 +198,7 @@ export default function StudentSuccess() {
 
         </div>
 
-        {/* Bottom CTA */}
-
-        <div
-          className="
-            mt-20
-            rounded-[32px]
-            bg-gradient-to-r
-            from-[#D6451B]
-            to-orange-500
-            p-10
-            text-center
-            text-white
-          "
-        >
-          <FaGraduationCap className="mx-auto text-5xl" />
-
-          <h3 className="mt-5 text-3xl font-bold">
-            Become Our Next Success Story
-          </h3>
-
-          <p className="mt-3 text-orange-100 max-w-2xl mx-auto">
-            Join live classes for English Speaking, IELTS, French,
-            and Academic Excellence. Start your learning journey today.
-          </p>
-
-          <button
-           onClick={()=>{router.push('/login')}}
-            className="
-              mt-6
-              rounded-2xl
-              bg-white
-              px-6
-              py-3
-              font-semibold
-              text-[#D6451B]
-              transition
-              hover:scale-105
-            "
-          >
-            Enroll Now
-          </button>
-        </div>
+      
 
       </div>
     </section>

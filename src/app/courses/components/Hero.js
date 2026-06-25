@@ -9,21 +9,24 @@ title: "English Language",
 subtitle:
 "Spoken English • IELTS • Communication Skills • Interview Preparation",
 image:
-"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+"/courses/english1.avif",
+ slug: "english-speaking-mastery",
 },
 {
 title: "French Language",
 subtitle:
 "DELF • TEF • Immigration Pathways • Study Abroad Preparation",
 image:
-"https://images.unsplash.com/photo-1431274172761-fca41d930114?q=80&w=1200&auto=format&fit=crop",
+"/courses/french1.avif",
+  slug: "french-language-program",
 },
 {
 title: "School Classes",
 subtitle:
 "Classes 1-12 • Academic Excellence • Subject Support • Exam Preparation",
 image:
-"https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop",
+"/courses/academic1.avif",
+  slug: "academic-excellence-program",
 },
 ];
 
@@ -104,7 +107,7 @@ return ( <section className="relative overflow-hidden bg-white pb-20 pt-28">
         "
       >
         <button
-        onClick={()=>{router.push('/login')}}
+        onClick={()=>{router.push('/find-tutor')}}
           className="
             rounded-2xl
             bg-[#D6451B]
@@ -120,7 +123,7 @@ return ( <section className="relative overflow-hidden bg-white pb-20 pt-28">
         </button>
 
         <button
-         onClick={()=>{router.push('/login')}}
+         onClick={()=>{router.push('/about')}}
           className="
             rounded-2xl
             border border-slate-300
@@ -196,7 +199,8 @@ return ( <section className="relative overflow-hidden bg-white pb-20 pt-28">
               {goal.subtitle}
             </p>
 
-            <div
+            <button
+            onClick={()=>{router.push(`/course/${goal.slug}`)}}
               className="
                 mt-6
                 flex
@@ -213,68 +217,13 @@ return ( <section className="relative overflow-hidden bg-white pb-20 pt-28">
             >
               Explore Program
               <FaArrowRight />
-            </div>
+            </button>
           </div>
         </div>
       ))}
     </div>
 
-    {/* Stats */}
-
-    <div
-      className="
-        mt-20
-        rounded-[32px]
-        bg-gradient-to-r
-        from-[#D6451B]
-        to-orange-500
-        p-8
-        text-white
-        shadow-xl
-      "
-    >
-      <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
-        <div>
-          <div className="text-4xl font-bold">
-            5000+
-          </div>
-
-          <div className="mt-2 text-white/80">
-            Students Trained
-          </div>
-        </div>
-
-        <div>
-          <div className="text-4xl font-bold">
-            98%
-          </div>
-
-          <div className="mt-2 text-white/80">
-            Success Rate
-          </div>
-        </div>
-
-        <div>
-          <div className="text-4xl font-bold">
-            12+
-          </div>
-
-          <div className="mt-2 text-white/80">
-            Years Experience
-          </div>
-        </div>
-
-        <div>
-          <div className="text-4xl font-bold">
-            3
-          </div>
-
-          <div className="mt-2 text-white/80">
-            Learning Programs
-          </div>
-        </div>
-      </div>
-    </div>
+ 
   </div>
 </section>
 

@@ -1,54 +1,10 @@
 "use client";
 
-import {
-  FaCheckCircle,
-  FaComments,
-  FaMicrophone,
-  FaBookOpen,
-  FaUserTie,
-  FaBullhorn,
-} from "react-icons/fa";
 
-const learnings = [
-  {
-    icon: <FaComments />,
-    title: "Speak Confidently",
-    description:
-      "Hold conversations naturally and express your ideas with confidence.",
-  },
-  {
-    icon: <FaMicrophone />,
-    title: "Improve Pronunciation",
-    description:
-      "Learn proper pronunciation, intonation, and speaking clarity.",
-  },
-  {
-    icon: <FaBookOpen />,
-    title: "Build Vocabulary",
-    description:
-      "Expand your vocabulary with practical words used in daily life.",
-  },
-  {
-    icon: <FaCheckCircle />,
-    title: "Master Grammar",
-    description:
-      "Understand grammar through real examples and speaking activities.",
-  },
-  {
-    icon: <FaUserTie />,
-    title: "Interview Preparation",
-    description:
-      "Answer interview questions confidently and professionally.",
-  },
-  {
-    icon: <FaBullhorn />,
-    title: "Public Speaking",
-    description:
-      "Present ideas clearly and improve communication in groups.",
-  },
-];
 
-export default function WhatYouWillLearn() {
+
+
+export default function WhatYouWillLearn({learnings}) {
   return (
     <section className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-6">
@@ -78,7 +34,7 @@ export default function WhatYouWillLearn() {
 
         {/* Learning Cards */}
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {learnings.map((item) => (
+          {learnings?.map((item) => (
             <div
               key={item.title}
               className="

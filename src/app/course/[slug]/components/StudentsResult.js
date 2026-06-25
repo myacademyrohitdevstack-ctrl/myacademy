@@ -2,36 +2,7 @@
 
 import { FaQuoteLeft } from "react-icons/fa";
 
-export default function StudentResult() {
-   const results= [
-  {
-    name: "Aman Sharma",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43d",
-    achievement: "Improved Spoken English Confidence",
-    result: "Beginner → Fluent Speaker",
-    quote:
-      "I was afraid of speaking English in class. After completing this course, I confidently participate in discussions and presentations.",
-  },
-  {
-    name: "Priya Verma",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    achievement: "Scored IELTS 7.5",
-    result: "Band 5.5 → Band 7.5",
-    quote:
-      "The speaking and writing modules helped me achieve my target score for studying abroad.",
-  },
-  {
-    name: "Rahul Singh",
-    image:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
-    achievement: "Improved Academic Performance",
-    result: "More Confidence in School",
-    quote:
-      "My grammar and vocabulary improved significantly. I now communicate much better in English.",
-  },
-];
+export default function StudentResult({results}) {
   if (!results?.length) return null;
 
   return (

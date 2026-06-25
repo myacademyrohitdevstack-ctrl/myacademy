@@ -46,7 +46,7 @@ export default function CTA() {
 
               {/* Buttons */}
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <button  onClick={()=>{router.push('/login')}} className="group flex items-center justify-center gap-3 rounded-2xl bg-white px-8 py-4 font-semibold text-[#D6451B] transition hover:scale-105">
+                <button  onClick={()=>{router.push('/find-tutor')}} className="group flex items-center justify-center gap-3 rounded-2xl bg-white px-8 py-4 font-semibold text-[#D6451B] transition hover:scale-105">
                   Enroll Now
 
                   <FaArrowRight className="transition group-hover:translate-x-1" />
