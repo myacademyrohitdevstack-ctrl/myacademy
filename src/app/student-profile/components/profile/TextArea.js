@@ -38,7 +38,7 @@ export default function TextArea({
 
       {error && (
         <p className="text-sm text-red-500">
-          {error}
+          {error.message}
         </p>
       )}
     </div>

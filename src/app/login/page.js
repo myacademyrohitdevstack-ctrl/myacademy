@@ -65,7 +65,7 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white py-20">
+    <section className="relative min-h-screen overflow-hidden bg-white ">
 
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.08),transparent_50%)]" />
@@ -79,11 +79,7 @@ export default function LoginPage() {
         >
           {/* Logo */}
           <div className="text-center">
-            <img
-              src="/icon1.png"
-              alt="IMA"
-              className="mx-auto h-16 w-16 object-contain"
-            />
+           
 
             <h1 className="mt-6 text-3xl font-bold text-slate-900">
               Welcome Back

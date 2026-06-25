@@ -1,5 +1,5 @@
 "use client";
-
+import { FaClipboardCheck } from "react-icons/fa";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -33,7 +33,7 @@ import { AnnouncementsSkeleton } from "@/app/Skeletons/AnnouncementSkeleton";
 import { ClassLinksSkeleton } from "@/app/Skeletons/ClassesSkeleton";
 import Loading from "@/app/Components/ui/Loading";
 
-export default function BatchDetailsPage() {
+export default function BatchDetailsPage({attendance}) {
     const searchParams=useSearchParams()
     const batchId=searchParams.get("batchId")
        const [activeTab, setActiveTab] = useState("notes");
@@ -125,17 +125,23 @@ export default function BatchDetailsPage() {
   icon={<FaBullhorn />}
   color="bg-purple-50 text-purple-600"
 />
+<StatCard
+  title="Attendance"
+  value={attendance?.length || 0}
+  icon={<FaClipboardCheck />}
+  color="bg-emerald-50 text-emerald-600"
+/>
       </div>
 
       {/* Tabs */}
 
  
   <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-    <div className="grid grid-cols-3 gap-1">
+   <div className="grid  grid-cols-4 gap-1">
 
       <button
         onClick={() => setActiveTab("notes")}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
+        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
           activeTab === "notes"
             ? "bg-[#D6451B] text-white shadow-md"
             : "text-slate-600 hover:bg-slate-50"
@@ -147,7 +153,7 @@ export default function BatchDetailsPage() {
 
       <button
         onClick={() => setActiveTab("links")}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
+        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
           activeTab === "links"
             ? "bg-[#D6451B] text-white shadow-md"
             : "text-slate-600 hover:bg-slate-50"
@@ -159,7 +165,7 @@ export default function BatchDetailsPage() {
 
       <button
         onClick={() => setActiveTab("announcements")}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
+        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
           activeTab === "announcements"
             ? "bg-[#D6451B] text-white shadow-md"
             : "text-slate-600 hover:bg-slate-50"
@@ -168,7 +174,17 @@ export default function BatchDetailsPage() {
         <FaBullhorn className="text-sm" />
         <span>Updates</span>
       </button>
-
+<button
+  onClick={() => setActiveTab("attendance")}
+  className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
+    activeTab === "attendance"
+      ? "bg-[#D6451B] text-white shadow-md"
+      : "text-slate-600 hover:bg-slate-50"
+  }`}
+>
+  <FaClipboardCheck className="text-sm" />
+  <span>Attendance</span>
+</button>
 
   </div>
 </div>
@@ -901,6 +917,82 @@ export default function BatchDetailsPage() {
 
   </div>
 )} { annoucementLoading && <AnnouncementsSkeleton></AnnouncementsSkeleton>}
+{activeTab === "attendance" && (
+  <div>
+    {/* Header */}
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 className="text-2xl font-bold sm:text-3xl">
+          Attendance
+        </h2>
+
+        <p className="mt-1 text-sm text-slate-500 sm:text-base">
+          Track student attendance records and participation.
+        </p>
+      </div>
+
+      <button
+        onClick={() =>
+          router.push(
+            `/admin-panel/mark-attendence?batchId=${batchId}`
+          )
+        }
+        className="
+          flex w-full items-center justify-center gap-2
+          rounded-xl bg-[#D6451B]
+          px-5 py-3 text-white
+          sm:w-auto
+        "
+      >
+        <FaPlus />
+        Mark Attendance
+      </button>
+    </div>
+
+    <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-center">
+      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+        <FaClipboardCheck className="text-3xl text-emerald-600" />
+      </div>
+
+      <h3 className="mt-5 text-xl font-semibold text-slate-800">
+        Attendance Records
+      </h3>
+
+      <p className="mt-2 text-slate-500">
+        View attendance percentages, absences, and student participation for this batch.
+      </p>
+
+      <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl bg-green-50 p-5">
+          <p className="text-sm text-slate-500">
+            Present Today
+          </p>
+          <h4 className="mt-2 text-3xl font-bold text-green-600">
+            24
+          </h4>
+        </div>
+
+        <div className="rounded-2xl bg-red-50 p-5">
+          <p className="text-sm text-slate-500">
+            Absent Today
+          </p>
+          <h4 className="mt-2 text-3xl font-bold text-red-600">
+            6
+          </h4>
+        </div>
+
+        <div className="rounded-2xl bg-blue-50 p-5">
+          <p className="text-sm text-slate-500">
+            Attendance Rate
+          </p>
+          <h4 className="mt-2 text-3xl font-bold text-blue-600">
+            80%
+          </h4>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
     <Modal
      isOpen={pdfOpen}

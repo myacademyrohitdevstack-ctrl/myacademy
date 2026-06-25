@@ -21,7 +21,7 @@ export const useCreateBatchMutation=(resetForm)=>{
              resetForm();
 
   setTimeout(() => {
-    router.push("/admin-panel/batches");
+    router.push("/admin-panel/courses");
   }, 1500);
   
         }

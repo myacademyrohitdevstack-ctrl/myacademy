@@ -17,7 +17,7 @@ export default function EditBatchPage({batchId}) {
 const {data:batch}=useGetBatchById(batchId)
 const [trainers,seTtrainers]=useState([])
 const [students,setStudents]=useState([])
-
+const [selectedStudents, setSelectedStudents] = useState([]);
   const { register, handleSubmit, watch,reset, setValue,formState:{isSubmitting,errors,isDirty} } = useForm({
     resolver:zodResolver(editBatchSchema),
     mode:"onBlur",
@@ -37,7 +37,10 @@ const [students,setStudents]=useState([])
 },
   });
   const batchMutation=useUpdateBatchMutation(reset)
-const {data:studentsData,isLoading}=useAdminStudent(1,"" ,"" ,"" ,"student")
+  const [page,setPage]=useState(1)
+const {data:studentsData,isLoading}=useAdminStudent(page,"" ,"" ,"" ,"student")
+  const users=studentsData?.users || []
+  const pagination=studentsData?.pagination || {}
 const {data:trainersData}=useAdminStudent(1,"" ,"" ,"" ,"teacher")
 useEffect(()=>{
 if(!batch) return
@@ -48,7 +51,7 @@ reset({
   maxStudents: batch?.maxStudents || 50,
   description: batch?.description || "",
   meetingPlatform: batch?.meetingPlatform || "zoom",
-  enrollmentOpen: batch?.enrollmentOpen ?? true,
+  enrollmentOpen: batch?.enrollmentOpen || true,
 
   "schedule.days": batch?.schedule?.days || [],
   "schedule.startTime":
@@ -61,8 +64,10 @@ reset({
   trainers:
     batch?.trainers?.map((t) => t._id) || [],
 });
+setSelectedStudents(batch.students.map((t) => t._id) || []);
 },[batch,reset])
 useEffect(()=>{
+  console.log(studentsData)
   if(!studentsData || !trainersData) return 
   
    seTtrainers(trainersData?.users)
@@ -77,9 +82,15 @@ const selectedTrainerIds = watch("trainers") || [];
 const addStudent = (student) => {
   if (selectedStudentIds.includes(student._id)) return;
 
-  setValue("students", [
-    ...selectedStudentIds,
-    student._id,
+  setValue(
+    "students",
+    [...selectedStudentIds, student._id],
+    { shouldDirty: true }
+  );
+
+  setSelectedStudents((prev) => [
+    ...prev,
+    student,
   ]);
 };
 
@@ -88,7 +99,12 @@ const removeStudent = (studentId) => {
     "students",
     selectedStudentIds.filter(
       (id) => id !== studentId
-    )
+    ),
+    { shouldDirty: true }
+  );
+
+  setSelectedStudents((prev) =>
+    prev.filter((s) => s._id !== studentId)
   );
 };
 
@@ -446,11 +462,8 @@ if(isLoading) return
   {/* Assigned Students */}
 
   <div className="mt-8 grid gap-4 md:grid-cols-2">
-    {students
-      .filter((student) =>
-        selectedStudentIds.includes(student._id)
-      )
-      .map((student) => (
+   
+      {selectedStudents.map((student) => (
         <div
           key={student._id}
           className="
@@ -550,6 +563,47 @@ if(isLoading) return
           </button>
         ))}
     </div>
+         <div className="flex items-center gap-2 py-2">
+
+        <button
+        type="button"
+  disabled={!pagination.hasPreviousPage}
+  onClick={() => setPage((prev) => prev - 1)}
+  className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
+>
+  Previous
+</button>
+
+         {Array.from(
+  { length: pagination.totalPages },
+  (_, i) => i + 1
+).map((pageNumber) => (
+  <button
+    key={pageNumber}
+    type="button"
+    onClick={() => setPage(pageNumber)}
+    className={`h-10 w-10 rounded-xl ${
+      page === pageNumber
+        ? "bg-[#D6451B] text-white"
+        : "border border-slate-200 hover:bg-slate-50"
+    }`}
+  >
+    {pageNumber}
+  </button>
+))}
+
+      <button
+      type="button"
+  disabled={!pagination.hasNextPage}
+  onClick={() => setPage((prev) => prev + 1)}
+  className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
+>
+  Next
+</button>
+
+          
+
+        </div>
   </div>
 </div>
 

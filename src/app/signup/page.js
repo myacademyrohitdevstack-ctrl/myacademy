@@ -120,7 +120,7 @@ useEffect(() => {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white py-20">
+    <section className="relative min-h-screen overflow-hidden bg-white ">
 
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.08),transparent_50%)]" />
@@ -133,21 +133,7 @@ useEffect(() => {
           className="w-full"
         >
           {/* Logo */}
-          <div className="text-center">
-            <img
-              src="/icon1.png"
-              alt="IMA"
-              className="mx-auto h-16 w-16 object-contain"
-            />
-
-            <h1 className="mt-6 text-3xl font-bold text-slate-900">
-              Create Account
-            </h1>
-
-            <p className="mt-3 text-sm text-slate-500">
-              Join thousands of learners improving communication skills worldwide.
-            </p>
-          </div>
+         
 
           {/* Form Card */}
           <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl">

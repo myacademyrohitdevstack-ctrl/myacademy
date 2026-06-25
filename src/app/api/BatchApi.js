@@ -9,3 +9,6 @@ export  function getBatchById(id){
 export  function updatedBatchApi({id,data}){
     return api.patch(`/batches/${id}/update`,data)
 }
+export  function batchStudentsApi(id,){
+    return api.get(`/batches/${id}/students`)
+}

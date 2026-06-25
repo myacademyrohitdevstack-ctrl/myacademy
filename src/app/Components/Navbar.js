@@ -36,11 +36,8 @@ export default function Navbar() {
  const user=useAuthStore((state)=>state.user)
 
 const links = [
-  { name: "Home", path: "/", icon: FaHome },
-  { name: "Courses", path: "/courses", icon: FaBookOpen },
-  { name: "Find Tutor", path: "/find-tutor", icon: FaSearch },
-  { name: "Become a Tutor", path: "/become-a-tutor", icon: FaChalkboardTeacher },
-  { name: "About", path: "/about", icon: FaInfoCircle },
+
+
 ];
 useEffect(() => {
 
@@ -146,7 +143,7 @@ logoutMutation.mutate()
 
           <div>
             <h2 className="text-sm font-bold text-slate-900">
-              Inquisitive Mind
+              My Academy
             </h2>
 
             <p className="text-[10px] tracking-[0.35em] text-[#D6451B]">

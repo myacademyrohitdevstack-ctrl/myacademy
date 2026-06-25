@@ -40,14 +40,7 @@ export default function PendingApprovalPage() {
             Registration Successful
           </h1>
 
-          <p className="mt-4 text-center text-sm leading-7 text-slate-600 sm:text-base">
-            Welcome to
-            <span className="font-semibold text-[#D6451B]">
-              {" "}
-              Inquisitive Mind Academy
-            </span>
-            .
-          </p>
+         
 
           <p className="mt-2 text-center text-sm leading-7 text-slate-500 sm:text-base">
             Your account has been created successfully and is currently waiting
