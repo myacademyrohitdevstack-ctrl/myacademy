@@ -266,11 +266,15 @@ export function ContactForm({
           className="w-full rounded-3xl border border-slate-200 px-5 py-4 outline-none transition focus:border-[#D6451B]"
         />
 
-        <input
-          type="tel"
-          placeholder="Phone Number"
-          className="w-full rounded-3xl border border-slate-200 px-5 py-4 outline-none transition focus:border-[#D6451B]"
-        />
+     <input
+  type="tel"
+  placeholder="Phone Number"
+  value={form.phone || ""}
+  onChange={(e) =>
+    update("phone", e.target.value)
+  }
+  className="w-full rounded-3xl border border-slate-200 px-5 py-4 outline-none transition focus:border-[#D6451B]"
+/>
       </div>
     </div>
   );

@@ -33,10 +33,13 @@ import {
 } from "./data";
 import ProgressTracker from "./ProgressTraker";
 import TutorPreview from "./TutorPreview";
+import { validateStep } from "../validation";
+import SITE_CONFIG from "@/app/siteConfig";
 
 export default function StudentOnboarding() {
+  const [error, setError] = useState("");
   const [step, setStep] = useState(0);
-
+const {whatsappNumber}=SITE_CONFIG
 const [form, setForm] = useState({
   goal: "",
   language: "",
@@ -73,11 +76,22 @@ const [form, setForm] = useState({
     }
   };
 
-  const next = () => {
-    if (step < 9) {
-      setStep(step + 1);
-    }
-  };
+
+
+const next = () => {
+  const errorMessage = validateStep(step, form);
+
+  if (errorMessage) {
+    setError(errorMessage);
+    return;
+  }
+
+  setError("");
+
+  if (step < 9) {
+    setStep(step + 1);
+  }
+};
 
   const prev = () => {
     if (step > 0) {
@@ -282,20 +296,45 @@ const [form, setForm] = useState({
                 {/* MATCHING */}
 
                 {step === 9 && (
-                  <MatchingScreen
-                    onContinue={() => {
-                      console.log(
-                        "Form Data",
-                        form
-                      );
-                    }}
-                  />
+                 <MatchingScreen
+  onContinue={() => {
+    const message = `
+🎓 New Tutor Request
+
+👤 Name: ${form.name}
+📧 Email: ${form.email}
+📱 Phone: ${form.phone}
+
+🎯 Goal: ${form.goal}
+📚 Subject: ${form.language}
+📈 Level: ${form.level}
+⭐ Focus: ${form.focus}
+
+💰 Budget: ${form.budget}
+📅 Days: ${form.availability.join(", ")}
+⏰ Time: ${form.timeSlot}
+
+🎯 Preference: ${form.tutor}
+`;
+
+    const whatsappUrl =
+      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        message
+      )}`;
+
+    window.open(whatsappUrl, "_blank");
+  }}
+/>
                 )}
 
               </AnimatePresence>
 
               {/* Navigation */}
-
+{error && (
+  <div className="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+    {error}
+  </div>
+)}
               {step < 9 && (
                 <div className="mt-10 flex items-center gap-3">
 

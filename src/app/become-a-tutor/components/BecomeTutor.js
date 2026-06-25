@@ -71,10 +71,7 @@ export default function BecomeTutor() {
   };
 
 const next = () => {
-  const errorMessage = validateStep(
-    step,
-    form
-  );
+  const errorMessage = validateStep(step, form);
 
   if (errorMessage) {
     setError(errorMessage);
@@ -82,6 +79,47 @@ const next = () => {
   }
 
   setError("");
+
+  // Contact form completed
+  if (step === 8) {
+    const message = `
+🎓 *New Tutor Application*
+
+👤 Name: ${form.name}
+📧 Email: ${form.email}
+📱 Phone: ${form.phone}
+📍 City: ${form.city}
+
+📚 Subject: ${form.subject}
+👨‍🏫 Experience: ${form.experience}
+🎯 Student Level: ${form.studentLevel}
+💻 Teaching Mode: ${form.mode}
+
+📅 Availability: ${
+      form.availability.length
+        ? form.availability.join(", ")
+        : "Not Provided"
+    }
+
+⏰ Time Slot: ${form.timeSlot}
+
+💰 Expected Earnings: ${form.earnings}
+
+🎓 Qualification: ${form.qualification}
+`;
+
+    const whatsappNumber = "919876543210"; // your number
+
+    window.open(
+      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        message
+      )}`,
+      "_blank"
+    );
+
+    setStep(9);
+    return;
+  }
 
   if (step < 9) {
     setStep(step + 1);

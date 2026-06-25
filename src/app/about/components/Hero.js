@@ -8,25 +8,35 @@ FaLanguage,
 FaSchool,
 FaCheckCircle,
 } from "react-icons/fa";
-
+import SITE_CONFIG from "@/app/siteConfig";
 export default function Hero() {
+  
 const [form, setForm] = useState({
 name: "",
 phone: "",
 course: "english",
 });
+const {whatsappNumber}=SITE_CONFIG
 
 const handleSubmit = (e) => {
-e.preventDefault();
+  e.preventDefault();
 
-```
-console.log(form);
+  const message = `
+*New Demo Class Request*
 
-// API Call Here
-```
+👤 Name: ${form.name}
+📞 Phone: ${form.phone}
+📚 Course: ${form.course}
+  `;
 
+ 
+
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    message
+  )}`;
+
+  window.open(whatsappUrl, "_blank");
 };
-
 return ( <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-50 py-20 lg:py-28">
 {/* Background Shapes */}
 

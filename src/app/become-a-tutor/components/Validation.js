@@ -1,106 +1,89 @@
 export function validateStep(step, form) {
   switch (step) {
+    // Subject
     case 0:
-      if (!form.goal) {
-        return "Please select an option";
-      }
-      break;
-
-    case 1:
-      if (!form.language && !form.subject) {
+      if (!form.subject) {
         return "Please select a subject";
       }
       break;
 
+    // Experience
+    case 1:
+      if (!form.experience) {
+        return "Please select your teaching experience";
+      }
+      break;
+
+    // Student Level
     case 2:
-      if (!form.level && !form.studentLevel) {
-        return "Please select your level";
+      if (!form.studentLevel) {
+        return "Please select who you teach";
       }
       break;
 
+    // Teaching Mode
     case 3:
-      if (!form.focus && !form.mode) {
-        return "Please make a selection";
+      if (!form.mode) {
+        return "Please select a teaching mode";
       }
       break;
 
+    // Availability
     case 4:
-      if (!form.budget && !form.availability?.length) {
-        return "Please make a selection";
+      if (!form.availability?.length) {
+        return "Please select at least one available day";
       }
       break;
 
+    // Time Slot
     case 5:
-      if (
-        form.availability &&
-        form.availability.length === 0
-      ) {
-        return "Please select availability";
-      }
-
       if (!form.timeSlot) {
-        return "Please select a time slot";
+        return "Please select your preferred teaching hours";
       }
       break;
 
+    // Earnings
     case 6:
-      if (
-        !form.tutor &&
-        !form.earnings
-      ) {
-        return "Please make a selection";
+      if (!form.earnings) {
+        return "Please select your expected earnings";
       }
       break;
 
+    // Qualification
     case 7:
-      if (
-        form.qualification !== undefined &&
-        !form.qualification
-      ) {
-        return "Please select a qualification";
-      }
-
-      if (
-        form.name !== undefined &&
-        !form.name.trim()
-      ) {
-        return "Please enter your name";
+      if (!form.qualification) {
+        return "Please select your qualification";
       }
       break;
 
+    // Contact Information
     case 8:
-      if (
-        !form.name?.trim()
-      ) {
-        return "Please enter your name";
+      if (!form.name?.trim()) {
+        return "Please enter your full name";
       }
 
-      if (
-        !form.email?.trim()
-      ) {
-        return "Please enter your email";
+      if (!form.email?.trim()) {
+        return "Please enter your email address";
       }
 
-      const emailRegex =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (
-        !emailRegex.test(form.email)
-      ) {
-        return "Please enter a valid email";
+      if (!emailRegex.test(form.email)) {
+        return "Please enter a valid email address";
       }
 
-      if (
-        form.phone !== undefined
-      ) {
-        const phoneRegex =
-          /^[0-9]{10,15}$/;
+      if (!form.phone?.trim()) {
+        return "Please enter your phone number";
+      }
 
-        if (
-          !phoneRegex.test(form.phone)
-        ) {
-          return "Please enter a valid phone number";
-        }
+      const phoneRegex = /^[0-9]{10}$/;
+
+      if (!phoneRegex.test(form.phone.replace(/\s/g, ""))) {
+        return "Please enter a valid 10-digit phone number";
+      }
+
+      if (!form.city?.trim()) {
+        return "Please enter your city";
       }
 
       break;
