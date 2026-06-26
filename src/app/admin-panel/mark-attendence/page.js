@@ -1,6 +1,8 @@
 "use client";
 
+import { useMarkAttendence } from "@/app/mutations/Attendence";
 import { useGetBatchStudents } from "@/Hooks/useGetBatchStudents";
+
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -14,6 +16,10 @@ export default function AttendancePage() {
     const searchParmas=useSearchParams()
     const batchId=searchParmas.get("batchId")
         const {data}=useGetBatchStudents(batchId)
+        const markAtttendenceMutation=useMarkAttendence()
+        const [date, setDate] = useState(
+  new Date().toISOString().split("T")[0]
+);
   const [students, setStudents] = useState([]);
   useEffect(()=>{
     if(!data) return
@@ -56,9 +62,32 @@ export default function AttendancePage() {
     (s) => s.status === "absent"
   ).length;
 
-  const handleSubmit = () => {
-    console.log(students);
-  };
+ const handleSubmit = async () => {
+
+    const payload = {
+      batch: batchId,
+      date,
+      records: students.map((student) => ({
+        student: student._id,
+        status: student.status,
+      })),
+    };
+
+
+  await markAtttendenceMutation.mutateAsync(payload)
+
+ 
+};
+  useEffect(() => {
+  if (!data) return;
+
+  setStudents(
+    data.map((student) => ({
+      ...student,
+      status: "present",
+    }))
+  );
+}, [data]);
 
   return (
     <div className="min-h-screen bg-slate-50 py-24">
@@ -105,19 +134,21 @@ export default function AttendancePage() {
       </div>
 
       <div className="col-span-2">
-        <input
-          type="date"
-          className="
-            w-full rounded-2xl
-            border border-white/20
-            bg-white/10
-            px-4 py-3
-            text-white
-            outline-none
-            backdrop-blur-sm
-            [color-scheme:dark]
-          "
-        />
+       <input
+  type="date"
+  value={date}
+  onChange={(e) => setDate(e.target.value)}
+  className="
+    w-full rounded-2xl
+    border border-white/20
+    bg-white/10
+    px-4 py-3
+    text-white
+    outline-none
+    backdrop-blur-sm
+    [color-scheme:dark]
+  "
+/>
       </div>
     </div>
 
@@ -263,6 +294,7 @@ export default function AttendancePage() {
         <div className="sticky bottom-4 z-20 mt-6 flex justify-end">
           <button
             onClick={handleSubmit}
+            disabled={markAtttendenceMutation.isPending}
             className="
               flex w-full items-center justify-center gap-2
               rounded-2xl bg-[#D6451B]
@@ -274,7 +306,7 @@ export default function AttendancePage() {
             "
           >
             <FaSave />
-            Save Attendance
+           {!markAtttendenceMutation.isPending? "Save Attendance":"Saving...."}
           </button>
         </div>
       </div>

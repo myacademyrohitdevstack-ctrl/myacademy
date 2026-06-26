@@ -19,6 +19,9 @@ import {
   FaEdit,
   FaBookOpen,
   FaLink,
+  FaClipboardCheck,
+  FaCheck,
+  FaTimes,
 } from "react-icons/fa";
 import { formatISTDateTime } from "@/Utils/formatDate";
 import { useGetStudentBatchById } from "@/Hooks/useGetStudentBatchById";
@@ -28,6 +31,8 @@ import Loading from "@/app/Components/ui/Loading";
 import { NotesSkeleton } from "@/app/Skeletons/NotesSkeleton";
 import { ClassLinksSkeleton } from "@/app/Skeletons/ClassesSkeleton";
 import { AnnouncementsSkeleton } from "@/app/Skeletons/AnnouncementSkeleton";
+import { StatCard } from "@/app/admin-panel/batches/[slug]/batch/BatchClient";
+import { useGetStudentAttendenceDashboard } from "@/Hooks/useStudentAttendanceDashboard";
 
 
 export default function LiveClasses() {
@@ -38,6 +43,7 @@ export default function LiveClasses() {
   const {data:notes,isLoading:notesLoading}=useGetStudentNotes(batchId,activeTab)
   const {data:batch,isLoading:batchLoading}=useGetStudentBatchById(batchId)
     const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
+    const {data:attendance}=useGetStudentAttendenceDashboard()
    const [pdfOpen,setPdfOpen]=useState(false)
     const [pdfUrl,setPdfUrl]=useState("")
 
@@ -129,45 +135,36 @@ if(batchLoading) return <Loading></Loading>
 
 
 
-  <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-    <div className="grid grid-cols-3 gap-1">
+<div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+  <div className="flex gap-2 overflow-x-auto scrollbar-hide">
 
-      <button
-        onClick={() => setActiveTab("notes")}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "notes"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaBookOpen className="text-sm" />
-        <span>Notes</span>
-      </button>
+    <TabButton
+      active={activeTab === "notes"}
+      onClick={() => setActiveTab("notes")}
+      icon={<FaBookOpen />}
+      label="Notes"
+    />
 
-      <button
-        onClick={() => setActiveTab("links")}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "links"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaLink className="text-sm" />
-        <span>Links</span>
-      </button>
+    <TabButton
+      active={activeTab === "links"}
+      onClick={() => setActiveTab("links")}
+      icon={<FaLink />}
+      label="Links"
+    />
 
-      <button
-        onClick={() => setActiveTab("announcements")}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "announcements"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaBullhorn className="text-sm" />
-        <span>Updates</span>
-      </button>
+    <TabButton
+      active={activeTab === "announcements"}
+      onClick={() => setActiveTab("announcements")}
+      icon={<FaBullhorn />}
+      label="Updates"
+    />
 
+    <TabButton
+      active={activeTab === "attendance"}
+      onClick={() => setActiveTab("attendance")}
+      icon={<FaClipboardCheck />}
+      label="Attendance"
+    />
 
   </div>
 </div>
@@ -720,7 +717,164 @@ if(batchLoading) return <Loading></Loading>
  
    </div>
  )}  { annoucementLoading && <AnnouncementsSkeleton></AnnouncementsSkeleton>}
+{activeTab === "attendance" && (
+  <div className="space-y-6">
 
+    {/* Header */}
+
+    <div>
+      <h2 className="text-2xl font-bold sm:text-3xl">
+        My Attendance
+      </h2>
+
+      <p className="mt-2 text-sm text-slate-500 sm:text-base">
+        Track your attendance and stay on target.
+      </p>
+    </div>
+
+    {/* Stats */}
+
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+      <StatCard
+        title="Attendance"
+        value={`${attendance?.stats?.attendancePercentage || 0}%`}
+        icon={<FaClipboardCheck />}
+        color="bg-green-50 text-green-600"
+      />
+
+      <StatCard
+        title="Present"
+        value={attendance?.stats?.present || 0}
+        icon={<FaCheck />}
+        color="bg-blue-50 text-blue-600"
+      />
+
+      <StatCard
+        title="Absent"
+        value={attendance?.stats?.absent || 0}
+        icon={<FaTimes />}
+        color="bg-red-50 text-red-600"
+      />
+
+    </div>
+
+    {/* Progress */}
+
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-slate-800">
+          Attendance Progress
+        </h3>
+
+        <span className="text-lg font-bold text-[#D6451B]">
+          {attendance?.stats?.attendancePercentage || 0}%
+        </span>
+      </div>
+
+      <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
+
+        <div
+          className="h-full rounded-full bg-[#D6451B] transition-all duration-500"
+          style={{
+            width: `${attendance?.stats?.attendancePercentage || 0}%`,
+          }}
+        />
+
+      </div>
+
+      <p
+        className={`mt-4 text-sm font-medium ${
+          attendance?.stats?.attendancePercentage >= 75
+            ? "text-green-600"
+            : attendance?.stats?.attendancePercentage >= 50
+            ? "text-amber-600"
+            : "text-red-600"
+        }`}
+      >
+        {attendance?.stats?.attendancePercentage >= 75
+          ? "✅ Excellent! Your attendance is above the required 75%."
+          : attendance?.stats?.attendancePercentage >= 50
+          ? `⚠️ Your attendance is ${attendance?.stats?.attendancePercentage}%. Try to reach at least 75%.`
+          : `❌ Your attendance is ${attendance?.stats?.attendancePercentage}%. Please improve to meet the 75% requirement.`}
+      </p>
+
+    </div>
+
+    {/* Recent Attendance */}
+
+    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+
+      <div className="border-b border-slate-200 p-5">
+        <h3 className="text-lg font-bold">
+          Recent Attendance
+        </h3>
+      </div>
+
+      {attendance?.recentAttendance?.length > 0 ? (
+
+        <div className="divide-y divide-slate-100">
+
+          {attendance.recentAttendance.map((item) => (
+
+            <div
+              key={item.date}
+              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+            >
+
+              <div>
+                <p className="text-sm text-slate-500">
+                  Class Date
+                </p>
+
+                <h4 className="font-semibold text-slate-800">
+                  {new Date(item.date).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </h4>
+              </div>
+
+              <span
+                className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${
+                  item.status === "present"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {item.status === "present" ? "Present" : "Absent"}
+              </span>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      ) : (
+
+        <div className="flex flex-col items-center justify-center px-6 py-12">
+
+          <FaClipboardCheck className="mb-4 text-5xl text-slate-300" />
+
+          <h3 className="text-lg font-semibold text-slate-700">
+            No Attendance Records
+          </h3>
+
+          <p className="mt-2 max-w-sm text-center text-sm text-slate-500">
+            Your attendance hasn't been marked yet. Once your trainer records attendance, it will appear here.
+          </p>
+
+        </div>
+
+      )}
+
+    </div>
+
+  </div>
+)}
     </div>
      <Modal
          isOpen={pdfOpen}
@@ -730,5 +884,20 @@ if(batchLoading) return <Loading></Loading>
     
         </Modal>
     </div>
+  );
+}
+function TabButton({ active, onClick, icon, label }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex shrink-0 items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all ${
+        active
+          ? "bg-[#D6451B] text-white shadow-md"
+          : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+      }`}
+    >
+      <span className="text-base">{icon}</span>
+      <span>{label}</span>
+    </button>
   );
 }

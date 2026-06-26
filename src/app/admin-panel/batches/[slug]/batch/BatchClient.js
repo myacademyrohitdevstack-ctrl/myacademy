@@ -32,8 +32,9 @@ import { NotesSkeleton } from "@/app/Skeletons/NotesSkeleton";
 import { AnnouncementsSkeleton } from "@/app/Skeletons/AnnouncementSkeleton";
 import { ClassLinksSkeleton } from "@/app/Skeletons/ClassesSkeleton";
 import Loading from "@/app/Components/ui/Loading";
+import { useGetAttendenceDashboard } from "@/Hooks/useGetAttendenceDashboard";
 
-export default function BatchDetailsPage({attendance}) {
+export default function BatchDetailsPage() {
     const searchParams=useSearchParams()
     const batchId=searchParams.get("batchId")
        const [activeTab, setActiveTab] = useState("notes");
@@ -43,6 +44,7 @@ export default function BatchDetailsPage({attendance}) {
   const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
     const [pdfOpen,setPdfOpen]=useState(false)
     const [pdfUrl,setPdfUrl]=useState("")
+    const {data:attendance}=useGetAttendenceDashboard(batchId)
  
     const router=useRouter()
     const deleteNoteMutation=usedeleteNotesMutation()
@@ -128,6 +130,9 @@ export default function BatchDetailsPage({attendance}) {
 <StatCard
   title="Attendance"
   value={attendance?.length || 0}
+
+
+
   icon={<FaClipboardCheck />}
   color="bg-emerald-50 text-emerald-600"
 />
@@ -918,79 +923,252 @@ export default function BatchDetailsPage({attendance}) {
   </div>
 )} { annoucementLoading && <AnnouncementsSkeleton></AnnouncementsSkeleton>}
 {activeTab === "attendance" && (
-  <div>
+  <div className="space-y-6">
+
     {/* Header */}
+
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-2xl font-bold sm:text-3xl">
+        <h2 className="text-2xl font-bold">
           Attendance
         </h2>
 
-        <p className="mt-1 text-sm text-slate-500 sm:text-base">
-          Track student attendance records and participation.
+        <p className="mt-1 text-slate-500">
+          Monitor attendance performance and manage daily records.
         </p>
       </div>
 
       <button
         onClick={() =>
-          router.push(
-            `/admin-panel/mark-attendence?batchId=${batchId}`
-          )
+          router.push(`/admin-panel/mark-attendence?batchId=${batchId}`)
         }
-        className="
-          flex w-full items-center justify-center gap-2
-          rounded-xl bg-[#D6451B]
-          px-5 py-3 text-white
-          sm:w-auto
-        "
+        className="flex items-center justify-center gap-2 rounded-xl bg-[#D6451B] px-5 py-3 text-white"
       >
         <FaPlus />
         Mark Attendance
       </button>
     </div>
 
-    <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-center">
-      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-        <FaClipboardCheck className="text-3xl text-emerald-600" />
+    {/* Stats */}
+
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+
+      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+        <p className="text-sm text-slate-500">
+          Total Classes
+        </p>
+
+        <h3 className="mt-2 text-3xl font-bold">
+          {attendance?.stats?.totalClasses}
+        </h3>
       </div>
 
-      <h3 className="mt-5 text-xl font-semibold text-slate-800">
-        Attendance Records
-      </h3>
+      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+        <p className="text-sm text-slate-500">
+          Average Attendance
+        </p>
 
-      <p className="mt-2 text-slate-500">
-        View attendance percentages, absences, and student participation for this batch.
-      </p>
-
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl bg-green-50 p-5">
-          <p className="text-sm text-slate-500">
-            Present Today
-          </p>
-          <h4 className="mt-2 text-3xl font-bold text-green-600">
-            24
-          </h4>
-        </div>
-
-        <div className="rounded-2xl bg-red-50 p-5">
-          <p className="text-sm text-slate-500">
-            Absent Today
-          </p>
-          <h4 className="mt-2 text-3xl font-bold text-red-600">
-            6
-          </h4>
-        </div>
-
-        <div className="rounded-2xl bg-blue-50 p-5">
-          <p className="text-sm text-slate-500">
-            Attendance Rate
-          </p>
-          <h4 className="mt-2 text-3xl font-bold text-blue-600">
-            80%
-          </h4>
-        </div>
+        <h3 className="mt-2 text-3xl font-bold text-green-600">
+       {attendance?.stats?.averageAttendance}
+        </h3>
       </div>
+
+      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+        <p className="text-sm text-slate-500">
+          Present Today
+        </p>
+
+        <h3 className="mt-2 text-3xl font-bold text-green-600">
+          {attendance?.stats?.todayPresent}
+        </h3>
+      </div>
+
+      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+        <p className="text-sm text-slate-500">
+          Absent Today
+        </p>
+
+        <h3 className="mt-2 text-3xl font-bold text-red-600">
+         {attendance?.stats?.todayAbsent}
+        </h3>
+      </div>
+
     </div>
+
+    {/* History */}
+
+    <div className="rounded-3xl border bg-white shadow-sm">
+
+      <div className="border-b p-6">
+        <h3 className="text-xl font-bold">
+          Attendance History
+        </h3>
+      </div>
+
+      <div className="divide-y">
+
+        {attendance?.attendanceHistory?.map((item) => (
+          <div
+            key={item._id}
+            className="p-5"
+          >
+
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+              <div className="flex-1">
+
+                <div className="flex items-center justify-between">
+
+                  <h4 className="font-semibold">
+                    {formatISTDateTime(item.date).split(",")[0]}
+                  </h4>
+
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      item.percentage >= 90
+                        ? "bg-green-100 text-green-700"
+                        : item.percentage >= 75
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {item.percentage}%
+                  </span>
+
+                </div>
+
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
+
+                  <div
+                    style={{
+                      width: `${item.percentage}%`,
+                    }}
+                    className="h-full rounded-full bg-[#D6451B]"
+                  />
+
+                </div>
+
+                <div className="mt-4 flex gap-6 text-sm">
+
+                  <span className="text-green-600">
+                    ✅ {item.present} Present
+                  </span>
+
+                  <span className="text-red-600">
+                    ❌ {item.absent} Absent
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div className="flex gap-3">
+
+                <button
+                  className="rounded-xl bg-blue-50 px-4 py-2 text-blue-600"
+                >
+                  View
+                </button>
+
+                <button
+                  className="rounded-xl bg-orange-50 px-4 py-2 text-[#D6451B]"
+                >
+                  Edit
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+
+    </div>
+
+    {/* Bottom Cards */}
+
+    <div className="grid gap-6 lg:grid-cols-2">
+
+      <div className="rounded-3xl border bg-white p-6 shadow-sm">
+
+        <h3 className="font-bold">
+          Recent Absentees
+        </h3>
+
+        <div className="mt-5 space-y-4">
+
+          {attendance?.recentAbsentees?.map((student) => (
+
+            <div
+              key={student}
+              className="flex items-center justify-between"
+            >
+
+              <div>
+                <p className="font-medium">
+                  {student}
+                </p>
+
+                <p className="text-sm text-slate-500">
+                  26 Jun 2026
+                </p>
+              </div>
+
+              <span className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-600">
+                Absent
+              </span>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+
+      <div className="rounded-3xl border bg-white p-6 shadow-sm">
+
+        <h3 className="font-bold">
+          Attendance Insights
+        </h3>
+
+        <div className="mt-6 space-y-5">
+
+          <div className="flex justify-between">
+            <span>Total Classes</span>
+            <strong>{attendance?.stats?.totalClasses}</strong>
+          </div>
+
+
+          <div className="flex justify-between">
+            <span>Highest Attendance</span>
+            <strong className="text-green-600">
+            {attendance?.insights?.highestAttendance?.percentage}
+            </strong>
+          </div>
+
+          <div className="flex justify-between">
+            <span>Lowest Attendance</span>
+            <strong className="text-red-600">
+              {attendance?.insights?.lowestAttendance?.percentage}
+            </strong>
+          </div>
+
+          <div className="flex justify-between">
+            <span>Last Updated</span>
+            <strong>
+               {formatISTDateTime(attendance?.insights?.lastUpdated)}
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 )}
     </div>
@@ -1005,7 +1183,7 @@ export default function BatchDetailsPage({attendance}) {
   );
 }
 
-function StatCard({
+export function StatCard({
   title,
   value,
   icon,
