@@ -3,7 +3,7 @@
 export default function ProfileSkeleton() {
   return (
     <div className="animate-pulse min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50">
-      <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-0">
 
         {/* Hero */}
         <div className="rounded-[32px] bg-slate-200 p-6 sm:p-8 lg:p-10">

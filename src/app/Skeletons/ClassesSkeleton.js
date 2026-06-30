@@ -1,6 +1,6 @@
 export function ClassLinksSkeleton() {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8">
+    <div className="rounded-3xl max-w-7xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <div className="h-8 w-48 animate-pulse rounded-xl bg-slate-200" />

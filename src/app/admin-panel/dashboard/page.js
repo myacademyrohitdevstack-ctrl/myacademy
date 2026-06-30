@@ -82,7 +82,7 @@ export default function Dashboard() {
   },
   {
     title: "Active Trainers",
-    value: "24",
+    value: data?.totalTeachers,
     growth: "+3%",
     icon: <FaUserTie />,
     color: "bg-violet-50 text-violet-600",
@@ -107,7 +107,7 @@ export default function Dashboard() {
   if(statsLoading || classesLoading || annoucementsLoading || activitiesLoading) return <DashboardSkeleton></DashboardSkeleton>
   return (
     <div className="py-28">
-    <div className="space-y-8 mx-auto max-w-7xl px-2 ">
+    <div className="space-y-8 mx-auto max-w-7xl px-4 md:px-0 ">
 
       {/* Hero */}
 

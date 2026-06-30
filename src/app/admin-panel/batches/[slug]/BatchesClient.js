@@ -18,44 +18,6 @@ import { useAdminGetAllBatches } from "@/Hooks/useAdminGetBatches";
 import { useRouter } from "next/navigation";
 import BatchesSkeleton from "@/app/Skeletons/BatchSkeleton";
 
-// const batches = [
-//   {
-//     id: 1,
-//     name: "Morning Batch A",
-//     course: "General English",
-//     trainer: "John Smith",
-//     students: 28,
-//     schedule: "Mon - Fri",
-//     timing: "9:00 AM - 10:30 AM",
-//     room: "Room 101",
-//     progress: 72,
-//     status: "Active",
-//   },
-//   {
-//     id: 2,
-//     name: "IELTS Evening",
-//     course: "IELTS",
-//     trainer: "Emma Johnson",
-//     students: 18,
-//     schedule: "Mon - Thu",
-//     timing: "6:00 PM - 7:30 PM",
-//     room: "Room 203",
-//     progress: 45,
-//     status: "Active",
-//   },
-//   {
-//     id: 3,
-//     name: "Weekend Speaking",
-//     course: "Spoken English",
-//     trainer: "David Wilson",
-//     students: 35,
-//     schedule: "Sat - Sun",
-//     timing: "10:00 AM - 1:00 PM",
-//     room: "Online",
-//     progress: 91,
-//     status: "Completed",
-//   },
-// ];
 
 export default function BatchesClient({slug}) {
   const router=useRouter()
@@ -109,7 +71,7 @@ if(isLoading) return <BatchesSkeleton></BatchesSkeleton>
 
         <Stat
           title="Total Batches"
-          value={batches?.length}
+          value={batches?.length || 0}
           icon={<FaLayerGroup />}
           color="bg-orange-50 text-[#D6451B]"
         />
@@ -313,7 +275,7 @@ if(isLoading) return <BatchesSkeleton></BatchesSkeleton>
 
       {/* Empty State */}
 
-      {batches.length === 0 && (
+      {(!batches || batches?.length===0) && (
 
         <div className="rounded-[32px] border border-dashed border-slate-300 bg-white py-20 text-center shadow-lg">
 

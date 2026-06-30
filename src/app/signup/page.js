@@ -15,25 +15,26 @@ import { toast } from "sonner";
 import Link from "next/link";
 
 export default function SignUpPage() {
-  const [role, setRole] = useState("student");
+
 const [otpSent, setOtpSent] = useState(false);
 const [otp, setOtp] = useState("");
 const [timer, setTimer] = useState(0);
 const [emailVerified,setEmailVerified]=useState(false)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: "",
-  });
+const [formData, setFormData] = useState({
+  name: "",
+  academyName: "",
+  email: "",
+  password: "",
+});
 const [verificationToken, setVerificationToken] = useState("");
 const resetForm = () => {
-  setFormData({
-    name: "",
-    email: "",
-    password: "",
-  });
+ setFormData({
+  name: "",
+  academyName: "",
+  email: "",
+  password: "",
+});
 
-  setRole("student");
   setOtp("");
   setOtpSent(false);
   setEmailVerified(false);
@@ -59,6 +60,9 @@ const resetForm = () => {
     if (!emailRegex.test(formData.email.trim())) {
       return "Enter a valid Email";
     }
+    if (!formData.academyName.trim()) {
+  return "Enter Academy Name";
+}
    if (!passwordRegex.test(formData.password)) {
   return "Password must contain uppercase, lowercase, number and special character.";
 }
@@ -66,11 +70,11 @@ const resetForm = () => {
     return null;
   };
 
-  const isFormValid =
-    formData.name.trim() &&
-    formData.email.trim() &&
-    formData.password;
-
+const isFormValid =
+  formData.name.trim() &&
+  formData.academyName.trim() &&
+  formData.email.trim() &&
+  formData.password;
 const sendOpt=()=>{
    if (!emailRegex.test(formData.email.trim())) {
       toast.error("Enter a valid Email");
@@ -108,13 +112,13 @@ useEffect(() => {
       return;
     }
 
-    const data = {
-      fullName: formData.name.trim(),
-      email: formData.email.trim(),
-      role,
-      verificationToken,
-      password: formData.password,
-    };
+  const data = {
+  fullName: formData.name.trim(),
+  academyName: formData.academyName.trim(),
+  email: formData.email.trim(),
+  verificationToken,
+  password: formData.password,
+};
 
     signUpMutation.mutate(data);
   };
@@ -134,42 +138,33 @@ useEffect(() => {
         >
           {/* Logo */}
          
+{/* Header */}
 
+<div className="text-center py-10">
+  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#D6451B]/10">
+    <FaUser className="text-3xl text-[#D6451B]" />
+  </div>
+
+  <h1 className="mt-6 text-3xl font-bold text-slate-900">
+    Register Your Academy
+  </h1>
+
+ 
+</div>
           {/* Form Card */}
           <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl">
 
-            {/* Role */}
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">
-                Register As
-              </p>
+         <div className="relative">
+  <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
-              <div className="flex rounded-2xl bg-slate-100 p-1">
-                <button
-                  onClick={() => setRole("student")}
-                  type="button"
-                  className={`flex-1 rounded-xl py-3 text-sm font-medium transition ${
-                    role === "student"
-                      ? "bg-white shadow text-[#D6451B]"
-                      : "text-slate-500"
-                  }`}
-                >
-                  🎓 Student
-                </button>
-
-                <button
-                  onClick={() => setRole("teacher")}
-                  type="button"
-                  className={`flex-1 rounded-xl py-3 text-sm font-medium transition ${
-                    role === "teacher"
-                      ? "bg-white shadow text-[#D6451B]"
-                      : "text-slate-500"
-                  }`}
-                >
-                  👨‍🏫 Teacher
-                </button>
-              </div>
-            </div>
+  <input
+    placeholder="Academy Name"
+    name="academyName"
+    value={formData.academyName}
+    onChange={handleChange}
+    className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
+  />
+</div>
 
             {/* Inputs */}
             <div className="mt-6 space-y-4">

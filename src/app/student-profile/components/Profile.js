@@ -208,7 +208,7 @@ export default function Profile({ user, profile }) {
 if(!user || !profile) return <ProfileSkeleton></ProfileSkeleton>
 return (
   <div className="min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50">
-    <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl py-6 px-4 md:px-0 ">
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 25 }}

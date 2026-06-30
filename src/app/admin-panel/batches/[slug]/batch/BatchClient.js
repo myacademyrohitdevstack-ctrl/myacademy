@@ -1,5 +1,5 @@
 "use client";
-import { FaClipboardCheck } from "react-icons/fa";
+import { FaClipboardCheck, FaEye } from "react-icons/fa";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -33,6 +33,7 @@ import { AnnouncementsSkeleton } from "@/app/Skeletons/AnnouncementSkeleton";
 import { ClassLinksSkeleton } from "@/app/Skeletons/ClassesSkeleton";
 import Loading from "@/app/Components/ui/Loading";
 import { useGetAttendenceDashboard } from "@/Hooks/useGetAttendenceDashboard";
+import { useDeleteAttendance } from "@/app/mutations/Attendence";
 
 export default function BatchDetailsPage() {
     const searchParams=useSearchParams()
@@ -50,6 +51,7 @@ export default function BatchDetailsPage() {
     const deleteNoteMutation=usedeleteNotesMutation()
     const deleteClassLinkMutation=useDeleteClassLinkMutation()
     const deleteAnnoucementMutation=useDeleteAnnouncementtMutation()
+    const deleteAttendance=useDeleteAttendance()
  if(batchLoading) return <Loading></Loading> 
 
   return (
@@ -1065,15 +1067,19 @@ export default function BatchDetailsPage() {
               <div className="flex gap-3">
 
                 <button
-                  className="rounded-xl bg-blue-50 px-4 py-2 text-blue-600"
+                onClick={()=>{router.push(`/admin-panel/attendence?attendanceId=${item._id}`)}}
+                  className="rounded-xl bg-blue-50 px-4 py-2 text-blue-600 cursor-pointer"
                 >
-                  View
+                <FaEye/>
                 </button>
 
                 <button
-                  className="rounded-xl bg-orange-50 px-4 py-2 text-[#D6451B]"
+                onClick={()=>{deleteAttendance.mutate(item._id)}}
+                  className="rounded-xl px-4 py-2  bg-red-50
+                        text-red-600
+                        transition hover:bg-red-100 cursor-pointer"
                 >
-                  Edit
+                  <FaTrash></FaTrash>
                 </button>
 
               </div>

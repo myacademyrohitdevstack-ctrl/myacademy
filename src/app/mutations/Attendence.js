@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { createBatchApi, updatedBatchApi } from "../api/BatchApi"
 import queryClient from "@/lib/queryClient"
 import { adminCreateAnnouncementApi, adminDeleteAnnouncementApi } from "../api/adminApi"
-import { postattendanceapi } from "../api/AttendenceApi"
+import { deleteAttendanceApi, postattendanceapi, updateAttendanceApi } from "../api/AttendenceApi"
 
 export const useMarkAttendence=()=>{
    
@@ -19,6 +19,9 @@ export const useMarkAttendence=()=>{
          retry:false,
         onError:(error)=>handleError(error),
          onSuccess:(data)=>{
+            queryClient.invalidateQueries({
+                queryKey:["Attendence-dashboard"]
+            })
                toast.success(data.message)
           
 
@@ -29,60 +32,55 @@ export const useMarkAttendence=()=>{
         }
     })
 }
-// export const useDeleteAnnouncementtMutation=()=>{
+export const useUpdateAttendance=(id)=>{
    
-//     const router=useRouter()
-//     return useMutation({
-//         mutationFn:async(id)=>{
-//          const response= await adminDeleteAnnouncementApi(id)
-//          return response.data
-//         },
-//          retry:false,
-//         onError:(error)=>handleError(error),
-//          onSuccess:(data)=>{
-//             queryClient.invalidateQueries({
-//                  queryKey:["Announcements"],
-//             })
-//                toast.success(data.message)
+   
+    return useMutation({
+        mutationFn:async(data)=>{
+         const response= await updateAttendanceApi(id,data)
+         return response.data
+        },
+         retry:false,
+        onError:(error)=>handleError(error),
+         onSuccess:(data)=>{
+            queryClient.invalidateQueries({
+                 queryKey:["Attendence"],
+            })
+             queryClient.invalidateQueries({
+                queryKey:["Attendence-dashboard"]
+            })
+               toast.success(data.message)
           
 
-//   setTimeout(() => {
-//     router.push("/admin-panel/courses");
-//   }, 1500);
+ 
+    router.push("/admin-panel/courses");
+
   
-//         }
-//     })
-// }
-// export const useUpdateBatchMutation=(resetForm)=>{
+        }
+    })
+}
+export const useDeleteAttendance=()=>{
    
-//     const router=useRouter()
-//     return useMutation({
-//         mutationFn:async(data)=>{
-//          const response= await updatedBatchApi(data)
-//          return response.data
-//         },
-//          retry:false,
-//         onError:(error)=>handleError(error),
-//          onSuccess: async(data)=>{
-//        await Promise.all([
-//   queryClient.invalidateQueries({
-//      queryKey:["batch"],
-//   }),
-//   queryClient.invalidateQueries({
-//     queryKey:["Admin-courses"],
-//   }),
-//   queryClient.invalidateQueries({
-//   queryKey:["Admin-batches"],
-//   }),
+   
+    return useMutation({
+        mutationFn:async(id)=>{
+         const response= await deleteAttendanceApi(id)
+         return response.data
+        },
+         retry:false,
+        onError:(error)=>handleError(error),
+         onSuccess:(data)=>{
+         
+             queryClient.invalidateQueries({
+                queryKey:["Attendence-dashboard"]
+            })
+               toast.success(data.message)
+          
 
-// ]);
-//                toast.success(data.message)
-//              resetForm();
-
-
-//     router.push("/admin-panel/courses");
+ 
+    router.push("/admin-panel/courses");
 
   
-//         }
-//     })
-// }
+        }
+    })
+}

@@ -18,11 +18,14 @@ export const useAddClassLinkMutation=(resetForm)=>{
          retry:false,
         onError:(error)=>handleError(error),
          onSuccess:(data)=>{
+            queryClient.invalidateQueries({
+                 queryKey:["Admin-class-links"],
+            })
                toast.success(data.message)
              resetForm();
 
 
-    router.push("/admin-panel/batches");
+    router.push("/admin-panel/courses");
 
   
         }

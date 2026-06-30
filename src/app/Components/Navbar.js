@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -94,6 +93,15 @@ const profileItems = [
           title: "My Batches",
           icon: FaUsers,
           href: `/${path}/batches`,
+        }
+      ]
+    : []),
+  ...(path === "admin-panel"
+    ? [
+        {
+          title: "My Students",
+          icon: FaUsers,
+          href: `/${path}/student`,
         }
       ]
     : []),
@@ -201,8 +209,8 @@ logoutMutation.mutate()
       >
         {user.profileImage ? (
           <img
-            src={user.profileImage.url}
-            alt={user.fullName}
+            src={user?.profileImage?.url}
+            alt={user?.fullName}
             className="h-11 w-11 rounded-full object-cover"
           />
         ) : (
@@ -258,7 +266,7 @@ logoutMutation.mutate()
 
   <div className="flex items-center gap-4">
 
-    {user.profileImage.url ? (
+    {user?.profileImage?.url ? (
       <img
         src={user.profileImage.url}
         className="h-16 w-16 rounded-full border-2 border-white object-cover"
@@ -290,7 +298,7 @@ logoutMutation.mutate()
 </div>
 <div className="space-y-1 p-3">
 
-  {profileItems.map((item) => (
+  {profileItems?.map((item) => (
     <ProfileItem
       key={item.title}
       {...item}

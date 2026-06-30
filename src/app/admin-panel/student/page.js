@@ -13,10 +13,12 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
+import Link from "next/link";
 import { useAdminStudent } from "@/Hooks/useAdminStudents";
 import useDebounce from "@/Hooks/useDebounce";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { useRouter } from "next/navigation";
+import { useAdminDeleteUser } from "@/app/mutations/AdminMutations";
 
 export default function Students() {
   const router=useRouter()
@@ -28,6 +30,7 @@ const [filters, setFilters] = useState({
   approvalStatus: "",
   role:""
 });
+const deleteUserMutation=useAdminDeleteUser()
   const debouncedSearch = useDebounce(search, 500);
   const {data,isLoading}=useAdminStudent(page,filters.search,filters.status,filters.approvalStatus,filters.role)
   const users=data?.users || []
@@ -66,51 +69,19 @@ useEffect(() => {
 
           </div>
 
-          <button className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 font-semibold text-[#D6451B] hover:scale-105 transition">
+          <Link href="/admin-panel/add-student" className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 font-semibold text-[#D6451B] hover:scale-105 transition">
 
             <FaPlus />
 
             Add Student
 
-          </button>
+          </Link>
 
         </div>
 
       </motion.div>
 
-      {/* Stats */}
-
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
-        <Stat
-          title="Students"
-          value="1284"
-          icon={<FaUsers />}
-          color="bg-blue-50 text-blue-600"
-        />
-
-        <Stat
-          title="Active"
-          value="1180"
-          icon={<FaCheckCircle />}
-          color="bg-green-50 text-green-600"
-        />
-
-        <Stat
-          title="Pending"
-          value="72"
-          icon={<FaClock />}
-          color="bg-yellow-50 text-yellow-600"
-        />
-
-        <Stat
-          title="Graduated"
-          value="425"
-          icon={<FaUserGraduate />}
-          color="bg-orange-50 text-[#D6451B]"
-        />
-
-      </div>
+    
 
       {/* Filters */}
 
@@ -251,13 +222,7 @@ useEffect(() => {
                   Contact
                 </th>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-                  Course
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-                  Batch
-                </th>
+               
 <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
   Approval
 </th>
@@ -329,23 +294,7 @@ useEffect(() => {
 
                     </td>
 
-                    {/* Course */}
-
-                    <td className="px-6 py-5">
-                      {/* {student.course} */}
-                    </td>
-
-                    {/* Batch */}
-
-                    <td className="px-6 py-5">
-
-                      <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-[#D6451B]">
-
-                        {/* {student.batch} */}
-
-                      </span>
-
-                    </td>
+                   
 <td className="px-6 py-5">
   <span
     className={`rounded-full px-4 py-2 text-sm font-medium ${
@@ -384,13 +333,13 @@ useEffect(() => {
                       <div className="flex justify-end gap-3">
 
 
-                        <button onClick={()=>{router.push(`/admin-panel/user/${student._id}`)}} className="rounded-xl bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
+                        <button onClick={()=>{router.push(`/admin-panel/user/${student._id}`)}} className="rounded-xl cursor-pointer bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
 
                           <FaEdit />
 
                         </button>
 
-                        <button className="rounded-xl bg-red-50 p-3 text-red-600 transition hover:scale-105">
+                        <button onClick={()=>{deleteUserMutation.mutate(student._id)}} className="rounded-xl cursor-pointer bg-red-50 p-3 text-red-600  hover:scale-105 active:scale-90 transition-all">
 
                           <FaTrash />
 

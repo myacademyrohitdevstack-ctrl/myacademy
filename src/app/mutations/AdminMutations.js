@@ -3,8 +3,9 @@ import handleError from "@/Utils/handleError"
 
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { adminApproveUserApi, adminBlockUserApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
+import { adminApproveUserApi, adminBlockUserApi, adminCreateStudent, adminDeleteAnnouncementApi, adminDeleteUserByIdApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
 import queryClient from "@/lib/queryClient"
+import { useRouter } from "next/navigation"
 
 export const useAdminUserUpdateMutation=(id)=>{
     return useMutation({
@@ -108,6 +109,49 @@ export const useAdminUnblockUser=(id)=>{
      toast.success(data.message)
         },
      onError:(error)=> handleError(error)
+    
+
+    })
+}
+export const useAdminCreateStuent=()=>{
+    const router=useRouter()
+    return useMutation({
+        mutationFn:async(data)=>{
+          const response=await  adminCreateStudent(data)
+          return response.data
+        },
+         retry:false,
+         onSuccess:(data)=>{
+           
+            queryClient.invalidateQueries({
+  queryKey: ["Admin-Student-List"],
+});
+     toast.success(data.message)
+     router.push('/admin-panel/student')
+
+        },
+     onError:(error)=> handleError(error)
+    
+
+    })
+}
+export const useAdminDeleteUser=()=>{
+    
+    return useMutation({
+        mutationFn:async(id)=>{
+          const response=await  adminDeleteUserByIdApi(id)
+          return response.data
+        },
+         retry:false,
+         onSuccess:(data)=>{
+           
+            queryClient.invalidateQueries({
+  queryKey: ["Admin-Student-List"],
+});
+     toast.success(data.message)
+
+
+        },
     
 
     })

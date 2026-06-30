@@ -74,7 +74,7 @@ logoutMutation.mutate()
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50">
-    <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 space-y-8">
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-0 space-y-8">
 
       {/* Hero */}
 

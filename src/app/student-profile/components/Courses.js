@@ -25,7 +25,7 @@ const router=useRouter()
 if(isLoading) return <CoursesSkeleton></CoursesSkeleton>
   return (
 <div className="min-h-screen bg-slate-50">
-  <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
+  <div className="mx-auto max-w-7xl px-4 py-6 md:px-0 ">
     <div className="space-y-6 sm:space-y-8">
 
       {/* Header */}

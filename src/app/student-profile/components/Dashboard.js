@@ -43,12 +43,12 @@ const stats = [
   },
   {
     title: "Notes",
-    value: statics?.notesCount || 0,
+    value: statics?.notes || 0,
     icon: <FaStickyNote />,
   },
   {
     title: "PDF Resources",
-    value: statics?.pdfsCount || 0,
+    value: statics?.pdfs || 0,
     icon: <FaFilePdf />,
   },
 ];

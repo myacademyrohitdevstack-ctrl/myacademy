@@ -87,13 +87,10 @@ export const useSignUpMutation=(resetForm)=>{
         },
          retry:false,
         onError:(error)=>handleError(error),
-         onSuccess:()=>{
+         onSuccess:(data)=>{
                toast.success("Your Account created successfully ")
              resetForm();
-
-  setTimeout(() => {
-    router.push("/signup/pending");
-  }, 1500);
+       router.push('/login')
   
         }
     })

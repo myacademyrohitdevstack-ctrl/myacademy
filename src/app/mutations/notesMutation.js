@@ -17,11 +17,14 @@ export const useCreateNotesMutation=(resetForm)=>{
          retry:false,
         onError:(error)=>handleError(error),
          onSuccess:(data)=>{
+            queryClient.invalidateQueries({
+                    queryKey:["Admin-notes"],
+            })
                toast.success(data.message)
              resetForm();
 
 
-    router.push("/admin-panel/batches");
+    router.push("/admin-panel/courses");
   
   
         }
