@@ -5,7 +5,6 @@ import {
   FaFileAlt,
   FaSave,
   FaEye,
-  FaLock,
   FaTag,
 } from "react-icons/fa";
 import Input from "@/app/student-profile/components/profile/Input";

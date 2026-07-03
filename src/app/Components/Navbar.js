@@ -67,7 +67,7 @@ const path =
   user?.role === "admin"
     ? "admin-panel"
     : user?.role === "teacher"
-    ? "teacher-profile"
+    ? "teacher-panel"
     : "student-profile";
 
 const profileItems = [

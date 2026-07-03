@@ -20,11 +20,12 @@ import { useAdminGetAllBatches } from "@/Hooks/useAdminGetBatches";
 import { useMemo } from "react";
 import { createAnnouncementSchema } from "@/schemas/createAnnouncementSchema";
 import { useCreateAnnouncementtMutation } from "@/app/mutations/AnnouncementMutation";
+import useAuthStore from "@/store/authStore";
 
 
 // import { useCreateAnnouncementMutation } from "@/app/mutations/announcementMutation";
 
-export default function AddAnnouncementForm() {
+export default function AddAnnouncementForm({courses}) {
   const {
     register,
     handleSubmit,
@@ -51,8 +52,9 @@ export default function AddAnnouncementForm() {
   });
   const targetType = watch("targetType");
   const selectedCourse=watch("course")
+  const user=useAuthStore((state)=>state.user)
  
-  const {data:courses}=useAdminGetAllCourses()
+
 
 
 const courseSlug = courses?.find(
@@ -132,10 +134,14 @@ const onSubmit = async (data) => {
       {...register("targetType")}
       error={errors.targetType}
       options={[
-        {
-          label: "Entire System",
-          value: "system",
-        },
+      ...(user.role === "admin"
+      ? [
+          {
+            label: "Entire System",
+            value: "system",
+          },
+        ]
+      : []),
         {
           label: "Course / Batch",
           value: "course-batch",
@@ -191,11 +197,11 @@ const onSubmit = async (data) => {
           {...register("batch")}
           error={errors.batch}
           options={[
-            {
+            ...(user.role==="admin"?[{
               label:
                 "All Batches (Entire Course)",
               value: "all",
-            },
+            }]:[]),
 
             ...(batches || []).map(
               (batch) => ({

@@ -17,12 +17,14 @@ import {
 import { useAdminGetAllBatches } from "@/Hooks/useAdminGetBatches";
 import { useRouter } from "next/navigation";
 import BatchesSkeleton from "@/app/Skeletons/BatchSkeleton";
+import useAuthStore from "@/store/authStore";
 
 
-export default function BatchesClient({slug}) {
+export default function BatchesClient({slug,permissions}) {
+  const user=useAuthStore(state=>state.user)
   const router=useRouter()
     const {data:batches,isLoading}=useAdminGetAllBatches(slug)
-  const [search, setSearch] = useState("");
+
 if(isLoading) return <BatchesSkeleton></BatchesSkeleton>
   return (
 <div className="mx-auto max-w-7xl space-y-6 px-4 py-28 sm:px-6 lg:px-8">
@@ -236,34 +238,34 @@ if(isLoading) return <BatchesSkeleton></BatchesSkeleton>
   </div>
 
   {/* Actions */}
-  <div className="mt-5 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4">
+  <div className="mt-5 flex gap-2 border-t border-slate-100 pt-4">
     <button
       onClick={() =>
         router.push(
-          `/admin-panel/batches/${slug}/batch?batchId=${batch._id}`
+          `/${user.role}-panel/batches/${slug}/batch?batchId=${batch._id}`
         )
       }
-      className="flex items-center justify-center gap-2 rounded-xl bg-blue-50 py-3 text-blue-600 transition hover:bg-blue-100"
+      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-50 py-3 text-blue-600 transition hover:bg-blue-100"
     >
       <FaEye />
     </button>
 
-    <button
+   {permissions.canEdit &&  <button
       onClick={() =>
         router.push(
           `/admin-panel/batches/${slug}/edit-batch?batchId=${batch._id}`
         )
       }
-      className="flex items-center justify-center gap-2 rounded-xl bg-orange-50 py-3 text-[#D6451B] transition hover:bg-orange-100"
+      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-50 py-3 text-[#D6451B] transition hover:bg-orange-100"
     >
       <FaEdit />
-    </button>
+    </button>}
 
-    <button
-      className="flex items-center justify-center gap-2 rounded-xl bg-red-50 py-3 text-red-600 transition hover:bg-red-100"
+   {permissions.canDelete && <button
+      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-50 py-3 text-red-600 transition hover:bg-red-100"
     >
       <FaTrash />
-    </button>
+    </button> }
   </div>
 </motion.div>
 

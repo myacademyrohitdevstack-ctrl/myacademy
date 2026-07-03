@@ -1,17 +1,18 @@
 "use client";
 
+import AddAnnouncementForm from "@/app/Components/AddAnnoucementForm";
+import { useAdminGetAllCourses } from "@/Hooks/useAdminGetCourses";
 import { motion } from "framer-motion";
 
 import { FaBookOpen } from "react-icons/fa";
 
 
-import { useAdminGetAllCourses } from "@/Hooks/useAdminGetCourses";
-import AddAnnouncementForm from "./AddForm";
+
+
 
 
 export default function page() {
-//   const {data:courses,isLoading}=useAdminGetAllCourses()
-  // if(isLoading) return
+  const {data:courses}=useAdminGetAllCourses()
   return (
     <div className="py-24 ">
       {/* Hero */}
@@ -36,11 +37,11 @@ export default function page() {
 
           <div>
             <h1 className="text-4xl font-bold">
-              Create New Batch
+              Add  New Annoucement
             </h1>
 
             <p className="mt-2 text-orange-100">
-              Add a new Batch for your course.
+              Add a new Annoucement for your course.
             </p>
           </div>
         </div>
@@ -61,7 +62,8 @@ export default function page() {
           shadow-lg
         "
       >
-        <AddAnnouncementForm  />
+        <AddAnnouncementForm courses={courses}></AddAnnouncementForm>
+      
       </motion.div>
       </div>
     </div>

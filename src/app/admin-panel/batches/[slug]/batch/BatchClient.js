@@ -1095,44 +1095,9 @@ export default function BatchDetailsPage() {
 
     {/* Bottom Cards */}
 
-    <div className="grid gap-6 lg:grid-cols-2">
-
-      <div className="rounded-3xl border bg-white p-6 shadow-sm">
-
-        <h3 className="font-bold">
-          Recent Absentees
-        </h3>
-
-        <div className="mt-5 space-y-4">
-
-          {attendance?.recentAbsentees?.map((student) => (
-
-            <div
-              key={student}
-              className="flex items-center justify-between"
-            >
-
-              <div>
-                <p className="font-medium">
-                  {student}
-                </p>
-
-                <p className="text-sm text-slate-500">
-                  26 Jun 2026
-                </p>
-              </div>
-
-              <span className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-600">
-                Absent
-              </span>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </div>
+    <div className="grid gap-6 lg:grid-cols-2 relative">
+   
+     
 
       <div className="rounded-3xl border bg-white p-6 shadow-sm">
 

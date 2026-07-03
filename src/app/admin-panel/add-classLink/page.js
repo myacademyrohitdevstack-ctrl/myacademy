@@ -6,8 +6,9 @@ import { FaBookOpen } from "react-icons/fa";
 
 
 
-import AddForm from "./AddForm";
+
 import { useSearchParams } from "next/navigation";
+import AddClassForm from "@/app/Components/AddClassForm";
 
 export default function page() {
   const searchParams=useSearchParams()
@@ -62,7 +63,8 @@ export default function page() {
           shadow-lg
         "
       >
-        <AddForm batchId={batchId} />
+      
+        <AddClassForm batchId={batchId}></AddClassForm>
       </motion.div>
       </div>
     </div>

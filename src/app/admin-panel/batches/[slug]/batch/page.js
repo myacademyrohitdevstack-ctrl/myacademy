@@ -1,5 +1,5 @@
 
-import Loading from '@/app/Components/ui/Loading'
+
 import React from 'react'
 import BatchDetailsPage from './BatchClient'
 

@@ -27,6 +27,9 @@ export const useLoginMutation=()=>{
      if(data.user.role==="admin"){
     router.push('/admin-panel/student')
      }
+     if(data.user.role==="teacher"){
+    router.push('/teacher-panel/dashboard')
+     }
 
         }
     })

@@ -18,7 +18,7 @@ import { useAddClassLinkMutation } from "@/app/mutations/classLinkMutation";
 
 
 
-export default function AddForm({ batchId }) {
+export default function AddClassForm({ batchId }) {
   const {
     register,
     handleSubmit,

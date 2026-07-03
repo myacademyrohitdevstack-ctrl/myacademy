@@ -1,11 +1,13 @@
 "use client";
 
+import AddNoteForm from "@/app/Components/AddNoteForm";
 import { motion } from "framer-motion";
 
 import { FaBookOpen } from "react-icons/fa";
-import AddNoteForm from "./AddNoteForm";
+
 
 export default function AddNotes() {
+  
   return (
     <div className="py-24 ">
       {/* Hero */}
@@ -55,7 +57,7 @@ export default function AddNotes() {
           shadow-lg
         "
       >
-        <AddNoteForm />
+        <AddNoteForm></AddNoteForm>
       </motion.div>
       </div>
     </div>
