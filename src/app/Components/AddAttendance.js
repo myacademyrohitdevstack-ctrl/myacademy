@@ -2,7 +2,7 @@
 
 import { useMarkAttendence } from "@/app/mutations/Attendence";
 import { useGetBatchStudents } from "@/Hooks/useGetBatchStudents";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   FaClipboardCheck,
@@ -10,9 +10,12 @@ import {
   FaCheck,
   FaTimes,
   FaCalendarAlt,
+  FaArrowLeft,
+  FaSearch,
 } from "react-icons/fa";
 
 export default function AttendancePage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const batchId = searchParams.get("batchId");
   const { data } = useGetBatchStudents(batchId);
@@ -77,9 +80,18 @@ export default function AttendancePage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="w-full min-w-0 space-y-4 sm:space-y-6">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#D6451B] hover:text-orange-700 transition-colors"
+      >
+        <FaArrowLeft className="text-xs" />
+        <span>Back to Cohort Details</span>
+      </button>
+
       {/* Hero Banner */}
-      <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg">
+      <div className="overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg w-full min-w-0">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <span className="rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider">

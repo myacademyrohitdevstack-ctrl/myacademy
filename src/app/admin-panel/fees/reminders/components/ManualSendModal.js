@@ -168,32 +168,32 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden my-6"
+        className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden my-4 sm:my-6"
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-transparent border-b border-slate-100 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#D6451B] to-orange-500 flex items-center justify-center text-white shadow-xs">
-              <FaWhatsapp className="text-xl" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-transparent border-b border-slate-100 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#D6451B] to-orange-500 flex items-center justify-center text-white shadow-xs shrink-0">
+              <FaWhatsapp className="text-lg sm:text-xl" />
             </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
+            <div className="min-w-0">
+              <h3 className="font-extrabold text-slate-900 text-xs sm:text-base truncate">
                 Fee Reminder Preview & Dispatch
               </h3>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
                 {candidate.studentName} ({candidate.batch})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors"
+            className="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors shrink-0"
           >
             <FaTimes className="text-xs" />
           </button>
         </div>
 
-        <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
           {/* Recipient Contact Status Alert */}
           {previewData?.recipient && (
             <div
@@ -367,15 +367,15 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="text-xs text-slate-500 font-semibold">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <span className="text-xs text-slate-500 font-semibold text-center sm:text-left">
             Pending amount: ₹{previewData?.amountDue || candidate.balanceAmount}
           </span>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors text-center"
             >
               Cancel
             </button>
@@ -384,7 +384,7 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
               <button
                 onClick={() => handleSend("cloud_api")}
                 disabled={actionLoading || !previewData?.recipient?.isValidPhone}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs inline-flex items-center gap-2 shadow-sm transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-50"
               >
                 <FaPaperPlane className="text-xs" />
                 Send via Cloud API
@@ -394,7 +394,7 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
             <button
               onClick={() => handleSend("click_to_chat")}
               disabled={actionLoading || !previewData?.recipient?.isValidPhone}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 hover:from-orange-600 hover:to-orange-500 text-white font-extrabold text-xs inline-flex items-center gap-2 shadow-md shadow-orange-200 transition-all disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 hover:from-orange-600 hover:to-orange-500 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-md shadow-orange-200 transition-all disabled:opacity-50"
             >
               <FaExternalLinkAlt className="text-xs" />
               Open WhatsApp Web

@@ -79,12 +79,12 @@ function IntegrationSettingsForm({ initialIntegration }) {
         </div>
 
         {mode === "cloud_api" && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => testMutation.mutate()}
               disabled={testMutation.isPending || !phoneNumberId}
-              className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
             >
               <FaSyncAlt className={`text-xs ${testMutation.isPending ? "animate-spin" : ""}`} />
               {testMutation.isPending ? "Testing..." : "Test Connection"}
@@ -93,7 +93,7 @@ function IntegrationSettingsForm({ initialIntegration }) {
               type="button"
               onClick={() => disconnectMutation.mutate()}
               disabled={disconnectMutation.isPending}
-              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
             >
               <FaTrashAlt className="text-xs" /> Disconnect
             </button>
@@ -300,25 +300,25 @@ function IntegrationSettingsForm({ initialIntegration }) {
           </p>
 
           <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800 border border-slate-700">
-              <span className="font-mono text-emerald-300 text-[11px] truncate mr-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-800 border border-slate-700">
+              <span className="font-mono text-emerald-300 text-[11px] truncate">
                 Callback URL: /api/webhooks/whatsapp
               </span>
               <button
                 onClick={handleCopyWebhookUrl}
-                className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[10px] inline-flex items-center gap-1 shrink-0"
+                className="w-full sm:w-auto justify-center px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[10px] inline-flex items-center gap-1 shrink-0"
               >
                 <FaCopy className="text-[9px]" /> Copy Full URL
               </button>
             </div>
 
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800 border border-slate-700">
-              <span className="font-mono text-emerald-300 text-[11px] truncate mr-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-800 border border-slate-700">
+              <span className="font-mono text-emerald-300 text-[11px] truncate">
                 Verify Token: {webhookVerifyToken}
               </span>
               <button
                 onClick={handleCopyToken}
-                className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[10px] inline-flex items-center gap-1 shrink-0"
+                className="w-full sm:w-auto justify-center px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[10px] inline-flex items-center gap-1 shrink-0"
               >
                 <FaCopy className="text-[9px]" /> Copy Token
               </button>

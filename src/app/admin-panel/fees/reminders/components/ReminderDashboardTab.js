@@ -118,12 +118,12 @@ export default function ReminderDashboardTab({
         {/* Connection Status Card */}
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                 <FaWhatsapp className="text-emerald-500 text-base" /> WhatsApp Channel
               </span>
               <span
-                className={`px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 w-fit ${
                   connection.mode === "cloud_api"
                     ? connection.connectionStatus === "connected"
                       ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -147,7 +147,7 @@ export default function ReminderDashboardTab({
                   : "Manual Mode (Click-to-Chat)"}
               </span>
             </div>
-            <p className="text-sm font-semibold text-slate-800">
+            <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
               {connection.mode === "cloud_api"
                 ? connection.senderPhoneNumber
                   ? `Active Phone: ${connection.senderPhoneNumber}`
@@ -168,12 +168,12 @@ export default function ReminderDashboardTab({
         {/* Automation Status Card */}
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                 <FaRobot className="text-orange-500 text-base" /> Automatic Reminders
               </span>
               <span
-                className={`px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 w-fit ${
                   automation.enabled && !automation.isPaused
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     : automation.isPaused
@@ -197,13 +197,13 @@ export default function ReminderDashboardTab({
                   : "Automation Disabled"}
               </span>
             </div>
-            <p className="text-sm font-semibold text-slate-800">
+            <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed break-words">
               {automation.enabled
                 ? `${automation.rulesCount} automated rules active | Window: ${automation.allowedSendingHours?.start} - ${automation.allowedSendingHours?.end} (${automation.timezone})`
                 : "Automated hourly rules are currently disabled. Reminders must be sent manually."}
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
             <button
               onClick={() => onNavigateTab("rules")}
               className="text-xs font-bold text-[#D6451B] hover:text-orange-600 inline-flex items-center gap-1.5"
@@ -213,7 +213,7 @@ export default function ReminderDashboardTab({
             <button
               onClick={() => triggerRunMutation.mutate()}
               disabled={triggerRunMutation.isPending}
-              className="px-3 py-1.5 rounded-lg bg-orange-50 hover:bg-orange-100 text-[#D6451B] text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-3.5 py-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#D6451B] text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
             >
               <FaSyncAlt className={`text-xs ${triggerRunMutation.isPending ? "animate-spin" : ""}`} />
               {triggerRunMutation.isPending ? "Running..." : "Run Check Now"}
@@ -408,52 +408,102 @@ export default function ReminderDashboardTab({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 text-slate-500 font-bold">
-                  <th className="pb-2.5">Recipient</th>
-                  <th className="pb-2.5">Amount Due</th>
-                  <th className="pb-2.5">Channel</th>
-                  <th className="pb-2.5">Status</th>
-                  <th className="pb-2.5">Time</th>
-                  <th className="pb-2.5 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {recentActivity.map((r) => (
-                  <tr key={r._id} className="hover:bg-slate-50/50">
-                    <td className="py-2.5">
-                      <p className="font-bold text-slate-800">{r.recipient?.name || "Student"}</p>
-                      <p className="text-[11px] text-slate-500">{r.recipient?.phone}</p>
-                    </td>
-                    <td className="py-2.5 font-bold text-slate-900">{formatCurrency(r.amountDue)}</td>
-                    <td className="py-2.5">
-                      <span className="text-[11px] font-semibold text-slate-600">
-                        {r.channel === "whatsapp_cloud_api" ? "Cloud API" : "Click-to-Chat"}
-                      </span>
-                    </td>
-                    <td className="py-2.5">{getStatusBadge(r.status)}</td>
-                    <td className="py-2.5 text-[11px] text-slate-500">
+          <div>
+            {/* Mobile Cards View (< 640px) */}
+            <div className="space-y-3 sm:hidden">
+              {recentActivity.map((r) => (
+                <div
+                  key={r._id}
+                  className="p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/40 space-y-2.5"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-extrabold text-slate-900 text-xs">
+                        {r.recipient?.name || "Student"}
+                      </p>
+                      <p className="text-[11px] text-slate-500 font-medium">{r.recipient?.phone}</p>
+                    </div>
+                    {getStatusBadge(r.status)}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/60">
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-medium">Due: </span>
+                      <span className="font-black text-slate-900">{formatCurrency(r.amountDue)}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400">
                       {new Date(r.createdAt).toLocaleString("en-IN", {
                         month: "short",
                         day: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    </td>
-                    <td className="py-2.5 text-right">
-                      <button
-                        onClick={() => onOpenDetails(r)}
-                        className="text-xs font-bold text-[#D6451B] hover:text-orange-600"
-                      >
-                        Details
-                      </button>
-                    </td>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      Channel: {r.channel === "whatsapp_cloud_api" ? "Cloud API" : "Click-to-Chat"}
+                    </span>
+                    <button
+                      onClick={() => onOpenDetails(r)}
+                      className="px-3 py-1 rounded-lg bg-orange-50 text-[#D6451B] font-bold text-xs hover:bg-orange-100 transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= 640px) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-500 font-bold">
+                    <th className="pb-2.5">Recipient</th>
+                    <th className="pb-2.5">Amount Due</th>
+                    <th className="pb-2.5">Channel</th>
+                    <th className="pb-2.5">Status</th>
+                    <th className="pb-2.5">Time</th>
+                    <th className="pb-2.5 text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {recentActivity.map((r) => (
+                    <tr key={r._id} className="hover:bg-slate-50/50">
+                      <td className="py-2.5">
+                        <p className="font-bold text-slate-800">{r.recipient?.name || "Student"}</p>
+                        <p className="text-[11px] text-slate-500">{r.recipient?.phone}</p>
+                      </td>
+                      <td className="py-2.5 font-bold text-slate-900">{formatCurrency(r.amountDue)}</td>
+                      <td className="py-2.5">
+                        <span className="text-[11px] font-semibold text-slate-600">
+                          {r.channel === "whatsapp_cloud_api" ? "Cloud API" : "Click-to-Chat"}
+                        </span>
+                      </td>
+                      <td className="py-2.5">{getStatusBadge(r.status)}</td>
+                      <td className="py-2.5 text-[11px] text-slate-500">
+                        {new Date(r.createdAt).toLocaleString("en-IN", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="py-2.5 text-right">
+                        <button
+                          onClick={() => onOpenDetails(r)}
+                          className="text-xs font-bold text-[#D6451B] hover:text-orange-600"
+                        >
+                          Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

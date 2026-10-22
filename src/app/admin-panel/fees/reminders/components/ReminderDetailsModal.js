@@ -44,34 +44,34 @@ export default function ReminderDetailsModal({ isOpen, onClose, reminder }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-6 text-xs"
+          className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-4 sm:my-6 text-xs"
         >
           {/* Header */}
-          <div className="px-6 py-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#D6451B] flex items-center justify-center text-white shadow-xs">
-                <FaWhatsapp className="text-xl" />
+          <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl sm:rounded-2xl bg-[#D6451B] flex items-center justify-center text-white shadow-xs shrink-0">
+                <FaWhatsapp className="text-lg sm:text-xl" />
               </div>
-              <div>
-                <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-extrabold text-slate-900 text-xs sm:text-base truncate">
                   Reminder Record Inspector
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
                   ID: {reminder._id?.slice(-8)} | Channel: {reminder.channel}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors"
+              className="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors shrink-0"
             >
               <FaTimes className="text-xs" />
             </button>
           </div>
 
-          <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+          <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
             {/* Recipient & Amount Cards */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                 <p className="text-[10px] uppercase font-bold text-slate-400">Recipient</p>
                 <p className="text-sm font-extrabold text-slate-900 mt-0.5">
@@ -157,21 +157,21 @@ export default function ReminderDetailsModal({ isOpen, onClose, reminder }) {
           </div>
 
           {/* Footer Actions */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors text-center"
             >
               Close
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
               {reminder.clickToChatUrl && (
                 <a
                   href={reminder.clickToChatUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#D6451B] font-bold text-xs inline-flex items-center gap-1.5 transition-colors"
+                  className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#D6451B] font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <FaExternalLinkAlt className="text-xs" /> Open WhatsApp
                 </a>
@@ -180,7 +180,7 @@ export default function ReminderDetailsModal({ isOpen, onClose, reminder }) {
                 <button
                   onClick={() => retryMutation.mutate(reminder._id)}
                   disabled={retryMutation.isPending}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                 >
                   <FaSyncAlt className={`text-xs ${retryMutation.isPending ? "animate-spin" : ""}`} />
                   Retry Reminder

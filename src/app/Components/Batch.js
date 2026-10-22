@@ -18,7 +18,16 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAdminGetAllNotes } from "@/Hooks/useAdminGetNotes";
 import Modal from "@/app/Components/ui/Modals";
-import PdfViewer from "@/Utils/pdfViewer";
+import dynamic from "next/dynamic";
+
+const PdfViewer = dynamic(() => import("@/Utils/pdfViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-8 text-xs text-slate-400">
+      Loading Document Viewer...
+    </div>
+  ),
+});
 import { usedeleteNotesMutation } from "@/app/mutations/notesMutation";
 import { useAdminGetAllLinks } from "@/Hooks/useAdminGetClassLinks";
 import { formatISTDateTime } from "@/Utils/formatDate";
@@ -144,60 +153,57 @@ export default function BatchDetailsPage({permissions}) {
       </div>
 
       {/* Tabs */}
+      <div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xs overflow-x-auto scrollbar-none">
+        <div className="flex sm:grid sm:grid-cols-4 gap-1 min-w-full">
+          <button
+            onClick={() => setActiveTab("notes")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "notes"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaBookOpen className="text-sm shrink-0" />
+            <span>Notes</span>
+          </button>
 
- 
-  <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm w-full min-w-0">
-   <div className="grid grid-cols-4 gap-1 w-full min-w-0">
+          <button
+            onClick={() => setActiveTab("links")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "links"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaLink className="text-sm shrink-0" />
+            <span>Links</span>
+          </button>
 
-      <button
-        onClick={() => setActiveTab("notes")}
-        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "notes"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaBookOpen className="text-sm" />
-        <span>Notes</span>
-      </button>
+          <button
+            onClick={() => setActiveTab("announcements")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "announcements"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaBullhorn className="text-sm shrink-0" />
+            <span>Updates</span>
+          </button>
 
-      <button
-        onClick={() => setActiveTab("links")}
-        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "links"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaLink className="text-sm" />
-        <span>Links</span>
-      </button>
-
-      <button
-        onClick={() => setActiveTab("announcements")}
-        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "announcements"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaBullhorn className="text-sm" />
-        <span>Updates</span>
-      </button>
-<button
-  onClick={() => setActiveTab("attendance")}
-  className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-    activeTab === "attendance"
-      ? "bg-[#D6451B] text-white shadow-md"
-      : "text-slate-600 hover:bg-slate-50"
-  }`}
->
-  <FaClipboardCheck className="text-sm" />
-  <span>Attendance</span>
-</button>
-
-  </div>
-</div>
+          <button
+            onClick={() => setActiveTab("attendance")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "attendance"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaClipboardCheck className="text-sm shrink-0" />
+            <span>Attendance</span>
+          </button>
+        </div>
+      </div>
 
       {/* Notes */}
 
@@ -928,17 +934,15 @@ export default function BatchDetailsPage({permissions}) {
   </div>
 )} { annoucementLoading && <AnnouncementsSkeleton></AnnouncementsSkeleton>}
 {activeTab === "attendance" && (
-  <div className="space-y-6">
+  <div className="space-y-4 sm:space-y-6">
 
     {/* Header */}
-
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
           Attendance
         </h2>
-
-        <p className="mt-1 text-slate-500">
+        <p className="mt-0.5 text-xs sm:text-sm text-slate-500">
           Monitor attendance performance and manage daily records.
         </p>
       </div>
@@ -947,153 +951,152 @@ export default function BatchDetailsPage({permissions}) {
         onClick={() =>
           router.push(`/${user.role}-panel/mark-attendence?batchId=${batchId}`)
         }
-        className="flex items-center justify-center gap-2 rounded-xl bg-[#D6451B] px-5 py-3 text-white"
+        className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#D6451B] px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-[#bf3b14] transition shrink-0"
       >
-        <FaPlus />
-        Mark Attendance
+        <FaPlus className="text-xs" />
+        <span>Mark Attendance</span>
       </button>
     </div>
 
     {/* Stats */}
-
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-
-      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
-        <p className="text-sm text-slate-500">
+    <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+        <p className="text-xs font-semibold text-slate-500">
           Total Classes
         </p>
-
-        <h3 className="mt-2 text-3xl font-bold">
-          {attendance?.stats?.totalClasses}
+        <h3 className="mt-1.5 text-xl sm:text-2xl font-extrabold text-slate-900">
+          {attendance?.stats?.totalClasses || 0}
         </h3>
+        <p className="text-[11px] text-slate-400 mt-0.5">Sessions recorded</p>
       </div>
 
-      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+        <p className="text-xs font-semibold text-slate-500">
           Average Attendance
         </p>
-
-        <h3 className="mt-2 text-3xl font-bold text-green-600">
-       {attendance?.stats?.averageAttendance}
+        <h3 className="mt-1.5 text-xl sm:text-2xl font-extrabold text-emerald-600">
+          {attendance?.stats?.averageAttendance || "0%"}
         </h3>
+        <p className="text-[11px] text-slate-400 mt-0.5">Overall presence</p>
       </div>
 
-      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+        <p className="text-xs font-semibold text-slate-500">
           Present Today
         </p>
-
-        <h3 className="mt-2 text-3xl font-bold text-green-600">
-          {attendance?.stats?.todayPresent}
+        <h3 className="mt-1.5 text-xl sm:text-2xl font-extrabold text-emerald-600">
+          {attendance?.stats?.todayPresent ?? 0}
         </h3>
+        <p className="text-[11px] text-slate-400 mt-0.5">Students in class</p>
       </div>
 
-      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+        <p className="text-xs font-semibold text-slate-500">
           Absent Today
         </p>
-
-        <h3 className="mt-2 text-3xl font-bold text-red-600">
-         {attendance?.stats?.todayAbsent}
+        <h3 className="mt-1.5 text-xl sm:text-2xl font-extrabold text-rose-600">
+          {attendance?.stats?.todayAbsent ?? 0}
         </h3>
+        <p className="text-[11px] text-slate-400 mt-0.5">Missed today</p>
       </div>
-
     </div>
 
     {/* History */}
-
-    <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-xs">
-
-      <div className="border-b p-6">
-        <h3 className="text-xl font-bold">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+      <div className="border-b border-slate-100 p-4 sm:p-5">
+        <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
           Attendance History
         </h3>
+        <p className="text-xs text-slate-400 mt-0.5">
+          Previously recorded session registers
+        </p>
       </div>
 
-      <div className="divide-y">
+      <div className="divide-y divide-slate-100">
+        {attendance?.attendanceHistory?.length > 0 ? (
+          attendance.attendanceHistory.map((item) => (
+            <div
+              key={item._id}
+              className="p-4 sm:p-5 hover:bg-slate-50/50 transition-colors"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="font-extrabold text-sm sm:text-base text-slate-900">
+                      {formatISTDateTime(item.date).split(",")[0]}
+                    </h4>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                        item.percentage >= 90
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : item.percentage >= 75
+                          ? "bg-amber-50 text-amber-700 border border-amber-200"
+                          : "bg-rose-50 text-rose-700 border border-rose-200"
+                      }`}
+                    >
+                      {item.percentage}%
+                    </span>
+                  </div>
 
-        {attendance?.attendanceHistory?.map((item) => (
-          <div
-            key={item._id}
-            className="p-5"
-          >
+                  <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      style={{
+                        width: `${item.percentage}%`,
+                      }}
+                      className={`h-full rounded-full ${
+                        item.percentage >= 75 ? "bg-emerald-500" : "bg-[#D6451B]"
+                      }`}
+                    />
+                  </div>
 
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-
-              <div className="flex-1">
-
-                <div className="flex items-center justify-between">
-
-                  <h4 className="font-semibold">
-                    {formatISTDateTime(item.date).split(",")[0]}
-                  </h4>
-
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      item.percentage >= 90
-                        ? "bg-green-100 text-green-700"
-                        : item.percentage >= 75
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {item.percentage}%
-                  </span>
-
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">
+                    <span className="text-emerald-700">
+                      ✓ {item.present} Present
+                    </span>
+                    <span className="text-rose-700">
+                      ✕ {item.absent} Absent
+                    </span>
+                  </div>
                 </div>
 
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
+                <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end shrink-0">
+                  {permissions.canEdit && (
+                    <button
+                      onClick={() => {
+                        router.push(`/admin-panel/attendence?attendanceId=${item._id}`);
+                      }}
+                      className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-600 hover:bg-blue-100 transition shadow-xs cursor-pointer"
+                      title="View attendance details"
+                    >
+                      <FaEye className="text-xs" />
+                      <span>View</span>
+                    </button>
+                  )}
 
-                  <div
-                    style={{
-                      width: `${item.percentage}%`,
-                    }}
-                    className="h-full rounded-full bg-[#D6451B]"
-                  />
-
+                  {permissions.canDelete && (
+                    <button
+                      onClick={() => {
+                        if (confirm("Are you sure you want to delete this attendance record?")) {
+                          deleteAttendance.mutate(item._id);
+                        }
+                      }}
+                      className="flex items-center gap-1.5 rounded-xl bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-100 transition shadow-xs cursor-pointer"
+                      title="Delete attendance record"
+                    >
+                      <FaTrash className="text-xs" />
+                      <span>Delete</span>
+                    </button>
+                  )}
                 </div>
-
-                <div className="mt-4 flex gap-6 text-sm">
-
-                  <span className="text-green-600">
-                    ✅ {item.present} Present
-                  </span>
-
-                  <span className="text-red-600">
-                    ❌ {item.absent} Absent
-                  </span>
-
-                </div>
-
               </div>
-
-              <div className="flex gap-3">
-
-                 {permissions.canEdit &&  <button
-                onClick={()=>{router.push(`/admin-panel/attendence?attendanceId=${item._id}`)}}
-                  className="rounded-xl bg-blue-50 px-4 py-2 text-blue-600 cursor-pointer"
-                >
-                <FaEye/>
-                </button> }
-
-               {permissions.canDelete && <button
-                onClick={()=>{deleteAttendance.mutate(item._id)}}
-                  className="rounded-xl px-4 py-2  bg-red-50
-                        text-red-600
-                        transition hover:bg-red-100 cursor-pointer"
-                >
-                  <FaTrash></FaTrash>
-                </button>}
-
-              </div>
-
             </div>
-
+          ))
+        ) : (
+          <div className="p-8 text-center text-xs text-slate-400">
+            No attendance records found for this cohort yet.
           </div>
-        ))}
-
+        )}
       </div>
-
     </div>
 
     {/* Bottom Cards */}

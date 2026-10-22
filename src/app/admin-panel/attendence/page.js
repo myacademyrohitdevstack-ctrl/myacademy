@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import {
   FaArrowLeft,
   FaClipboardCheck,
@@ -12,7 +11,11 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaUsers,
-  FaEdit,
+  FaCalendarAlt,
+  FaUserTie,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaClock,
 } from "react-icons/fa";
 
 import Loading from "@/app/Components/ui/Loading";
@@ -20,951 +23,552 @@ import { formatISTDateTime } from "@/Utils/formatDate";
 import { useGetAttendanceById } from "@/Hooks/useGetAttendenceById";
 import { useUpdateAttendance } from "@/app/mutations/Attendence";
 
-
 export default function AttendancePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const attendanceId = searchParams.get("attendanceId");
 
-  const { data, isLoading } =
-    useGetAttendanceById(attendanceId);
-
+  const { data, isLoading } = useGetAttendanceById(attendanceId);
   const attendance = data?.attendance;
 
   const [search, setSearch] = useState("");
-const updateAttendance=useUpdateAttendance(attendanceId)
-
+  const [statusFilter, setStatusFilter] = useState("all"); // 'all' | 'present' | 'absent'
+  const updateAttendance = useUpdateAttendance(attendanceId);
 
   const records = attendance?.records || [];
 
+  const present = records.filter((r) => r.status === "present").length;
+  const absent = records.filter((r) => r.status === "absent").length;
+  const totalStudents = records.length;
 
-
-const present = records.filter(
-  (r) => r.status === "present"
-).length;
-
-const absent = records.filter(
-  (r) => r.status === "absent"
-).length;
-
-const totalStudents = records.length;
-
-const percentage =
-  totalStudents === 0
-    ? 0
-    : Math.round((present / totalStudents) * 100);
+  const percentage =
+    totalStudents === 0 ? 0 : Math.round((present / totalStudents) * 100);
 
   const filteredStudents = useMemo(() => {
-    return records.filter((item) =>
-      item.student?.fullName
-        ?.toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  }, [records, search]);
+    return records.filter((item) => {
+      const nameMatch =
+        item.student?.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+        item.student?.email?.toLowerCase().includes(search.toLowerCase()) ||
+        item.student?.rollNumber?.toLowerCase().includes(search.toLowerCase()) ||
+        item.student?.phone?.toLowerCase().includes(search.toLowerCase());
+
+      const statusMatch =
+        statusFilter === "all" ? true : item.status === statusFilter;
+
+      return nameMatch && statusMatch;
+    });
+  }, [records, search, statusFilter]);
 
   const updateStatus = (studentId, status) => {
-  const updatedRecords = records.map((record) =>
-    record.student._id === studentId
-      ? {
-          ...record,
-          status,
-        }
-      : record
-  );
+    const updatedRecords = records.map((record) =>
+      record.student._id === studentId
+        ? {
+            ...record,
+            status,
+          }
+        : record
+    );
 
-  updateAttendance.mutate(
-    {
+    updateAttendance.mutate({
       records: updatedRecords.map((r) => ({
         student: r.student._id,
         status: r.status,
-     
       })),
-    },
-   
-  );
-};
-    if (isLoading) return <Loading />;
+    });
+  };
+
+  if (isLoading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-3 sm:py-6">
-      <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-3 sm:px-6 lg:px-8">
-                {/* Back */}
+    <div className="w-full min-w-0 space-y-4 sm:space-y-6">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#D6451B] hover:text-orange-700 transition-colors"
+      >
+        <FaArrowLeft className="text-xs" />
+        <span>Back to Cohort Details</span>
+      </button>
 
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 font-medium text-[#D6451B] hover:opacity-80"
-        >
-          <FaArrowLeft />
-          Back
-        </button>
+      {/* Hero Header */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg w-full min-w-0"
+      >
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between min-w-0">
+          <div className="min-w-0 flex-1">
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+              Cohort Attendance Register
+            </span>
 
-        {/* Hero */}
+            <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl truncate">
+              {attendance?.batch?.name || "Batch Attendance"}
+            </h1>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="
-            rounded-2xl sm:rounded-3xl
-            bg-gradient-to-r
-            from-[#D6451B]
-            to-orange-500
-            p-4 sm:p-6 lg:p-8
-            text-white
-            shadow-xl
-          "
-        >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-
-            <div>
-
-              <span className="rounded-full bg-white/20 px-4 py-2 text-sm">
-                Attendance Details
-              </span>
-
-              <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
-                {attendance?.batch?.name || "Batch Attendance"}
-              </h1>
-
-              <p className="mt-3 text-orange-100">
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-orange-100 font-medium">
+              <span className="inline-flex items-center gap-1.5">
+                <FaCalendarAlt className="text-xs text-orange-200" />
                 {formatISTDateTime(attendance?.date)}
-              </p>
-
-              <p className="mt-2 text-sm text-orange-200">
-                Marked by{" "}
-                <span className="font-semibold text-white">
-                  {attendance?.markedBy?.fullName}
-                </span>
-              </p>
-
-            </div>
-
-            <div className="rounded-2xl bg-white/20 p-5">
-
-              <p className="text-sm text-orange-100">
-                Attendance
-              </p>
-
-              <h2 className="mt-2 text-2xl sm:text-4xl lg:text-5xl font-bold">
-                {percentage}%
-              </h2>
-
-              <p className="mt-2 text-sm text-orange-100">
-                {present} of {totalStudents} Students Present
-              </p>
-
-            </div>
-
-          </div>
-        </motion.div>
-
-        {/* Stats */}
-
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
-
-          <StatCard
-            title="Students"
-            value={totalStudents}
-            icon={<FaUsers />}
-            color="bg-blue-50 text-blue-600"
-          />
-
-          <StatCard
-            title="Present"
-            value={present}
-            icon={<FaCheckCircle />}
-            color="bg-green-50 text-green-600"
-          />
-
-          <StatCard
-            title="Absent"
-            value={absent}
-            icon={<FaTimesCircle />}
-            color="bg-red-50 text-red-600"
-          />
-
-          <StatCard
-            title="Attendance"
-            value={`${percentage}%`}
-            icon={<FaClipboardCheck />}
-            color="bg-orange-50 text-[#D6451B]"
-          />
-
-        </div>
-
-        {/* Search */}
-
-        <div className="rounded-3xl border bg-white p-5 shadow-sm">
-
-          <div className="relative">
-
-            <FaSearch className="absolute left-4 top-4 text-slate-400" />
-
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search student..."
-              className="
-                w-full
-                rounded-xl
-                border
-                py-3
-                pl-12
-                pr-4
-                outline-none
-                transition
-                focus:border-[#D6451B]
-              "
-            />
-
-          </div>
-
-        </div>
-        {/* Student List */}
-
-<div className="space-y-6">
-
-  {/* Mobile Cards */}
-
-  <div className="space-y-5 lg:hidden">
-
-    {filteredStudents.length > 0 ? (
-
-      filteredStudents.map((record) => (
-
-        <motion.div
-          key={record.student._id}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="
-            overflow-hidden
-            rounded-xl sm:rounded-2xl
-            border
-            border-slate-200
-            bg-white
-            shadow-sm
-          "
-        >
-
-          {/* Header */}
-
-          <div className="bg-gradient-to-r from-orange-50 to-white p-3.5 sm:p-4">
-
-            <div className="flex items-start gap-4">
-
-              {record.student?.profileImage?.url ? (
-
-                <img
-                  src={record.student.profileImage.url}
-                  alt={record.student.fullName}
-                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover"
-                />
-
-              ) : (
-
-                <div
-                  className="
-                    flex
-                    h-16
-                    w-16
-                    items-center
-                    justify-center
-                    rounded-2xl
-                    bg-orange-100
-                    text-[#D6451B]
-                  "
-                >
-                  <FaUserGraduate className="text-3xl" />
-                </div>
-
-              )}
-
-              <div className="min-w-0 flex-1">
-
-                <h3 className="truncate text-lg font-bold">
-                  {record.student.fullName}
-                </h3>
-
-                <p className="truncate text-sm text-slate-500">
-                  {record.student.email}
-                </p>
-
-                <p className="mt-1 text-xs text-slate-400">
-                  {record.student.phone || "-"}
-                </p>
-
-              </div>
-
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  record.status === "present"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {record.status}
               </span>
-
+              <span className="hidden sm:inline">•</span>
+              <span className="inline-flex items-center gap-1.5">
+                <FaUserTie className="text-xs text-orange-200" />
+                Marked by{" "}
+                <span className="font-bold text-white">
+                  {attendance?.markedBy?.fullName || "Faculty"}
+                </span>
+              </span>
             </div>
-
           </div>
 
-          {/* Details */}
-
-          <div className="space-y-4 p-5">
-
-            <div className="grid grid-cols-2 gap-4">
-
-              <div className="rounded-2xl bg-slate-50 p-4">
-
-                <p className="text-xs text-slate-500">
-                  Roll Number
-                </p>
-
-                <p className="mt-1 font-semibold">
-                  {record.student.rollNumber || "-"}
-                </p>
-
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-4">
-
-                <p className="text-xs text-slate-500">
-                  Status
-                </p>
-
-                <p
-                  className={`mt-1 font-semibold ${
-                    record.status === "present"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {record.status}
-                </p>
-
-              </div>
-
+          {/* Overall Attendance Metric Card */}
+          <div className="rounded-2xl border border-white/20 bg-white/10 p-4 sm:p-5 backdrop-blur-md shrink-0 lg:w-72">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-orange-100 font-semibold uppercase tracking-wider">
+                Attendance Rate
+              </p>
+              <FaClipboardCheck className="text-white/80" />
             </div>
-
-           
-
-           <button
-  disabled={updateAttendance.isPending}
-  onClick={() =>
-    updateStatus(
-      record.student._id,
-      record.status === "present"
-        ? "absent"
-        : "present"
-    )
-  }
-  className={`rounded-xl px-4 py-2 font-medium transition ${
-    record.status === "present"
-      ? "bg-red-50 text-red-600 hover:bg-red-100"
-      : "bg-green-50 text-green-600 hover:bg-green-100"
-  } ${
-    updateAttendance.isPending
-      ? "cursor-not-allowed opacity-60"
-      : ""
-  }`}
->
-  {record.status === "present"
-    ? "Mark Absent"
-    : "Mark Present"}
-</button>
-
+            <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white">
+              {percentage}%
+            </h2>
+            <p className="mt-1 text-xs text-orange-100">
+              {present} of {totalStudents} Students Present
+            </p>
           </div>
+        </div>
+      </motion.section>
 
-        </motion.div>
+      {/* KPI Stats Cards */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
+        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-slate-500">Total Enrolled</p>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 text-xs sm:text-sm">
+              <FaUsers />
+            </div>
+          </div>
+          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
+            {totalStudents}
+          </h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">Assigned to batch</p>
+        </div>
 
-      ))
+        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-slate-500">Present</p>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-xs sm:text-sm">
+              <FaCheckCircle />
+            </div>
+          </div>
+          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600">
+            {present}
+          </h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">Attended this session</p>
+        </div>
 
-    ) : (
+        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-slate-500">Absent</p>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 text-xs sm:text-sm">
+              <FaTimesCircle />
+            </div>
+          </div>
+          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-rose-600">
+            {absent}
+          </h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">Missed session</p>
+        </div>
 
-      <EmptyState />
+        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-slate-500">Overall Rate</p>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B] text-xs sm:text-sm">
+              <FaClipboardCheck />
+            </div>
+          </div>
+          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
+            {percentage}%
+          </h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">Presence ratio</p>
+        </div>
+      </div>
 
-    )}
+      {/* Filter and Search Bar */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Search Input */}
+        <div className="relative flex-1 w-full sm:max-w-md">
+          <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search student by name, email, roll no, or phone..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-[#D6451B] focus:bg-white"
+          />
+        </div>
 
-  </div>
-  {/* Desktop Table */}
+        {/* Status Filter Buttons */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-slate-100 p-1 rounded-xl text-xs font-bold shrink-0">
+          <button
+            onClick={() => setStatusFilter("all")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              statusFilter === "all"
+                ? "bg-white text-slate-900 shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            All ({records.length})
+          </button>
+          <button
+            onClick={() => setStatusFilter("present")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              statusFilter === "present"
+                ? "bg-emerald-600 text-white shadow-xs"
+                : "text-slate-600 hover:text-emerald-700"
+            }`}
+          >
+            Present ({present})
+          </button>
+          <button
+            onClick={() => setStatusFilter("absent")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              statusFilter === "absent"
+                ? "bg-rose-600 text-white shadow-xs"
+                : "text-slate-600 hover:text-rose-700"
+            }`}
+          >
+            Absent ({absent})
+          </button>
+        </div>
+      </div>
 
-{/* Desktop Table */}
-
-<div className="hidden  lg:block">
-
-  <div className="overflow-hidden w-fit rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-sm">
-
-    <div className="overflow-x-auto">
-
-      <table className="min-w-full">
-
-        <thead className="sticky top-0 bg-slate-50">
-
-          <tr className="border-b border-slate-200">
-
-            <th className="px-8 py-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-              Student
-            </th>
-
-            <th className="px-6 py-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-              Phone
-            </th>
-
-
-            <th className="px-6 py-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">
-              Status
-            </th>
-
-        
-
-            <th className="px-8 py-5 text-right text-xs font-bold uppercase tracking-wider text-slate-500">
-              Action
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
+      {/* Student List Section */}
+      <div className="space-y-4">
+        {/* Mobile Cards (Shown on mobile & tablets < 1024px) */}
+        <div className="space-y-3 lg:hidden">
           {filteredStudents.length > 0 ? (
-
             filteredStudents.map((record) => (
-
-              <tr
+              <div
                 key={record.student._id}
-                className="
-                  border-b
-                  border-slate-100
-                  transition-all
-                  duration-200
-                  hover:bg-orange-50/40
-                "
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-[#D6451B]"
               >
+                <div className="flex items-start gap-3.5">
+                  {record.student?.profileImage?.url ? (
+                    <img
+                      src={record.student.profileImage.url}
+                      alt={record.student.fullName}
+                      className="h-11 w-11 rounded-xl object-cover shrink-0 border border-slate-200 shadow-xs"
+                    />
+                  ) : (
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 font-bold text-[#D6451B] text-base border border-orange-200 shadow-xs">
+                      {record.student?.fullName?.charAt(0) || <FaUserGraduate />}
+                    </div>
+                  )}
 
-                {/* Student */}
-
-                <td className="px-8 py-5">
-
-                  <div className="flex items-center gap-4">
-
-                    {record.student?.profileImage?.url ? (
-
-                      <img
-                        src={record.student.profileImage.url}
-                        alt={record.student.fullName}
-                        className="h-14 w-14 rounded-2xl object-cover shadow-sm"
-                      />
-
-                    ) : (
-
-                      <div
-                        className="
-                          flex
-                          h-9 sm:h-11
-                          w-9 sm:w-11
-                          items-center
-                          justify-center
-                          rounded-2xl
-                          bg-orange-100
-                          text-xl
-                          text-[#D6451B]
-                        "
-                      >
-                        <FaUserGraduate />
-                      </div>
-
-                    )}
-
-                    <div>
-
-                      <h3 className="font-semibold text-slate-900">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="truncate text-sm sm:text-base font-extrabold text-slate-900">
                         {record.student.fullName}
                       </h3>
-
-                      <p className="mt-1 text-sm text-slate-500">
-                        {record.student.email}
-                      </p>
-
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
+                          record.status === "present"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-rose-50 text-rose-700 border border-rose-200"
+                        }`}
+                      >
+                        {record.status}
+                      </span>
                     </div>
 
+                    <p className="truncate text-xs text-slate-500 mt-0.5">
+                      {record.student.email}
+                    </p>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+                      {record.student.rollNumber && (
+                        <span>Roll: <strong className="text-slate-800">{record.student.rollNumber}</strong></span>
+                      )}
+                      {record.student.phone && (
+                        <span>Phone: <strong className="text-slate-800">{record.student.phone}</strong></span>
+                      )}
+                    </div>
                   </div>
-
-                </td>
-
-                {/* Phone */}
-
-                <td className="px-6 py-5 text-sm text-slate-700">
-
-                  {record.student.phone || "-"}
-
-                </td>
-
-                
-
-                {/* Status */}
-
-                <td className="px-6 py-5 text-center">
-
-                  <span
-                    className={`inline-flex rounded-full px-4 py-2 text-xs font-semibold ${
-                      record.status === "present"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {record.status}
-                  </span>
-
-                </td>
-
-                {/* Remark */}
-
-                
-
-                {/* Action */}
-
-                <td className="px-8 py-5 text-right">
-
-                <div className="flex justify-end">
-
-
-
-    <button
-  disabled={updateAttendance.isPending}
-  onClick={() =>
-    updateStatus(
-      record.student._id,
-      record.status === "present"
-        ? "absent"
-        : "present"
-    )
-  }
-  className={`rounded-xl px-4 py-2 font-medium transition ${
-    record.status === "present"
-      ? "bg-red-50 text-red-600 hover:bg-red-100"
-      : "bg-green-50 text-green-600 hover:bg-green-100"
-  } ${
-    updateAttendance.isPending
-      ? "cursor-not-allowed opacity-60"
-      : ""
-  }`}
->
-  {record.status === "present"
-    ? "Mark Absent"
-    : "Mark Present"}
-</button>
-
-
-
-  
-
-</div>
-
-                </td>
-
-              </tr>
-
-            ))
-
-          ) : (
-
-            <tr>
-
-              <td
-                colSpan={6}
-                className="py-20 text-center"
-              >
-
-                <div className="flex flex-col items-center">
-
-                  <FaClipboardCheck className="text-5xl text-slate-300" />
-
-                  <h3 className="mt-4 text-lg font-semibold text-slate-700">
-                    No Students Found
-                  </h3>
-
-                  <p className="mt-2 text-slate-500">
-                    No attendance records match your search.
-                  </p>
-
                 </div>
 
-              </td>
-
-            </tr>
-
+                {/* Status Toggle Action Button */}
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <button
+                    disabled={updateAttendance.isPending}
+                    onClick={() =>
+                      updateStatus(
+                        record.student._id,
+                        record.status === "present" ? "absent" : "present"
+                      )
+                    }
+                    className={`w-full flex items-center justify-center gap-2 rounded-xl py-2.5 px-4 text-xs font-bold transition-all ${
+                      record.status === "present"
+                        ? "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
+                        : "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                    } ${
+                      updateAttendance.isPending ? "cursor-not-allowed opacity-60" : ""
+                    }`}
+                  >
+                    {record.status === "present" ? (
+                      <>
+                        <FaTimesCircle className="text-xs" />
+                        <span>Change to Absent</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaCheckCircle className="text-xs" />
+                        <span>Change to Present</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <EmptyState />
           )}
+        </div>
 
-        </tbody>
+        {/* Desktop Table (Shown on lg >= 1024px) */}
+        <div className="hidden lg:block">
+          <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-full text-left text-xs">
+                <thead className="bg-slate-50/80 border-b border-slate-200">
+                  <tr className="text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                    <th className="px-6 py-4">Student</th>
+                    <th className="px-6 py-4">Roll Number</th>
+                    <th className="px-6 py-4">Phone Number</th>
+                    <th className="px-6 py-4 text-center">Status</th>
+                    <th className="px-6 py-4 text-right">Quick Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredStudents.length > 0 ? (
+                    filteredStudents.map((record) => (
+                      <tr
+                        key={record.student._id}
+                        className="hover:bg-orange-50/30 transition-colors"
+                      >
+                        {/* Student */}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            {record.student?.profileImage?.url ? (
+                              <img
+                                src={record.student.profileImage.url}
+                                alt={record.student.fullName}
+                                className="h-10 w-10 rounded-xl object-cover border border-slate-200 shadow-xs"
+                              />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 font-bold text-[#D6451B] text-sm border border-orange-200 shadow-xs">
+                                {record.student?.fullName?.charAt(0) || <FaUserGraduate />}
+                              </div>
+                            )}
 
-      </table>
+                            <div>
+                              <p className="font-extrabold text-slate-900 text-sm">
+                                {record.student.fullName}
+                              </p>
+                              <p className="text-[11px] text-slate-500">
+                                {record.student.email}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
 
-    </div>
+                        {/* Roll Number */}
+                        <td className="px-6 py-4 font-semibold text-slate-700">
+                          {record.student.rollNumber || "—"}
+                        </td>
 
-  </div>
+                        {/* Phone */}
+                        <td className="px-6 py-4 font-semibold text-slate-700">
+                          {record.student.phone || "—"}
+                        </td>
 
-</div>
-{/* Attendance Summary */}
+                        {/* Status Badge */}
+                        <td className="px-6 py-4 text-center">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                              record.status === "present"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : "bg-rose-50 text-rose-700 border border-rose-200"
+                            }`}
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                record.status === "present"
+                                  ? "bg-emerald-500"
+                                  : "bg-rose-500"
+                              }`}
+                            />
+                            {record.status}
+                          </span>
+                        </td>
 
-<div className="grid gap-6 lg:grid-cols-2">
-
-  {/* Summary */}
-
-  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-
-    <h2 className="text-xl font-bold">
-      Attendance Summary
-    </h2>
-
-    {/* Present */}
-
-    <div className="mt-6">
-
-      <div className="mb-2 flex items-center justify-between">
-
-        <span className="font-medium text-green-600">
-          Present
-        </span>
-
-        <span className="font-semibold">
-          {present} / {totalStudents}
-        </span>
-
+                        {/* Action Toggle */}
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            disabled={updateAttendance.isPending}
+                            onClick={() =>
+                              updateStatus(
+                                record.student._id,
+                                record.status === "present" ? "absent" : "present"
+                              )
+                            }
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 font-bold text-xs transition shadow-xs ${
+                              record.status === "present"
+                                ? "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
+                                : "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                            } ${
+                              updateAttendance.isPending
+                                ? "cursor-not-allowed opacity-60"
+                                : ""
+                            }`}
+                          >
+                            {record.status === "present" ? "Mark Absent" : "Mark Present"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="py-12 text-center">
+                        <EmptyState />
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-
-        <div
-          className="h-full rounded-full bg-green-500"
-          style={{
-            width: `${percentage}%`,
-          }}
-        />
-
-      </div>
-
-    </div>
-
-    {/* Absent */}
-
-    <div className="mt-6">
-
-      <div className="mb-2 flex items-center justify-between">
-
-        <span className="font-medium text-red-600">
-          Absent
-        </span>
-
-        <span className="font-semibold">
-          {absent} / {totalStudents}
-        </span>
-
-      </div>
-
-      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-
-        <div
-          className="h-full rounded-full bg-red-500"
-          style={{
-            width: `${100 - percentage}%`,
-          }}
-        />
-
-      </div>
-
-    </div>
-
-    <div className="mt-8 rounded-2xl bg-orange-50 p-5">
-
-      <p className="text-sm text-slate-500">
-        Overall Attendance
-      </p>
-
-      <h3 className="mt-2 text-2xl sm:text-4xl lg:text-5xl font-bold text-[#D6451B]">
-        {percentage}%
-      </h3>
-
-    </div>
-
-  </div>
-
-  {/* Information */}
-
-  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-
-    <h2 className="text-xl font-bold">
-      Attendance Information
-    </h2>
-
-    <div className="mt-6 space-y-5">
-
-      <div className="flex items-center justify-between border-b pb-4">
-
-        <span className="text-slate-500">
-          Batch
-        </span>
-
-        <strong>
-          {attendance?.batch?.name || "-"}
-        </strong>
-
-      </div>
-
-      <div className="flex items-center justify-between border-b pb-4">
-
-        <span className="text-slate-500">
-          Date
-        </span>
-
-        <strong>
-          {formatISTDateTime(attendance?.date)}
-        </strong>
-
-      </div>
-
-      <div className="flex items-center justify-between border-b pb-4">
-
-        <span className="text-slate-500">
-          Marked By
-        </span>
-
-        <strong>
-          {attendance?.markedBy?.fullName}
-        </strong>
-
-      </div>
-
-      <div className="flex items-center justify-between border-b pb-4">
-
-        <span className="text-slate-500">
-          Created
-        </span>
-
-        <strong>
-          {formatISTDateTime(attendance?.createdAt)}
-        </strong>
-
-      </div>
-
-      <div className="flex items-center justify-between">
-
-        <span className="text-slate-500">
-          Last Updated
-        </span>
-
-        <strong>
-          {formatISTDateTime(attendance?.updatedAt)}
-        </strong>
-
-      </div>
-
-    </div>
-    </div>
-
-  </div>
-
-</div>
-{/* Quick Insights */}
-
-<div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-
-  <div className="flex items-center justify-between">
-
-    <div>
-
-      <h2 className="text-xl font-bold">
-        Quick Insights
-      </h2>
-
-      <p className="mt-1 text-slate-500">
-        Snapshot of this attendance record.
-      </p>
-
-    </div>
-
-    <div
-      className={`
-        rounded-2xl px-5 py-3 text-center
-        ${
-          percentage >= 90
-            ? "bg-green-100 text-green-700"
-            : percentage >= 75
-            ? "bg-yellow-100 text-yellow-700"
-            : "bg-red-100 text-red-700"
-        }
-      `}
-    >
-      <p className="text-xs uppercase">
-        Performance
-      </p>
-
-      <h3 className="text-2xl font-bold">
-        {percentage >= 90
-          ? "Excellent"
-          : percentage >= 75
-          ? "Good"
-          : "Needs Improvement"}
-      </h3>
-
-    </div>
-
-  </div>
-
-  <div className="mt-8 grid gap-5 md:grid-cols-3">
-
-    <div className="rounded-2xl bg-slate-50 p-5">
-
-      <p className="text-sm text-slate-500">
-        Present Students
-      </p>
-
-      <h3 className="mt-2 text-3xl font-bold text-green-600">
-        {present}
-      </h3>
-
-    </div>
-
-    <div className="rounded-2xl bg-slate-50 p-5">
-
-      <p className="text-sm text-slate-500">
-        Absent Students
-      </p>
-
-      <h3 className="mt-2 text-3xl font-bold text-red-600">
-        {absent}
-      </h3>
-
-    </div>
-
-    <div className="rounded-2xl bg-slate-50 p-5">
-
-      <p className="text-sm text-slate-500">
-        Total Students
-      </p>
-
-      <h3 className="mt-2 text-3xl font-bold text-[#D6451B]">
-        {totalStudents}
-      </h3>
-
-    </div>
-
-  </div>
-
-</div>
-
+      {/* Attendance Summary & Cohort Details */}
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 w-full min-w-0">
+        {/* Attendance Breakdown */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900">
+            Attendance Distribution
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Statistical breakdown of presence across this classroom cohort
+          </p>
+
+          <div className="mt-5 space-y-4">
+            {/* Present Progress */}
+            <div>
+              <div className="mb-1.5 flex items-center justify-between text-xs font-bold">
+                <span className="text-emerald-700">Present</span>
+                <span className="text-slate-900">
+                  {present} / {totalStudents} ({percentage}%)
+                </span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Absent Progress */}
+            <div>
+              <div className="mb-1.5 flex items-center justify-between text-xs font-bold">
+                <span className="text-rose-700">Absent</span>
+                <span className="text-slate-900">
+                  {absent} / {totalStudents} ({100 - percentage}%)
+                </span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-rose-500 transition-all duration-500"
+                  style={{ width: `${100 - percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Overall Assessment Banner */}
+            <div className="mt-5 rounded-2xl bg-orange-50/70 border border-orange-200/60 p-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-slate-600">Cohort Performance</p>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  {percentage >= 85
+                    ? "High classroom engagement achieved."
+                    : percentage >= 70
+                    ? "Normal cohort presence maintained."
+                    : "Attendance follow-up recommended."}
+                </p>
+              </div>
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#D6451B]">
+                {percentage}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Attendance Record Information */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900">
+            Session Details & Audit
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            System metadata and verification logs
+          </p>
+
+          <div className="mt-5 divide-y divide-slate-100 text-xs">
+            <div className="flex items-center justify-between py-2.5">
+              <span className="text-slate-500 font-medium">Cohort Batch</span>
+              <strong className="text-slate-900">{attendance?.batch?.name || "—"}</strong>
+            </div>
+
+            <div className="flex items-center justify-between py-2.5">
+              <span className="text-slate-500 font-medium">Session Date</span>
+              <strong className="text-slate-900">{formatISTDateTime(attendance?.date)}</strong>
+            </div>
+
+            <div className="flex items-center justify-between py-2.5">
+              <span className="text-slate-500 font-medium">Marked By Faculty</span>
+              <strong className="text-slate-900">
+                {attendance?.markedBy?.fullName || "Faculty"}
+              </strong>
+            </div>
+
+            <div className="flex items-center justify-between py-2.5">
+              <span className="text-slate-500 font-medium">Logged in System</span>
+              <strong className="text-slate-900">{formatISTDateTime(attendance?.createdAt)}</strong>
+            </div>
+
+            <div className="flex items-center justify-between py-2.5">
+              <span className="text-slate-500 font-medium">Last Modified</span>
+              <strong className="text-slate-900">{formatISTDateTime(attendance?.updatedAt)}</strong>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-/* ------------------------------------------------ */
-/*                  Empty State                     */
-/* ------------------------------------------------ */
 
 function EmptyState() {
   return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 20,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      className="
-        flex
-        flex-col
-        items-center
-        justify-center
-        rounded-2xl sm:rounded-3xl
-        border-2
-        border-dashed
-        border-slate-300
-        bg-white
-        px-6
-        py-10 sm:py-16
-        text-center
-      "
-    >
-      <div
-        className="
-          flex
-          h-20
-          w-20
-          items-center
-          justify-center
-          rounded-full
-          bg-orange-100
-        "
-      >
-        <FaClipboardCheck className="text-3xl text-[#D6451B]" />
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 sm:py-14 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-[#D6451B]">
+        <FaClipboardCheck className="text-2xl" />
       </div>
-
-      <h3 className="mt-6 text-2xl font-bold text-slate-800">
+      <h3 className="mt-4 text-base font-bold text-slate-800">
         No Students Found
       </h3>
-
-      <p className="mt-3 max-w-md text-slate-500">
-        No attendance records matched your search. Try a different
-        student name or clear the search box.
+      <p className="mt-1 max-w-sm text-xs text-slate-500">
+        No students matched your search criteria. Try a different keyword or reset the status filter.
       </p>
-    </motion.div>
-  );
-}
-/* ------------------------------------------------ */
-/*                     Stat Card                    */
-/* ------------------------------------------------ */
-
-function StatCard({
-  title,
-  value,
-  icon,
-  color,
-}) {
-  return (
-    <motion.div
-      whileHover={{
-        y: -4,
-        scale: 1.02,
-      }}
-      transition={{
-        duration: 0.2,
-      }}
-      className="
-        rounded-xl sm:rounded-2xl
-        border
-        border-slate-200
-        bg-white
-        p-3 sm:p-4
-        shadow-sm
-        transition-all
-        hover:shadow-lg
-      "
-    >
-      <div
-        className={`
-          flex
-          h-9 sm:h-11
-          w-9 sm:w-11
-          items-center
-          justify-center
-          rounded-2xl
-          text-2xl
-          ${color}
-        `}
-      >
-        {icon}
-      </div>
-
-      <h2 className="mt-2.5 text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-        {value}
-      </h2>
-
-      <p className="mt-0.5 text-xs font-semibold text-slate-500 truncate">
-        {title}
-      </p>
-    </motion.div>
+    </div>
   );
 }

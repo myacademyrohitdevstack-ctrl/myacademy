@@ -6,7 +6,16 @@ import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Modal from "@/app/Components/ui/Modals";
-import PdfViewer from "@/Utils/pdfViewer";
+import dynamic from "next/dynamic";
+
+const PdfViewer = dynamic(() => import("@/Utils/pdfViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-8 text-xs text-slate-400">
+      Loading Document Viewer...
+    </div>
+  ),
+});
 import {
 
   FaUserTie,

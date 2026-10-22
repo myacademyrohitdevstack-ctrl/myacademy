@@ -68,32 +68,32 @@ export default function BulkSendConfirmModal({
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-6"
+          className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden my-4 sm:my-6"
         >
           {/* Header */}
-          <div className="px-6 py-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#D6451B] flex items-center justify-center text-white shadow-xs">
-                <FaUsers className="text-xl" />
+          <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl sm:rounded-2xl bg-[#D6451B] flex items-center justify-center text-white shadow-xs shrink-0">
+                <FaUsers className="text-lg sm:text-xl" />
               </div>
-              <div>
-                <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-extrabold text-slate-900 text-xs sm:text-base truncate">
                   Confirm Bulk Fee Reminders
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
                   Review recipient counts, templates, and delivery method
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors"
+              className="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors shrink-0"
             >
               <FaTimes className="text-xs" />
             </button>
           </div>
 
-          <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
+          <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
             {/* Delivery Method Banner */}
             <div
               className={`p-3.5 rounded-2xl border flex items-start gap-2.5 ${
@@ -175,17 +175,17 @@ export default function BulkSendConfirmModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors text-center"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={bulkSendMutation.isPending || validRecipients.length === 0}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 hover:from-orange-600 hover:to-orange-500 text-white font-extrabold text-xs shadow-md shadow-orange-200 inline-flex items-center gap-2 transition-all disabled:opacity-50"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 hover:from-orange-600 hover:to-orange-500 text-white font-extrabold text-xs shadow-md shadow-orange-200 inline-flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               {bulkSendMutation.isPending ? (
                 <>

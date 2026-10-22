@@ -18,7 +18,16 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAdminGetAllNotes } from "@/Hooks/useAdminGetNotes";
 import Modal from "@/app/Components/ui/Modals";
-import PdfViewer from "@/Utils/pdfViewer";
+import dynamic from "next/dynamic";
+
+const PdfViewer = dynamic(() => import("@/Utils/pdfViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-8 text-xs text-slate-400">
+      Loading Document Viewer...
+    </div>
+  ),
+});
 import { usedeleteNotesMutation } from "@/app/mutations/notesMutation";
 import { useAdminGetAllLinks } from "@/Hooks/useAdminGetClassLinks";
 import { formatISTDateTime } from "@/Utils/formatDate";
@@ -141,60 +150,57 @@ export default function BatchDetailsPage() {
       </div>
 
       {/* Tabs */}
+      <div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xs overflow-x-auto scrollbar-none">
+        <div className="flex sm:grid sm:grid-cols-4 gap-1 min-w-full">
+          <button
+            onClick={() => setActiveTab("notes")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "notes"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaBookOpen className="text-sm shrink-0" />
+            <span>Notes</span>
+          </button>
 
- 
-  <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-   <div className="grid  grid-cols-4 gap-1">
+          <button
+            onClick={() => setActiveTab("links")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "links"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaLink className="text-sm shrink-0" />
+            <span>Links</span>
+          </button>
 
-      <button
-        onClick={() => setActiveTab("notes")}
-        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "notes"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaBookOpen className="text-sm" />
-        <span>Notes</span>
-      </button>
+          <button
+            onClick={() => setActiveTab("announcements")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "announcements"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaBullhorn className="text-sm shrink-0" />
+            <span>Updates</span>
+          </button>
 
-      <button
-        onClick={() => setActiveTab("links")}
-        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "links"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaLink className="text-sm" />
-        <span>Links</span>
-      </button>
-
-      <button
-        onClick={() => setActiveTab("announcements")}
-        className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-          activeTab === "announcements"
-            ? "bg-[#D6451B] text-white shadow-md"
-            : "text-slate-600 hover:bg-slate-50"
-        }`}
-      >
-        <FaBullhorn className="text-sm" />
-        <span>Updates</span>
-      </button>
-<button
-  onClick={() => setActiveTab("attendance")}
-  className={`flex  items-center justify-center gap-1 rounded-xl py-3 text-xs font-semibold transition-all sm:flex-row sm:text-sm ${
-    activeTab === "attendance"
-      ? "bg-[#D6451B] text-white shadow-md"
-      : "text-slate-600 hover:bg-slate-50"
-  }`}
->
-  <FaClipboardCheck className="text-sm" />
-  <span>Attendance</span>
-</button>
-
-  </div>
-</div>
+          <button
+            onClick={() => setActiveTab("attendance")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === "attendance"
+                ? "bg-[#D6451B] text-white shadow-xs"
+                : "text-slate-600 hover:text-[#D6451B] hover:bg-orange-50/60"
+            }`}
+          >
+            <FaClipboardCheck className="text-sm shrink-0" />
+            <span>Attendance</span>
+          </button>
+        </div>
+      </div>
 
       {/* Notes */}
 
