@@ -15,6 +15,8 @@ import {
   FaEdit,
   FaExclamationTriangle,
   FaSpinner,
+  FaMobileAlt,
+  FaCloud,
 } from "react-icons/fa";
 import {
   previewWhatsAppReminderApi,
@@ -100,7 +102,7 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-list"] });
 
-      if (channelPreference === "click_to_chat" || !isCloudApiConnected) {
+      if (channelPreference === "click_to_chat" || channelPreference === "direct_whatsapp") {
         const record = res.data?.data;
         const clickUrl = res.data?.clickToChatUrl || record?.clickToChatUrl;
         setSentReminderRecord(record);
@@ -108,6 +110,9 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
           window.open(clickUrl, "_blank", "noopener,noreferrer");
         }
         toast.info("WhatsApp opened. Please click 'Confirm Manually Sent' after sending.");
+      } else if (channelPreference === "myacademy_api") {
+        toast.success(res.data?.message || "Reminder dispatched via MyAcademy WhatsApp Gateway!");
+        onClose();
       } else {
         toast.success(res.data?.message || "Reminder dispatched via WhatsApp Cloud API!");
         onClose();
@@ -374,31 +379,50 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto justify-end">
             <button
+              type="button"
               onClick={onClose}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors text-center"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors text-center cursor-pointer"
             >
               Cancel
             </button>
 
-            {isCloudApiConnected && (
-              <button
-                onClick={() => handleSend("cloud_api")}
-                disabled={actionLoading || !previewData?.recipient?.isValidPhone}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-50"
-              >
-                <FaPaperPlane className="text-xs" />
-                Send via Cloud API
-              </button>
-            )}
-
+            {/* Option 1: Direct Admin WhatsApp */}
             <button
+              type="button"
               onClick={() => handleSend("click_to_chat")}
               disabled={actionLoading || !previewData?.recipient?.isValidPhone}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 hover:from-orange-600 hover:to-orange-500 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-md shadow-orange-200 transition-all disabled:opacity-50"
+              className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#D6451B] border border-orange-200 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer shadow-2xs"
+              title="Open message directly on admin WhatsApp"
             >
-              <FaExternalLinkAlt className="text-xs" />
-              Open WhatsApp Web
+              <FaMobileAlt className="text-xs text-[#D6451B]" />
+              Open Admin WhatsApp
             </button>
+
+            {/* Option 2: MyAcademy WhatsApp API (Managed Zero-Setup) */}
+            <button
+              type="button"
+              onClick={() => handleSend("myacademy_api")}
+              disabled={actionLoading || !previewData?.recipient?.isValidPhone}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-purple-200 transition-all disabled:opacity-50 cursor-pointer"
+              title="Dispatches via MyAcademy Platform Gateway"
+            >
+              <FaCloud className="text-xs" />
+              Send via MyAcademy API
+            </button>
+
+            {/* Option 3: Custom Meta Cloud API (If connected) */}
+            {isCloudApiConnected && (
+              <button
+                type="button"
+                onClick={() => handleSend("cloud_api")}
+                disabled={actionLoading || !previewData?.recipient?.isValidPhone}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
+                title="Send using your verified Meta Cloud API"
+              >
+                <FaPaperPlane className="text-xs" />
+                Send via Custom Meta API
+              </button>
+            )}
           </div>
         </div>
       </motion.div>

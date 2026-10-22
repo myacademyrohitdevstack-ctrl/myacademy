@@ -75,3 +75,12 @@ export  function adminCreateTeacher(data){
 export function adminCreateParent(data) {
   return api.post(`/admin/create-parent`, data);
 }
+
+export function adminBulkCreateStudents(data) {
+  return api.post(`/admin/bulk-create-students`, data);
+}
+
+export function adminBulkCreateTeachers(data) {
+  return api.post(`/admin/bulk-create-teachers`, data);
+}
+

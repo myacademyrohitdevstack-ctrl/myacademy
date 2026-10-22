@@ -124,35 +124,43 @@ export default function ReminderDashboardTab({
               </span>
               <span
                 className={`px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 w-fit ${
-                  connection.mode === "cloud_api"
+                  connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                    ? "bg-purple-50 text-purple-700 border border-purple-200"
+                    : connection.mode === "cloud_api"
                     ? connection.connectionStatus === "connected"
                       ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                       : "bg-rose-50 text-rose-700 border border-rose-200"
-                    : "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "bg-orange-50 text-[#D6451B] border border-orange-200"
                 }`}
               >
                 <span
                   className={`h-2 w-2 rounded-full ${
-                    connection.mode === "cloud_api"
+                    connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                      ? "bg-purple-600 animate-pulse"
+                      : connection.mode === "cloud_api"
                       ? connection.connectionStatus === "connected"
                         ? "bg-emerald-500 animate-pulse"
                         : "bg-rose-500"
-                      : "bg-blue-500"
+                      : "bg-orange-500"
                   }`}
                 />
-                {connection.mode === "cloud_api"
+                {connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                  ? "MyAcademy API (Managed Gateway)"
+                  : connection.mode === "cloud_api"
                   ? connection.connectionStatus === "connected"
-                    ? "Official Cloud API: Live"
-                    : "Official Cloud API: Disconnected"
-                  : "Manual Mode (Click-to-Chat)"}
+                    ? "Custom Meta API: Live"
+                    : "Custom Meta API: Disconnected"
+                  : "Direct Admin WhatsApp"}
               </span>
             </div>
             <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
-              {connection.mode === "cloud_api"
+              {connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                ? "MyAcademy Platform Gateway active. Automated and manual messages dispatched instantly without personal API setup."
+                : connection.mode === "cloud_api"
                 ? connection.senderPhoneNumber
                   ? `Active Phone: ${connection.senderPhoneNumber}`
-                  : "Official Meta WhatsApp Cloud API credentials configured"
-                : "Free zero-credential mode enabled. Generates WhatsApp Web links with manual delivery confirmation."}
+                  : "Custom Meta WhatsApp Cloud API credentials configured."
+                : "Direct WhatsApp links generated with 1 tap. Send directly from admin device without external API."}
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">

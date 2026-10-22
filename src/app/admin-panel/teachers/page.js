@@ -12,7 +12,9 @@ import {
   FaUserCheck,
   FaChalkboardTeacher,
   FaUndo,
+  FaFileExcel,
 } from "react-icons/fa";
+import BulkImportModal from "@/app/Components/BulkImportModal";
 
 import { useAdminStudent } from "@/Hooks/useAdminStudents";
 import useDebounce from "@/Hooks/useDebounce";
@@ -30,6 +32,7 @@ export default function Teachers() {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     status: "",
     approvalStatus: "",
@@ -191,16 +194,31 @@ export default function Teachers() {
           </p>
         </div>
 
-        <PortalButton
-          variant="secondary"
-          size="sm"
-          icon={FaPlus}
-          onClick={() => router.push("/admin-panel/add-user?role=teacher")}
-          className="w-full sm:w-auto shrink-0 shadow-xs"
-        >
-          Add New Teacher
-        </PortalButton>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all border border-white/30 shadow-xs cursor-pointer backdrop-blur-md"
+          >
+            <FaFileExcel className="text-sm" /> Import Excel / CSV
+          </button>
+          <PortalButton
+            variant="secondary"
+            size="sm"
+            icon={FaPlus}
+            onClick={() => router.push("/admin-panel/add-user?role=teacher")}
+            className="w-full sm:w-auto shrink-0 shadow-xs"
+          >
+            Add New Teacher
+          </PortalButton>
+        </div>
       </motion.div>
+
+      <BulkImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        type="teacher"
+      />
 
       {/* Filter and Search Bar */}
       <PortalCard padding="p-3.5 sm:p-5" className="relative overflow-hidden shadow-xs border border-slate-200/80">

@@ -3,7 +3,21 @@ import handleError from "@/Utils/handleError"
 
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { adminApproveUserApi, adminBlockUserApi, adminCreateStudent, adminCreateTeacher, adminCreateParent, adminDeleteAnnouncementApi, adminDeleteUserByIdApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
+import {
+  adminApproveUserApi,
+  adminBlockUserApi,
+  adminCreateStudent,
+  adminCreateTeacher,
+  adminCreateParent,
+  adminBulkCreateStudents,
+  adminBulkCreateTeachers,
+  adminDeleteAnnouncementApi,
+  adminDeleteUserByIdApi,
+  adminGetUserById,
+  adminRejectUserApi,
+  adminUnblockUserApi,
+  adminUpdateUserById,
+} from "../api/adminApi";
 import queryClient from "@/lib/queryClient"
 import { useRouter } from "next/navigation"
 
@@ -199,3 +213,36 @@ export const useAdminDeleteUser=()=>{
 
     })
 }
+
+
+export const useAdminBulkCreateStudents = () => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      const response = await adminBulkCreateStudents(payload);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Batches"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Batch"] });
+      toast.success(data.message || "Students imported successfully!");
+    },
+    onError: (error) => handleError(error),
+  });
+};
+
+export const useAdminBulkCreateTeachers = () => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      const response = await adminBulkCreateTeachers(payload);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      toast.success(data.message || "Teachers imported successfully!");
+    },
+    onError: (error) => handleError(error),
+  });
+};

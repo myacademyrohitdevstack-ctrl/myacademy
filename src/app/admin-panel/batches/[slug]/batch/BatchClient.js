@@ -14,7 +14,9 @@ import {
   FaFilePdf,
   FaSpinner,
   FaBullhorn,
+  FaFileExcel,
 } from "react-icons/fa";
+import BulkImportModal from "@/app/Components/BulkImportModal";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAdminGetAllNotes } from "@/Hooks/useAdminGetNotes";
 import Modal from "@/app/Components/ui/Modals";
@@ -54,6 +56,7 @@ export default function BatchDetailsPage() {
   const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
     const [pdfOpen,setPdfOpen]=useState(false)
     const [pdfUrl,setPdfUrl]=useState("")
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const {data:attendance}=useGetAttendenceDashboard(batchId)
  
     const router=useRouter()
@@ -96,23 +99,39 @@ export default function BatchDetailsPage() {
             </p>
           </div>
 
-          <span
-            className={`
-              rounded-full
-              bg-white/20
-              px-5 py-3
-              font-semibold 
-               ${
-              batch?.status === "active"
-                ? "bg-white text-green-600"
-                : "bg-red-50 text-red-600"
-            }
-            `}
-          >
-            {capitalizeFirstLetter(batch?.status)}
-          </span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsImportModalOpen(true)}
+              className="px-4 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all border border-white/30 shadow-xs cursor-pointer backdrop-blur-md"
+            >
+              <FaFileExcel className="text-sm" /> Bulk Import Students
+            </button>
+            <span
+              className={`
+                rounded-full
+                px-5 py-2.5 text-center
+                font-bold text-xs sm:text-sm
+                 ${
+                batch?.status === "active"
+                  ? "bg-white text-emerald-600"
+                  : "bg-red-50 text-red-600"
+              }
+              `}
+            >
+              {capitalizeFirstLetter(batch?.status)}
+            </span>
+          </div>
         </div>
       </motion.div>
+
+      <BulkImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        type="student"
+        defaultCourseId={batch?.course?._id || batch?.course}
+        defaultBatchId={batchId}
+      />
 
       {/* Stats */}
 

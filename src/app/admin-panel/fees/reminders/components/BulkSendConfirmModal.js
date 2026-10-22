@@ -11,6 +11,10 @@ import {
   FaUsers,
   FaInfoCircle,
   FaSpinner,
+  FaMobileAlt,
+  FaCloud,
+  FaCog,
+  FaCheck,
 } from "react-icons/fa";
 import { useSendBulkRemindersMutation } from "@/app/mutations/whatsappReminderMutations";
 
@@ -38,6 +42,10 @@ export default function BulkSendConfirmModal({
   const isCloudApiConnected =
     integrationData?.mode === "cloud_api" && integrationData?.connectionStatus === "connected";
 
+  const [dispatchMode, setDispatchMode] = useState(
+    isCloudApiConnected ? "custom_api" : "myacademy_api"
+  );
+
   const handleConfirm = () => {
     bulkSendMutation.mutate(
       {
@@ -45,6 +53,7 @@ export default function BulkSendConfirmModal({
         selectedFeeIds: data.selectedFeeIds,
         templateId: data.templateId || null,
         recipientRole: data.recipientRole || "student",
+        dispatchMode,
       },
       {
         onSuccess: () => {
@@ -94,30 +103,95 @@ export default function BulkSendConfirmModal({
           </div>
 
           <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
-            {/* Delivery Method Banner */}
-            <div
-              className={`p-3.5 rounded-2xl border flex items-start gap-2.5 ${
-                isCloudApiConnected
-                  ? "bg-emerald-50/70 border-emerald-200 text-emerald-900"
-                  : "bg-amber-50/80 border-amber-200 text-amber-900"
-              }`}
-            >
-              {isCloudApiConnected ? (
-                <FaCheckCircle className="text-emerald-600 mt-0.5 shrink-0 text-sm" />
-              ) : (
-                <FaInfoCircle className="text-amber-600 mt-0.5 shrink-0 text-sm" />
-              )}
-              <div>
-                <p className="font-bold">
-                  {isCloudApiConnected
-                    ? "Dispatch Mode: Official WhatsApp Cloud API"
-                    : "Dispatch Mode: Manual Click-to-Chat Generation"}
-                </p>
-                <p className="text-[11px] font-medium mt-0.5">
-                  {isCloudApiConnected
-                    ? "Messages will be sent directly in the background using your Meta Business Cloud API integration."
-                    : "Reminders will be created as drafts with prepopulated Click-to-Chat links. The system will NOT claim delivery until you manually confirm."}
-                </p>
+            {/* 3 WhatsApp Messaging Dispatch Modes */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
+                Choose WhatsApp Dispatch Method
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {/* 1. MyAcademy WhatsApp API (Managed) */}
+                <div
+                  onClick={() => setDispatchMode("myacademy_api")}
+                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    dispatchMode === "myacademy_api"
+                      ? "bg-purple-50/70 border-purple-600 ring-2 ring-purple-600/20"
+                      : "bg-white border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-xs text-purple-900 flex items-center gap-1.5">
+                        <FaCloud className="text-purple-600" /> MyAcademy API
+                      </span>
+                      {dispatchMode === "myacademy_api" && (
+                        <FaCheck className="text-purple-600 text-xs" />
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      Platform managed gateway. Instant cloud dispatch with zero setup.
+                    </p>
+                  </div>
+                  <span className="mt-2 text-[9px] font-bold text-purple-700 uppercase">Recommended</span>
+                </div>
+
+                {/* 2. Direct Admin WhatsApp */}
+                <div
+                  onClick={() => setDispatchMode("direct_whatsapp")}
+                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    dispatchMode === "direct_whatsapp"
+                      ? "bg-orange-50/70 border-[#D6451B] ring-2 ring-[#D6451B]/20"
+                      : "bg-white border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+                        <FaMobileAlt className="text-[#D6451B]" /> Direct WhatsApp
+                      </span>
+                      {dispatchMode === "direct_whatsapp" && (
+                        <FaCheck className="text-[#D6451B] text-xs" />
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      Creates Click-to-Chat links for sending directly from admin WhatsApp.
+                    </p>
+                  </div>
+                  <span className="mt-2 text-[9px] font-bold text-orange-700 uppercase">Manual Links</span>
+                </div>
+
+                {/* 3. Custom Meta Cloud API */}
+                <div
+                  onClick={() => {
+                    if (isCloudApiConnected) setDispatchMode("custom_api");
+                  }}
+                  className={`p-3 rounded-xl border transition-all flex flex-col justify-between ${
+                    !isCloudApiConnected
+                      ? "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
+                      : dispatchMode === "custom_api"
+                      ? "bg-emerald-50/70 border-emerald-600 ring-2 ring-emerald-600/20 cursor-pointer"
+                      : "bg-white border-slate-200 hover:border-slate-300 cursor-pointer"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-xs text-emerald-900 flex items-center gap-1.5">
+                        <FaCog className="text-emerald-600" /> Custom Meta API
+                      </span>
+                      {dispatchMode === "custom_api" && (
+                        <FaCheck className="text-emerald-600 text-xs" />
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      {isCloudApiConnected
+                        ? "Dispatches using your academy's custom Meta Cloud API credentials."
+                        : "Not configured. Configure in Integration Settings to use."}
+                    </p>
+                  </div>
+                  <span className="mt-2 text-[9px] font-bold text-emerald-700 uppercase">
+                    {isCloudApiConnected ? "Meta Verified" : "Unconnected"}
+                  </span>
+                </div>
               </div>
             </div>
 

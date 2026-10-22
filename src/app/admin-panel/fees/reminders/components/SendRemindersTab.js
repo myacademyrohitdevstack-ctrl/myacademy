@@ -133,18 +133,22 @@ export default function SendRemindersTab({
         </div>
 
         <div className="flex items-center gap-2">
-          <span
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 ${
-              isCloudApiConnected
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                : "bg-amber-50 text-amber-700 border border-amber-200"
-            }`}
-          >
-            <FaWhatsapp className="text-sm" />
-            {isCloudApiConnected
-              ? "Meta Cloud API Active (Automated Background Send)"
-              : "Manual Mode Active (WhatsApp Web / Click-to-Chat)"}
-          </span>
+          {integrationData?.mode === "platform_api" || integrationData?.mode === "myacademy_api" ? (
+            <span className="px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200">
+              <FaWhatsapp className="text-sm text-purple-600" />
+              MyAcademy WhatsApp API (Managed Gateway)
+            </span>
+          ) : isCloudApiConnected ? (
+            <span className="px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <FaWhatsapp className="text-sm text-emerald-600" />
+              Custom Meta API Active (Verified Business)
+            </span>
+          ) : (
+            <span className="px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 bg-orange-50 text-[#D6451B] border border-orange-200">
+              <FaWhatsapp className="text-sm text-[#D6451B]" />
+              Direct WhatsApp (Admin Device / Click-to-Chat)
+            </span>
+          )}
         </div>
       </div>
 

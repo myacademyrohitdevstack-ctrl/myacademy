@@ -100,8 +100,7 @@ export default function RemindersClient() {
               WhatsApp Fee Reminder System
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-slate-300 max-w-2xl">
-              Automate due date alerts, overdue notifications, and manual payment follow-ups with
-              official WhatsApp Cloud API or zero-setup Click-to-Chat links.
+              Automate due date alerts, overdue notifications, and fee follow-ups with Direct WhatsApp, MyAcademy Managed API, or Custom Meta Cloud API.
             </p>
           </div>
 
