@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
+import NotificationBell from "./NotificationBell";
 
 const superAdminNavItems = [
   { name: "Platform Overview", href: "/super-admin/dashboard", icon: FaChartPie },
@@ -70,6 +71,7 @@ export default function SuperAdminDrawerNav({ children }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold text-xs border border-amber-200 shadow-xs">
             {user?.fullName?.charAt(0) || "S"}
           </span>
@@ -256,7 +258,37 @@ export default function SuperAdminDrawerNav({ children }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 w-full max-w-full p-3 sm:p-5 lg:p-8 overflow-x-hidden">{children}</main>
+      <main className="flex-1 min-w-0 w-full max-w-full p-3 sm:p-5 lg:p-8 overflow-x-hidden">
+        {/* Desktop Top Header Bar */}
+        <div className="hidden lg:flex items-center justify-between pb-4 mb-4 border-b border-slate-200/80">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Super Admin Platform
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="text-xs font-bold text-slate-700 capitalize">
+              {pathname?.replace("/super-admin/", "").replace(/-/g, " ") || "Platform Overview"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+            <div className="flex items-center gap-2.5 p-1.5 pr-3 rounded-2xl bg-white border border-slate-200 shadow-xs">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-700 font-bold text-xs border border-amber-200">
+                {user?.fullName?.charAt(0) || "S"}
+              </span>
+              <div className="text-left">
+                <p className="text-xs font-bold text-slate-800 leading-tight">
+                  {user?.fullName || "Super Admin"}
+                </p>
+                <p className="text-[10px] text-slate-400 font-medium">Platform Admin</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {children}
+      </main>
     </div>
   );
 }

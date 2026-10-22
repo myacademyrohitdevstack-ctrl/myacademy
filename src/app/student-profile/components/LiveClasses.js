@@ -4,7 +4,7 @@ import { useGetStudentClassLInks } from "@/Hooks/useGetStudentClassLinks";
 import { useGetStudentNotes } from "@/Hooks/useGetStudentNotes";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "@/app/Components/ui/Modals";
 import dynamic from "next/dynamic";
 
@@ -45,9 +45,16 @@ import { useGetStudentAttendenceDashboard } from "@/Hooks/useStudentAttendanceDa
 
 
 export default function LiveClasses() {
-  const searchParams=useSearchParams()
-    const [activeTab,setActiveTab]=useState("notes")
-  const batchId=searchParams.get("batchId")
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabParam || "notes");
+  const batchId = searchParams.get("batchId");
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   const {data:classLinks,isLoading:classLoading}=useGetStudentClassLInks(batchId,activeTab)
   const {data:notes,isLoading:notesLoading}=useGetStudentNotes(batchId,activeTab)
   const {data:batch,isLoading:batchLoading}=useGetStudentBatchById(batchId)

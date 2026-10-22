@@ -1,6 +1,6 @@
 "use client";
 import { FaClipboardCheck, FaEye } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   FaUsers,
@@ -48,9 +48,16 @@ import { useGetAttendenceDashboard } from "@/Hooks/useGetAttendenceDashboard";
 import { useDeleteAttendance } from "@/app/mutations/Attendence";
 
 export default function BatchDetailsPage() {
-    const searchParams=useSearchParams()
-    const batchId=searchParams.get("batchId")
-       const [activeTab, setActiveTab] = useState("notes");
+    const searchParams = useSearchParams();
+    const batchId = searchParams.get("batchId");
+    const tabParam = searchParams.get("tab");
+    const [activeTab, setActiveTab] = useState(tabParam || "notes");
+
+    useEffect(() => {
+      if (tabParam) {
+        setActiveTab(tabParam);
+      }
+    }, [tabParam]);
     const {data:notes,isLoading:notesLoading}=useAdminGetAllNotes(batchId,activeTab)
     const {data:classLinks,isLoading:classLoading}=useAdminGetAllLinks(batchId,activeTab)
   const {data:batch,isLoading:batchLoading}=useAdminGetBatche(batchId)
