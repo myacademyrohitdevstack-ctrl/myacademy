@@ -1,11 +1,9 @@
-import PortalLoading from "@/app/Components/portal-ui/PortalLoading";
+import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
 
 export default function AdminLoading() {
   return (
-    <PortalLoading
-      type="admin"
-      title="Loading Admin Console..."
-      subtitle="Syncing academy finances, multi-cohort batches, and student ledgers..."
-    />
+    <div className="w-full min-w-0 p-3 sm:p-6 lg:p-8">
+      <DashboardSkeleton />
+    </div>
   );
 }

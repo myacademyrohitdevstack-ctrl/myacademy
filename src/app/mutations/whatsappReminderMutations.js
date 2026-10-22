@@ -32,6 +32,8 @@ export const useSendManualReminderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-list"] });
       queryClient.invalidateQueries({ queryKey: ["pending-fees"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-pending"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-dashboard"] });
       toast.success(data.message || "Manual reminder created successfully.");
     },
     onError: (error) => handleError(error),
@@ -49,6 +51,8 @@ export const useSendBulkRemindersMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-list"] });
       queryClient.invalidateQueries({ queryKey: ["pending-fees"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-pending"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-dashboard"] });
       toast.success(data.message || "Bulk reminders processed.");
     },
     onError: (error) => handleError(error),

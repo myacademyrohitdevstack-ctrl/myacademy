@@ -1,11 +1,9 @@
-import PortalLoading from "@/app/Components/portal-ui/PortalLoading";
+import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
 
 export default function StudentRouteLoading() {
   return (
-    <PortalLoading
-      type="student"
-      title="Loading Student Portal..."
-      subtitle="Preparing your enrolled cohorts, attendance tracking, and fee receipts..."
-    />
+    <div className="w-full min-w-0 p-3 sm:p-6 lg:p-8">
+      <DashboardSkeleton />
+    </div>
   );
 }

@@ -15,11 +15,96 @@ export default function PortalTable({
 }) {
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-3 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6">
-        <div className="h-5 w-1/4 rounded bg-slate-200" />
-        <div className="space-y-2.5">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-14 w-full rounded-xl bg-slate-100" />
+      <div className={`w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white shadow-xs animate-pulse ${className}`}>
+        {/* Desktop Table View Skeleton */}
+        <div className="hidden lg:block overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-bold uppercase tracking-wider text-slate-400">
+                {columns.map((col, idx) => (
+                  <th
+                    key={col.key || idx}
+                    className={`px-5 py-3.5 ${col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"} ${col.headerClassName || ""}`}
+                  >
+                    <div
+                      className={`h-3.5 rounded bg-slate-200 ${
+                        col.align === "right"
+                          ? "ml-auto w-16"
+                          : col.align === "center"
+                          ? "mx-auto w-16"
+                          : "w-20"
+                      }`}
+                    />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-sm">
+              {[1, 2, 3, 4, 5, 6].map((rowIdx) => (
+                <tr key={rowIdx}>
+                  {columns.map((col, colIdx) => (
+                    <td
+                      key={col.key || colIdx}
+                      className={`px-5 py-4 ${col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"}`}
+                    >
+                      {colIdx === 0 ? (
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 shrink-0 rounded-full bg-orange-100/70" />
+                          <div className="space-y-1.5 flex-1 min-w-0">
+                            <div className="h-4 w-32 rounded bg-slate-200" />
+                            <div className="h-3 w-16 rounded bg-slate-100" />
+                          </div>
+                        </div>
+                      ) : colIdx === columns.length - 1 ? (
+                        <div className={`flex items-center gap-2 ${col.align === "right" ? "justify-end" : "justify-start"}`}>
+                          <div className="h-8 w-8 rounded-lg bg-slate-100" />
+                          <div className="h-8 w-8 rounded-lg bg-slate-100" />
+                        </div>
+                      ) : (
+                        <div
+                          className={`space-y-1.5 ${
+                            col.align === "right"
+                              ? "ml-auto w-20"
+                              : col.align === "center"
+                              ? "mx-auto w-16"
+                              : "w-28"
+                          }`}
+                        >
+                          <div className="h-3.5 rounded bg-slate-200" />
+                          <div className="h-2.5 w-3/4 rounded bg-slate-100" />
+                        </div>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Cards View Skeleton */}
+        <div className="divide-y divide-slate-100 lg:hidden p-3.5 sm:p-4 space-y-3">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="pt-3 first:pt-0 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 shrink-0 rounded-full bg-orange-100/70" />
+                  <div className="space-y-1.5">
+                    <div className="h-4 w-28 rounded bg-slate-200" />
+                    <div className="h-3 w-14 rounded bg-slate-100" />
+                  </div>
+                </div>
+                <div className="h-5 w-16 rounded-full bg-emerald-100/60" />
+              </div>
+              <div className="rounded-xl bg-slate-50 p-2.5 border border-slate-100 space-y-1.5">
+                <div className="h-3 w-44 rounded bg-slate-200" />
+                <div className="h-3 w-28 rounded bg-slate-100" />
+              </div>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="h-8 flex-1 rounded-xl bg-slate-100" />
+                <div className="h-8 flex-1 rounded-xl bg-slate-100" />
+              </div>
+            </div>
           ))}
         </div>
       </div>

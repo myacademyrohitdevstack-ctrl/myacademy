@@ -2,44 +2,50 @@
 
 export default function BatchesSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-6  md:px-0">
-        <div className="space-y-6 sm:space-y-8">
+    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-1 sm:px-6 lg:px-8 min-w-0 animate-pulse">
+      {/* Hero Banner Skeleton */}
+      <div className="w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-orange-500/15 via-[#D6451B]/20 to-orange-500/15 p-4 sm:p-6 lg:p-8 border border-orange-200/40">
+        <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-3 flex-1">
+            <div className="h-5 w-32 rounded-full bg-orange-200/60" />
+            <div className="h-8 sm:h-10 w-56 sm:w-80 rounded-xl bg-orange-300/50" />
+            <div className="h-4 w-full max-w-xl rounded bg-orange-200/40" />
+          </div>
 
-          {/* Hero */}
-          <div className="animate-pulse overflow-hidden rounded-3xl bg-white p-6 shadow-xl sm:p-8 lg:p-10">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="h-10 sm:h-12 w-36 rounded-xl bg-white/70 border border-orange-200/40 shrink-0 self-start lg:self-auto" />
+        </div>
+      </div>
 
-              <div className="space-y-4">
-                <div className="h-6 w-32 rounded-full bg-slate-200" />
-                <div className="h-10 w-72 rounded-xl bg-slate-200" />
-                <div className="h-4 w-96 max-w-full rounded bg-slate-200" />
-                <div className="h-4 w-72 max-w-full rounded bg-slate-200" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:w-[320px]">
-                {[1, 2].map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-2xl bg-slate-100 p-4"
-                  >
-                    <div className="h-3 w-16 rounded bg-slate-200" />
-                    <div className="mt-3 h-8 w-12 rounded bg-slate-200" />
-                  </div>
-                ))}
-              </div>
-
+      {/* 3 Stat Cards Skeleton */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 sm:grid-cols-3 w-full">
+        {[
+          { color: "bg-orange-100" },
+          { color: "bg-emerald-100" },
+          { color: "bg-purple-100" },
+        ].map((item, idx) => (
+          <div
+            key={idx}
+            className={`rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-xs ${
+              idx === 2 ? "col-span-2 sm:col-span-1" : ""
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-xl ${item.color}`} />
+              <div className="h-4 w-8 rounded-full bg-slate-100" />
+            </div>
+            <div className="mt-2.5 sm:mt-3 space-y-1">
+              <div className="h-6 sm:h-7 w-12 sm:w-16 rounded bg-slate-200" />
+              <div className="h-3 w-20 rounded bg-slate-100" />
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Batch Cards */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 2xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <BatchCardSkeleton key={index} />
-            ))}
-          </div>
-
-        </div>
+      {/* Batch Cards Grid Skeleton */}
+      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 xl:grid-cols-3 w-full">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <BatchCardSkeleton key={index} />
+        ))}
       </div>
     </div>
   );
@@ -47,70 +53,45 @@ export default function BatchesSkeleton() {
 
 export function BatchCardSkeleton() {
   return (
-    <div className="animate-pulse rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-
-      {/* Header */}
-      <div className="flex justify-between gap-3">
-        <div className="flex-1">
-          <div className="h-6 w-40 rounded bg-slate-200" />
-          <div className="mt-2 h-4 w-28 rounded bg-slate-200" />
-        </div>
-
-        <div className="h-7 w-20 rounded-xl bg-slate-200" />
-      </div>
-
-      {/* Enrollment */}
-      <div className="mt-4 h-7 w-32 rounded-xl bg-slate-200" />
-
-      {/* Description */}
-      <div className="mt-5 space-y-2">
-        <div className="h-4 rounded bg-slate-200" />
-        <div className="h-4 rounded bg-slate-200" />
-      </div>
-
-      {/* Stats */}
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        {[1, 2].map((item) => (
-          <div
-            key={item}
-            className="rounded-2xl bg-slate-100 p-4"
-          >
-            <div className="h-3 w-16 rounded bg-slate-200" />
-            <div className="mt-3 h-5 w-20 rounded bg-slate-200" />
+    <div className="w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
+      <div className="space-y-3.5">
+        {/* Header: Name + Status Badge */}
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="space-y-1.5 flex-1">
+            <div className="h-5 w-40 rounded-lg bg-slate-200" />
+            <div className="h-3.5 w-24 rounded bg-slate-100" />
           </div>
-        ))}
-      </div>
-
-      {/* Dates */}
-      <div className="mt-5 grid grid-cols-2 gap-3 rounded-2xl bg-slate-100 p-4">
-        <div>
-          <div className="h-3 w-16 rounded bg-slate-200" />
-          <div className="mt-2 h-4 w-20 rounded bg-slate-200" />
+          <div className="h-5 w-16 rounded-full bg-emerald-100/70" />
         </div>
 
-        <div>
-          <div className="ml-auto h-3 w-16 rounded bg-slate-200" />
-          <div className="mt-2 ml-auto h-4 w-20 rounded bg-slate-200" />
+        {/* Course Info */}
+        <div className="flex items-center gap-2 py-1">
+          <div className="h-4 w-4 rounded bg-slate-200" />
+          <div className="h-3.5 w-32 rounded bg-slate-100" />
         </div>
-      </div>
 
-      {/* Schedule */}
-      <div className="mt-5 rounded-2xl bg-slate-100 p-5">
-        <div className="h-3 w-20 rounded bg-slate-200" />
-        <div className="mt-3 h-4 w-full rounded bg-slate-200" />
-        <div className="mt-2 h-4 w-32 rounded bg-slate-200" />
+        {/* Timings / Schedule chip */}
+        <div className="h-6 w-36 rounded-lg bg-slate-100" />
 
-        <div className="mt-4 flex justify-between">
-          <div className="h-3 w-16 rounded bg-slate-200" />
-          <div className="h-6 w-20 rounded-lg bg-slate-200" />
+        {/* Student & Trainer counts */}
+        <div className="rounded-xl bg-slate-50 p-2.5 border border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3.5 w-3.5 rounded bg-slate-200" />
+            <div className="h-3 w-16 rounded bg-slate-200" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3.5 w-3.5 rounded bg-slate-200" />
+            <div className="h-3 w-16 rounded bg-slate-200" />
+          </div>
         </div>
       </div>
 
-      {/* Button */}
-      <div className="mt-5 border-t border-slate-100 pt-4">
-        <div className="h-12 w-full rounded-2xl bg-slate-200" />
+      {/* Footer: Action Buttons */}
+      <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
+        <div className="h-9 flex-1 rounded-xl bg-orange-100/70" />
+        <div className="h-9 w-9 rounded-xl bg-slate-100" />
+        <div className="h-9 w-9 rounded-xl bg-slate-100" />
       </div>
-
     </div>
   );
 }

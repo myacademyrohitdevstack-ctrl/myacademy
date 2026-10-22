@@ -1,8 +1,6 @@
-
-import handleError from "@/Utils/handleError"
-
-import { useMutation } from "@tanstack/react-query"
-import { toast } from "sonner"
+import handleError from "@/Utils/handleError";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   adminApproveUserApi,
   adminBlockUserApi,
@@ -18,202 +16,185 @@ import {
   adminUnblockUserApi,
   adminUpdateUserById,
 } from "../api/adminApi";
-import queryClient from "@/lib/queryClient"
-import { useRouter } from "next/navigation"
+import queryClient from "@/lib/queryClient";
+import { useRouter } from "next/navigation";
 
-export const useAdminUserUpdateMutation=(id)=>{
-    return useMutation({
-        mutationFn:async(data)=>{
-          const response=await  adminUpdateUserById(id,data)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-            queryClient.invalidateQueries({
-                queryKey:["Admin-User",id]
-            })
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-        },
-     onError:(error)=> handleError(error)
-    
+export const useAdminUserUpdateMutation = (id) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await adminUpdateUserById(id, data);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-User", id] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      toast.success(data.message);
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-    })
-}
-export const useAdminApproveUser=(id)=>{
-    return useMutation({
-        mutationFn:async()=>{
-          const response=await  adminApproveUserApi(id)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-            queryClient.invalidateQueries({
-                queryKey:["Admin-User",id]
-            })
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-        },
-     onError:(error)=> handleError(error)
-    
+export const useAdminApproveUser = (id) => {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await adminApproveUserApi(id);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-User", id] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      toast.success(data.message);
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-    })
-}
-export const useAdminRejectUser=(id)=>{
-    return useMutation({
-        mutationFn:async()=>{
-          const response=await  adminRejectUserApi(id)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-            queryClient.invalidateQueries({
-                queryKey:["Admin-User",id]
-            })
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-        },
-     onError:(error)=> handleError(error)
-    
+export const useAdminRejectUser = (id) => {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await adminRejectUserApi(id);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-User", id] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      toast.success(data.message);
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-    })
-}
-export const useAdminBlockUser=(id,setOpen)=>{
-    return useMutation({
-        mutationFn:async(data)=>{
-          const response=await  adminBlockUserApi(id,data)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-            queryClient.invalidateQueries({
-                queryKey:["Admin-User",id]
-            })
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-        },
-        onSettled:()=>setOpen(false),
-     onError:(error)=> handleError(error)
-    
+export const useAdminBlockUser = (id, setOpen) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await adminBlockUserApi(id, data);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-User", id] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      toast.success(data.message);
+    },
+    onSettled: () => setOpen && setOpen(false),
+    onError: (error) => handleError(error),
+  });
+};
 
-    })
-}
-export const useAdminUnblockUser=(id)=>{
-    return useMutation({
-        mutationFn:async()=>{
-          const response=await  adminUnblockUserApi(id)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-            queryClient.invalidateQueries({
-                queryKey:["Admin-User",id]
-            })
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-        },
-     onError:(error)=> handleError(error)
-    
+export const useAdminUnblockUser = (id) => {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await adminUnblockUserApi(id);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-User", id] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      toast.success(data.message);
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-    })
-}
-export const useAdminCreateStuent=()=>{
-    const router=useRouter()
-    return useMutation({
-        mutationFn:async(data)=>{
-          const response=await  adminCreateStudent(data)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-           
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-     router.push('/admin-panel/student')
+export const useAdminCreateStuent = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await adminCreateStudent(data);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["all-academy-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batch"] });
+      queryClient.invalidateQueries({ queryKey: ["batch"] });
+      queryClient.invalidateQueries({ queryKey: ["Batch-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-dashboard"] });
+      toast.success(data.message);
+      router.push("/admin-panel/student");
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-        },
-     onError:(error)=> handleError(error)
-    
+export const useAdminCreateTeacher = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await adminCreateTeacher(data);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["all-academy-batches"] });
+      toast.success(data.message);
+      router.push("/admin-panel/teachers");
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-    })
-}
-export const useAdminCreateTeacher=()=>{
-    const router=useRouter()
-    return useMutation({
-        mutationFn:async(data)=>{
-          const response=await  adminCreateTeacher(data)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-           
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-     router.push('/admin-panel/teachers')
+export const useAdminCreateParent = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await adminCreateParent(data);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      toast.success(data.message || "Parent account created successfully");
+      router.push("/admin-panel/parents");
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
-        },
-     onError:(error)=> handleError(error)
-    
-
-    })
-}
-
-export const useAdminCreateParent=()=>{
-    const router=useRouter()
-    return useMutation({
-        mutationFn:async(data)=>{
-          const response=await adminCreateParent(data)
-          return response.data
-        },
-        retry:false,
-        onSuccess:(data)=>{
-          queryClient.invalidateQueries({
-            queryKey: ["Admin-Student-List"],
-          });
-          queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] });
-          toast.success(data.message || "Parent account created successfully")
-          router.push('/admin-panel/parents')
-        },
-        onError:(error)=> handleError(error)
-    })
-}
-
-export const useAdminDeleteUser=()=>{
-    
-    return useMutation({
-        mutationFn:async(id)=>{
-          const response=await  adminDeleteUserByIdApi(id)
-          return response.data
-        },
-         retry:false,
-         onSuccess:(data)=>{
-           
-            queryClient.invalidateQueries({
-  queryKey: ["Admin-Student-List"],
-});
-     toast.success(data.message)
-
-
-        },
-    
-
-    })
-}
-
+export const useAdminDeleteUser = () => {
+  return useMutation({
+    mutationFn: async (id) => {
+      const response = await adminDeleteUserByIdApi(id);
+      return response.data;
+    },
+    retry: false,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["all-academy-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["Batch-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-students"] });
+      toast.success(data.message);
+    },
+    onError: (error) => handleError(error),
+  });
+};
 
 export const useAdminBulkCreateStudents = () => {
   return useMutation({
@@ -224,8 +205,15 @@ export const useAdminBulkCreateStudents = () => {
     retry: false,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
-      queryClient.invalidateQueries({ queryKey: ["Admin-Batches"] });
-      queryClient.invalidateQueries({ queryKey: ["Admin-Batch"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["all-academy-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batch"] });
+      queryClient.invalidateQueries({ queryKey: ["batch"] });
+      queryClient.invalidateQueries({ queryKey: ["Batch-students"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-recent-activities"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fees-dashboard"] });
       toast.success(data.message || "Students imported successfully!");
     },
     onError: (error) => handleError(error),
@@ -241,6 +229,9 @@ export const useAdminBulkCreateTeachers = () => {
     retry: false,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["Admin-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["all-academy-batches"] });
       toast.success(data.message || "Teachers imported successfully!");
     },
     onError: (error) => handleError(error),

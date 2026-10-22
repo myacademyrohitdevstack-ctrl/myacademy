@@ -42,6 +42,7 @@ import { useDeleteAnnouncementtMutation } from "@/app/mutations/AnnouncementMuta
 import { NotesSkeleton } from "@/app/Skeletons/NotesSkeleton";
 import { AnnouncementsSkeleton } from "@/app/Skeletons/AnnouncementSkeleton";
 import { ClassLinksSkeleton } from "@/app/Skeletons/ClassesSkeleton";
+import BatchDetailsSkeleton from "@/app/Skeletons/BatchDetailsSkeleton";
 import Loading from "@/app/Components/ui/Loading";
 import { useGetAttendenceDashboard } from "@/Hooks/useGetAttendenceDashboard";
 import { useDeleteAttendance } from "@/app/mutations/Attendence";
@@ -64,7 +65,7 @@ export default function BatchDetailsPage() {
     const deleteClassLinkMutation=useDeleteClassLinkMutation()
     const deleteAnnoucementMutation=useDeleteAnnouncementtMutation()
     const deleteAttendance=useDeleteAttendance()
- if(batchLoading) return <Loading></Loading> 
+ if(batchLoading) return <BatchDetailsSkeleton /> 
 
   return (
     <div className="py-2 sm:py-4">

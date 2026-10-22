@@ -15,10 +15,12 @@ export const useCreateParentMutation = () => {
       return response;
     },
     retry: false,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+    onSuccess: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] }),
+        queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] }),
+        queryClient.invalidateQueries({ queryKey: ["Admin-stats"] }),
+      ]);
       toast.success(data.message || "Parent account created successfully");
     },
     onError: (error) => handleError(error),
@@ -32,10 +34,12 @@ export const useLinkParentMutation = () => {
       return response;
     },
     retry: false,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+    onSuccess: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] }),
+        queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] }),
+        queryClient.invalidateQueries({ queryKey: ["Admin-stats"] }),
+      ]);
       toast.success(data.message || "Parent linked to student successfully");
     },
     onError: (error) => handleError(error),
@@ -49,9 +53,12 @@ export const useUnlinkParentMutation = () => {
       return response;
     },
     retry: false,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    onSuccess: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] }),
+        queryClient.invalidateQueries({ queryKey: ["Admin-Student-List"] }),
+        queryClient.invalidateQueries({ queryKey: ["Admin-stats"] }),
+      ]);
       toast.success(data.message || "Parent link revoked successfully");
     },
     onError: (error) => handleError(error),
