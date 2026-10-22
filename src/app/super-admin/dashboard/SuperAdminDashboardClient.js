@@ -80,7 +80,7 @@ export default function SuperAdminDashboardClient() {
             {isLoading ? "..." : metrics.totalAcademies || 0}
           </h3>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            {metrics.activeAcademies || 0} Active • {metrics.suspendedAcademies || 0} Suspended
+            {metrics.activeAcademies || 0} Active • {metrics.pendingAcademies || 0} Pending • {metrics.suspendedAcademies || 0} Suspended
           </p>
         </div>
 
@@ -123,6 +123,36 @@ export default function SuperAdminDashboardClient() {
         </div>
       </div>
 
+      {/* Pending Approvals Alert Banner */}
+      {!isLoading && metrics.pendingAcademies > 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white font-bold">
+              <FaClock className="text-base" />
+            </div>
+            <div>
+              <h4 className="font-extrabold text-sm text-slate-900">
+                {metrics.pendingAcademies} Academy Registration{metrics.pendingAcademies > 1 ? "s" : ""} Awaiting Review
+              </h4>
+              <p className="text-xs text-slate-600 mt-0.5">
+                New academy owners have submitted their workspace details for verification and platform access.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/super-admin/academies"
+            className="rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700 transition shadow-xs whitespace-nowrap self-stretch sm:self-auto text-center"
+          >
+            Review Pending Tenants
+          </Link>
+        </motion.div>
+      )}
+
       {isLoading ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">
           <FaSpinner className="animate-spin inline mr-2 text-[#D6451B] text-lg" />
@@ -155,8 +185,11 @@ export default function SuperAdminDashboardClient() {
             ) : (
               <div className="divide-y divide-slate-100">
                 {recentAcademies.map((aca) => {
-                  const isActive = aca.status === "active";
-                  const isSuspended = aca.status === "suspended";
+                  const isAct = aca.status === "active";
+                  const isPend = aca.status === "pending";
+                  const isHold = aca.status === "on_hold";
+                  const isRej = aca.status === "rejected";
+                  const isSusp = aca.status === "suspended";
 
                   return (
                     <div
@@ -169,15 +202,21 @@ export default function SuperAdminDashboardClient() {
                             {aca.name}
                           </h4>
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                              isActive
-                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                : isSuspended
-                                ? "bg-rose-50 text-rose-700 border border-rose-200"
-                                : "bg-slate-100 text-slate-600"
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
+                              isAct
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : isPend
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : isHold
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : isRej
+                                ? "bg-rose-50 text-rose-700 border-rose-200"
+                                : isSusp
+                                ? "bg-red-50 text-red-700 border-red-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
                             }`}
                           >
-                            {aca.status || "active"}
+                            {aca.status?.replace("_", " ") || "active"}
                           </span>
                         </div>
                         <p className="text-xs text-slate-400 mt-0.5">
