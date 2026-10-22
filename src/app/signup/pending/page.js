@@ -32,12 +32,12 @@ export default function PendingApprovalPage() {
 
           {/* Heading */}
           <h1 className="mt-5 text-center text-xl font-extrabold text-slate-900 sm:text-2xl lg:text-3xl">
-            Registration Submitted!
+            Academy Registration Submitted!
           </h1>
 
           <p className="mt-2 text-center text-xs sm:text-sm leading-relaxed text-slate-600">
-            Your account has been created successfully and is currently queued for
-            verification by the MyAcademy administration.
+            Your academy workspace has been created and is currently queued for
+            verification by the MyAcademy platform administration.
           </p>
 
           {/* Timeline Process */}
@@ -55,15 +55,15 @@ export default function PendingApprovalPage() {
                 <ul className="mt-2 space-y-1.5 text-xs leading-5 text-slate-600 font-medium">
                   <li className="flex items-center gap-2">
                     <span className="text-emerald-600 font-bold">✓</span>
-                    <span>Admin reviews your profile & course choice</span>
+                    <span>Platform team reviews your academy registration</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-emerald-600 font-bold">✓</span>
-                    <span>You are assigned to an active live cohort</span>
+                    <span>Dedicated academy workspace and communication gateway provisioned</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-emerald-600 font-bold">✓</span>
-                    <span>Log in to your Student Portal & start learning</span>
+                    <span>Log in to your Admin Panel to add teachers, batches, and students</span>
                   </li>
                 </ul>
               </div>

@@ -315,7 +315,7 @@ export default function Navbar() {
                 href="/signup"
                 className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-500/20 transition hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/30"
               >
-                <span>Enroll Now</span>
+                <span>Register Academy</span>
               </Link>
             </div>
           ) : (
@@ -560,7 +560,7 @@ export default function Navbar() {
                         onClick={() => setOpen(false)}
                         className="flex items-center justify-center rounded-xl bg-[#D6451B] py-3 text-center text-sm font-bold text-white shadow-xs transition hover:bg-orange-700"
                       >
-                        Enroll Now
+                        Register Academy
                       </Link>
                     </div>
                   </div>

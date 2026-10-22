@@ -64,7 +64,7 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-slate-50 pt-20 pb-12 px-3 sm:px-6">
+    <section className="relative min-h-screen overflow-hidden bg-slate-50 pt-24 sm:pt-28 pb-12 px-3 sm:px-6">
       {/* Background Ambience */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-orange-100/50 via-transparent to-transparent pointer-events-none" />
 
@@ -186,12 +186,12 @@ export default function LoginPage() {
 
           {/* Footer Navigation */}
           <div className="mt-6 text-center text-xs text-slate-500">
-            <span>Don&apos;t have an account yet?</span>
+            <span>Looking to launch an academy?</span>
             <Link
               href="/signup"
               className="ml-1.5 font-bold text-[#D6451B] hover:underline"
             >
-              Enroll Now
+              Register Academy
             </Link>
           </div>
         </motion.div>

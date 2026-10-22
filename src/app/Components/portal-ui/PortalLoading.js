@@ -111,7 +111,7 @@ export default function PortalLoading({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50/90 p-4 w-full">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50/90 p-4 pt-24 sm:pt-28 w-full">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
