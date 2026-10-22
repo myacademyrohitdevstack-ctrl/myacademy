@@ -10,16 +10,17 @@ export const createAnnouncementSchema = z
     message: z
       .string()
       .trim()
-      .min(10, "Message must be at least 10 characters"),
+      .min(5, "Message must be at least 5 characters"),
 
     targetType: z.enum([
       "system",
+      "academy",
       "course-batch",
     ]),
 
-    course: z.string().optional(),
+    course: z.string().optional().or(z.literal("")),
 
-    batch: z.string().optional(),
+    batch: z.string().optional().or(z.literal("")),
 
     priority: z.enum([
       "low",
@@ -38,45 +39,38 @@ export const createAnnouncementSchema = z
       .optional()
       .or(z.literal("")),
 
-    isPinned: z.boolean(),
+    isPinned: z.boolean().default(false),
 
-    isPublished: z.boolean(),
+    isPublished: z.boolean().default(true),
   })
   .superRefine((data, ctx) => {
-    if (
-      data.targetType === "course-batch" &&
-      !data.course
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["course"],
-        message: "Course is required",
-      });
-    }
+    if (data.targetType === "course-batch") {
+      if (!data.course || data.course === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["course"],
+          message: "Please select a Course",
+        });
+      }
 
-    if (
-      data.targetType === "course-batch" &&
-      !data.batch
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["batch"],
-        message:
-          "Select a batch or All Batches",
-      });
+      if (!data.batch || data.batch === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["batch"],
+          message: "Select a Batch or 'All Batches (Entire Course)'",
+        });
+      }
     }
 
     if (
       data.publishAt &&
       data.expiresAt &&
-      new Date(data.expiresAt) <=
-        new Date(data.publishAt)
+      new Date(data.expiresAt) <= new Date(data.publishAt)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["expiresAt"],
-        message:
-          "Expiry date must be after publish date",
+        message: "Expiry date must be after publish date",
       });
     }
   });

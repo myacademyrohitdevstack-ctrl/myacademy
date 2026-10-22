@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import AddAnnouncementForm from "@/app/Components/AddAnnoucementForm";
 import { useTeacherCourses } from "@/Hooks/teacher-hooks/useTeacherCourses";
 import { motion } from "framer-motion";
@@ -41,7 +42,9 @@ export default function Page() {
           transition={{ delay: 0.1 }}
           className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-xs"
         >
-          <AddAnnouncementForm courses={courses} />
+          <Suspense fallback={<div className="p-8 text-center text-slate-400">Loading form...</div>}>
+            <AddAnnouncementForm courses={courses} />
+          </Suspense>
         </motion.div>
       </div>
     </div>

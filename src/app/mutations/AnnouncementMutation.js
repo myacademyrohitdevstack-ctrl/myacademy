@@ -9,7 +9,6 @@ import {
 } from "../api/adminApi";
 
 export const useCreateAnnouncementtMutation = () => {
-  const router = useRouter();
   return useMutation({
     mutationFn: async (data) => {
       const response = await adminCreateAnnouncementApi(data);
@@ -21,15 +20,14 @@ export const useCreateAnnouncementtMutation = () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["Announcements"] }),
         queryClient.invalidateQueries({ queryKey: ["Admin-annoucements"] }),
+        queryClient.invalidateQueries({ queryKey: ["my-notifications"] }),
       ]);
-      toast.success(data.message);
-      router.push("/admin-panel/courses");
+      toast.success(data.message || "Announcement published successfully");
     },
   });
 };
 
 export const useDeleteAnnouncementtMutation = () => {
-  const router = useRouter();
   return useMutation({
     mutationFn: async (id) => {
       const response = await adminDeleteAnnouncementApi(id);
@@ -41,9 +39,9 @@ export const useDeleteAnnouncementtMutation = () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["Announcements"] }),
         queryClient.invalidateQueries({ queryKey: ["Admin-annoucements"] }),
+        queryClient.invalidateQueries({ queryKey: ["my-notifications"] }),
       ]);
-      toast.success(data.message);
-      router.push("/admin-panel/courses");
+      toast.success(data.message || "Announcement deleted successfully");
     },
   });
 };

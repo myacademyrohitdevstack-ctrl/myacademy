@@ -819,26 +819,33 @@ export default function BatchDetailsPage() {
 
                 <div className="flex flex-wrap items-center gap-2">
 
-                  {announcement?.pinned && (
-                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                  {(announcement?.isPinned || announcement?.pinned) && (
+                    <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
                       📌 Pinned
                     </span>
                   )}
 
-                  <span
-                    className={`
-                      rounded-full px-3 py-1 text-xs font-semibold
-                      ${
-                        announcement?.type === "system"
-                          ? "bg-purple-100 text-purple-700"
-                          : announcement?.type === "course"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-green-100 text-green-700"
-                      }
-                    `}
-                  >
-                    {announcement?.type}
-                  </span>
+                  {(() => {
+                    const target = announcement?.targetType || announcement?.type || "batch";
+                    const isSystem = target === "system" || target === "academy";
+                    const isCourse = target === "course";
+                    return (
+                      <span
+                        className={`
+                          rounded-full px-3 py-1 text-xs font-semibold
+                          ${
+                            isSystem
+                              ? "bg-purple-100 text-purple-700"
+                              : isCourse
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-emerald-100 text-emerald-700"
+                          }
+                        `}
+                      >
+                        {isSystem ? "Entire Academy" : isCourse ? "Course-Wide" : "Batch"}
+                      </span>
+                    );
+                  })()}
 
                   <span className="text-xs text-slate-500">
                     {formatISTDateTime(

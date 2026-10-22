@@ -290,13 +290,24 @@ export default function Dashboard({ user }) {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h3 className="truncate text-xs sm:text-sm font-bold text-slate-900">
-                            {item.title}
-                          </h3>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            {(item.isPinned || item.pinned) && (
+                              <span className="text-[10px] text-amber-700 font-bold shrink-0">📌</span>
+                            )}
+                            <h3 className="truncate text-xs sm:text-sm font-bold text-slate-900">
+                              {item.title}
+                            </h3>
+                          </div>
                           <span className="text-[10px] text-slate-400 shrink-0">
-                            {formatISTDateTime(item.createdAt)}
+                            {formatISTDateTime(item.publishAt || item.createdAt)}
                           </span>
                         </div>
+
+                        {item.batch?.name && (
+                          <span className="inline-block mt-0.5 text-[10px] font-semibold text-[#D6451B] bg-orange-50 px-1.5 py-0.5 rounded-md">
+                            Batch: {item.batch.name}
+                          </span>
+                        )}
 
                         <p className="mt-1 text-xs text-slate-600 line-clamp-2">
                           {item.message}

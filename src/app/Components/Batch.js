@@ -795,30 +795,60 @@ export default function BatchDetailsPage({permissions}) {
 
                 <div className="flex flex-wrap items-center gap-2">
 
-                  {announcement?.pinned && (
-                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                  {(announcement?.isPinned || announcement?.pinned) && (
+                    <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
                       📌 Pinned
                     </span>
                   )}
 
-                  <span
-                    className={`
-                      rounded-full px-3 py-1 text-xs font-semibold
-                      ${
-                        announcement?.type === "system"
-                          ? "bg-purple-100 text-purple-700"
-                          : announcement?.type === "course"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-green-100 text-green-700"
-                      }
-                    `}
-                  >
-                    {announcement?.type}
-                  </span>
+                  {(() => {
+                    const target = announcement?.targetType || announcement?.type || "batch";
+                    const isSystem = target === "system" || target === "academy";
+                    const isCourse = target === "course";
+                    return (
+                      <span
+                        className={`
+                          rounded-full px-3 py-1 text-xs font-semibold
+                          ${
+                            isSystem
+                              ? "bg-purple-100 text-purple-700"
+                              : isCourse
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-emerald-100 text-emerald-700"
+                          }
+                        `}
+                      >
+                        {isSystem ? "Entire Academy" : isCourse ? "Course-Wide" : "Batch"}
+                      </span>
+                    );
+                  })()}
+
+                  {announcement?.priority && announcement?.priority !== "normal" && (
+                    <span
+                      className={`
+                        rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider
+                        ${
+                          announcement.priority === "urgent"
+                            ? "bg-rose-100 text-rose-700 border border-rose-200"
+                            : announcement.priority === "high"
+                            ? "bg-orange-100 text-orange-700 border border-orange-200"
+                            : "bg-slate-100 text-slate-600"
+                        }
+                      `}
+                    >
+                      {announcement.priority}
+                    </span>
+                  )}
+
+                  {announcement?.isPublished === false && (
+                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 border border-slate-200">
+                      Draft (Unpublished)
+                    </span>
+                  )}
 
                   <span className="text-xs text-slate-500">
                     {formatISTDateTime(
-                      announcement?.createdAt
+                      announcement?.publishAt || announcement?.createdAt
                     )}
                   </span>
 
@@ -848,7 +878,12 @@ export default function BatchDetailsPage({permissions}) {
 
                     <p className="font-medium text-slate-700 break-words">
                       {announcement?.createdBy?.fullName ||
-                        "Admin"}
+                        "Academy Admin"}
+                      {announcement?.createdBy?.role && (
+                        <span className="ml-1.5 text-xs font-normal text-slate-400 capitalize">
+                          ({announcement.createdBy.role})
+                        </span>
+                      )}
                     </p>
 
                   </div>
