@@ -21,14 +21,16 @@ export const useLoginMutation=()=>{
 
   login({user:data.user,accessToken:data.accessToken})
      toast.success("You Logged in Successlly ")
-     if(data.user.role==="student"){
-    router.push('/student-profile/profile')
-     }
-     if(data.user.role==="admin"){
-    router.push('/admin-panel/student')
-     }
-     if(data.user.role==="teacher"){
-    router.push('/teacher-panel/dashboard')
+     if (data.user?.platformRole === "super_admin" || data.user?.role === "super_admin") {
+       router.replace('/super-admin/dashboard');
+     } else if (data.user?.role === "parent") {
+       router.replace('/parent-panel/dashboard');
+     } else if (data.user?.role === "student") {
+       router.replace('/student-profile/profile');
+     } else if (data.user?.role === "admin") {
+       router.replace('/admin-panel/student');
+     } else if (data.user?.role === "teacher") {
+       router.replace('/teacher-panel/dashboard');
      }
 
         }

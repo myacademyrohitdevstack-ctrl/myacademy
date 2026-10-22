@@ -43,7 +43,7 @@ export default function AddStudent() {
           transition={{ delay: 0.1 }}
           className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-xs"
         >
-          <AddStudentForm />
+          <AddStudentForm role={role} />
         </motion.div>
       </div>
     </div>

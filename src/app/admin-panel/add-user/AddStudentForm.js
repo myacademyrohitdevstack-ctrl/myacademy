@@ -7,7 +7,7 @@ import Input from "@/app/student-profile/components/profile/Input";
 import Select from "@/app/student-profile/components/profile/Select";
 import { useAdminGetAllCourses } from "@/Hooks/useAdminGetCourses";
 import { useAdminGetAllBatches } from "@/Hooks/useAdminGetBatches";
-import { useAdminCreateStuent, useAdminCreateTeacher } from "@/app/mutations/AdminMutations";
+import { useAdminCreateStuent, useAdminCreateTeacher, useAdminCreateParent } from "@/app/mutations/AdminMutations";
 
 // import { zodResolver } from "@hookform/resolvers/zod";
 // import { createStudentSchema } from "@/schemas/createStudentSchema";
@@ -41,7 +41,8 @@ export default function AddStudentForm({role}) {
   const { data: batches } =
     useAdminGetAllBatches(courseSlug);
   const createStudentMutation = useAdminCreateStuent();
-  const createTeacherMuation=useAdminCreateTeacher()
+  const createTeacherMuation=useAdminCreateTeacher();
+  const createParentMutation = useAdminCreateParent();
   const onSubmit = async (data) => {
 const payload={
     fullName:data.name,
@@ -74,7 +75,7 @@ else{
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
-            label="Student Name"
+            label={role === "parent" ? "Parent / Guardian Name" : role === "teacher" ? "Teacher Name" : "Student Name"}
             placeholder="John Doe"
             icon={<FaUserGraduate />}
             {...register("name")}
@@ -162,7 +163,7 @@ else{
         >
           <FaSave />
 
-          {isSubmitting ? "Creating..." : "Create Student"}
+          {isSubmitting ? "Creating..." : role === "parent" ? "Create Parent Account" : role === "teacher" ? "Create Teacher" : "Create Student"}
         </button>
       </div>
     </form>

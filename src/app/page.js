@@ -33,8 +33,15 @@ export default function HomePage() {
   const [activeFaq, setActiveFaq] = useState(null);
   const [activeModule, setActiveModule] = useState("fees"); // 'fees', 'attendance', 'batches'
 
+  const isSuperAdmin =
+    user?.platformRole === "super_admin" || user?.role === "super_admin";
+
   const portalHref = !user
     ? "/login"
+    : isSuperAdmin
+    ? "/super-admin/dashboard"
+    : user.role === "parent"
+    ? "/parent-panel/dashboard"
     : user.role === "admin"
     ? "/admin-panel/dashboard"
     : user.role === "teacher"

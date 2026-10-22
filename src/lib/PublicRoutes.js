@@ -18,7 +18,16 @@ export default function PublicRoute({ children }) {
     if (!isInitialized) return;
 
     if (isAuthenticated) {
+      if (user?.platformRole === "super_admin" || user?.role === "super_admin") {
+        router.replace("/super-admin/dashboard");
+        return;
+      }
+
       switch (user?.role) {
+        case "parent":
+          router.replace("/parent-panel/dashboard");
+          break;
+
         case "student":
           router.replace("/student-profile/dashboard");
           break;

@@ -3,7 +3,7 @@ import handleError from "@/Utils/handleError"
 
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { adminApproveUserApi, adminBlockUserApi, adminCreateStudent, adminCreateTeacher, adminDeleteAnnouncementApi, adminDeleteUserByIdApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
+import { adminApproveUserApi, adminBlockUserApi, adminCreateStudent, adminCreateTeacher, adminCreateParent, adminDeleteAnnouncementApi, adminDeleteUserByIdApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
 import queryClient from "@/lib/queryClient"
 import { useRouter } from "next/navigation"
 
@@ -157,6 +157,27 @@ export const useAdminCreateTeacher=()=>{
 
     })
 }
+
+export const useAdminCreateParent=()=>{
+    const router=useRouter()
+    return useMutation({
+        mutationFn:async(data)=>{
+          const response=await adminCreateParent(data)
+          return response.data
+        },
+        retry:false,
+        onSuccess:(data)=>{
+          queryClient.invalidateQueries({
+            queryKey: ["Admin-Student-List"],
+          });
+          queryClient.invalidateQueries({ queryKey: ["admin-parent-links"] });
+          toast.success(data.message || "Parent account created successfully")
+          router.push('/admin-panel/parents')
+        },
+        onError:(error)=> handleError(error)
+    })
+}
+
 export const useAdminDeleteUser=()=>{
     
     return useMutation({

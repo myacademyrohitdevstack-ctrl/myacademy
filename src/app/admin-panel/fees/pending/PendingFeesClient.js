@@ -18,14 +18,20 @@ import {
 } from "react-icons/fa";
 import FeesNav from "../components/FeesNav";
 import { usePendingFees } from "@/Hooks/useFees";
+import ManualSendModal from "../reminders/components/ManualSendModal";
+import { useReminderTemplates, useWhatsAppIntegration } from "@/Hooks/useWhatsAppReminders";
 
 export default function PendingFeesClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [activeTab, setActiveTab] = useState("all"); // 'all', 'critical', 'upcoming'
   const [reminderToast, setReminderToast] = useState(null);
+  const [reminderModalOpen, setReminderModalOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
 
   const { data: serverPending, isLoading } = usePendingFees();
+  const { data: reminderTemplates = [] } = useReminderTemplates();
+  const { data: whatsappIntegration } = useWhatsAppIntegration();
 
   const now = new Date();
   const studentsList =
@@ -47,8 +53,9 @@ export default function PendingFeesClient() {
             pending: f.balanceAmount || 0,
             dueDate: dueDateObj ? dueDateObj.toLocaleDateString("en-IN") : "Pending",
             overdueDays: diffDays,
-            phone: f.student?.phone || "+91 98765 00000",
+            phone: f.student?.phone || "",
             status: f.urgency || (diffDays > 7 ? "critical" : "upcoming"),
+            rawDoc: f,
           };
         })
       : [];
@@ -80,13 +87,15 @@ export default function PendingFeesClient() {
   const totalOutstanding = filteredStudents.reduce((sum, s) => sum + s.pending, 0);
 
   const handleSendReminder = (student) => {
-    const message = `Hello ${student.name}, this is a gentle fee reminder from MyAcademy. Your pending fee balance of ₹${student.pending.toLocaleString("en-IN")} for batch ${student.batch} was due on ${student.dueDate}. Kindly clear the outstanding at the earliest.`;
-    const encoded = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${student.phone.replace(/[^0-9]/g, "")}?text=${encoded}`;
-    window.open(whatsappUrl, "_blank");
-
-    setReminderToast(`WhatsApp reminder dispatched to ${student.name}!`);
-    setTimeout(() => setReminderToast(null), 4000);
+    setSelectedCandidate({
+      _id: student._id,
+      studentName: student.name,
+      batch: student.batch,
+      balanceAmount: student.pending,
+      phone: student.phone,
+      rawDoc: student.rawDoc,
+    });
+    setReminderModalOpen(true);
   };
 
   return (
@@ -366,6 +375,15 @@ export default function PendingFeesClient() {
             </table>
           </div>
         </div>
+
+        {/* Manual Send Modal */}
+        <ManualSendModal
+          isOpen={reminderModalOpen}
+          onClose={() => setReminderModalOpen(false)}
+          candidate={selectedCandidate}
+          templates={reminderTemplates}
+          integrationData={whatsappIntegration}
+        />
       </div>
     </div>
   );

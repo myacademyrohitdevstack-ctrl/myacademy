@@ -8,6 +8,8 @@ import Certificates from "../components/Certificates";
 import Settings from "../components/Settings";
 import Profile from "../components/Profile";
 import StudentLoading from "../components/StudentLoading";
+import Exams from "../components/Exams";
+import Homework from "../components/Homework";
 
 import useMe from "@/Hooks/useMe";
 import useAuthStore from "@/store/authStore";
@@ -29,6 +31,8 @@ export default function StudentPortal({ section }) {
       {section === "courses" && <Courses />}
       {section === "classes" && <LiveClasses />}
       {section === "batches" && <Batches />}
+      {section === "homework" && <Homework user={user} />}
+      {section === "exams" && <Exams user={user} />}
       {section === "certificates" && <Certificates />}
       {section === "settings" && <Settings />}
     </div>

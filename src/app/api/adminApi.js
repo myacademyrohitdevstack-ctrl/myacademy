@@ -72,3 +72,6 @@ export  function adminCreateStudent(data){
 export  function adminCreateTeacher(data){
     return api.post(`/admin/create-teacher`,data)
 }
+export function adminCreateParent(data) {
+  return api.post(`/admin/create-parent`, data);
+}

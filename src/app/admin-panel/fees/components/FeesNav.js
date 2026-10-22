@@ -9,6 +9,7 @@ import {
   FaHistory,
   FaFileInvoiceDollar,
   FaFileAlt,
+  FaWhatsapp,
 } from "react-icons/fa";
 
 export default function FeesNav() {
@@ -32,6 +33,12 @@ export default function FeesNav() {
       href: "/admin-panel/fees/pending",
       aliases: ["/admin-panel/fees/pending-fees"],
       icon: FaClock,
+    },
+    {
+      name: "WhatsApp Reminders",
+      href: "/admin-panel/fees/reminders",
+      aliases: [],
+      icon: FaWhatsapp,
     },
     {
       name: "Transactions",

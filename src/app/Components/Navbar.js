@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaBars,
@@ -19,6 +20,9 @@ import {
   FaGraduationCap,
   FaPhoneAlt,
   FaCheckCircle,
+  FaCrown,
+  FaChartPie,
+  FaUserFriends,
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
@@ -56,13 +60,20 @@ export default function Navbar() {
     };
   }, [open]);
 
+  const isSuperAdmin =
+    user?.platformRole === "super_admin" || user?.role === "super_admin";
+  const isParent = user?.role === "parent";
+
   // Determine portal path based on user role
-  const portalPath =
-    user?.role === "admin"
-      ? "admin-panel"
-      : user?.role === "teacher"
-      ? "teacher-panel"
-      : "student-profile";
+  const portalPath = isSuperAdmin
+    ? "super-admin"
+    : isParent
+    ? "parent-panel"
+    : user?.role === "admin"
+    ? "admin-panel"
+    : user?.role === "teacher"
+    ? "teacher-panel"
+    : "student-profile";
 
   // Dynamic Navigation Links based on authentication
   const guestLinks = [
@@ -72,6 +83,21 @@ export default function Navbar() {
     { name: "Attendance", path: "/#attendance" },
     { name: "Batches", path: "/#batches" },
     { name: "Portals", path: "/#portals" },
+  ];
+
+  const superAdminLinks = [
+    { name: "Platform Overview", path: "/super-admin/dashboard", icon: FaChartPie },
+    { name: "Academies", path: "/super-admin/academies", icon: FaUsers },
+    { name: "SaaS Plans", path: "/super-admin/plans", icon: FaBookOpen },
+    { name: "Subscriptions", path: "/super-admin/subscriptions", icon: FaMoneyBillWave },
+    { name: "Audit Logs", path: "/super-admin/audit-logs", icon: FaCertificate },
+  ];
+
+  const parentLinks = [
+    { name: "Dashboard", path: "/parent-panel/dashboard", icon: FaHome },
+    { name: "Attendance", path: "/parent-panel/attendance", icon: FaCheckCircle },
+    { name: "Fees", path: "/parent-panel/fees", icon: FaMoneyBillWave },
+    { name: "Batches", path: "/parent-panel/batches", icon: FaUsers },
   ];
 
   const studentLinks = [
@@ -99,6 +125,10 @@ export default function Navbar() {
 
   const currentNavLinks = !user
     ? guestLinks
+    : isSuperAdmin
+    ? superAdminLinks
+    : isParent
+    ? parentLinks
     : user.role === "admin"
     ? adminLinks
     : user.role === "teacher"
@@ -136,6 +166,44 @@ export default function Navbar() {
           },
         ]
       : []),
+    ...(portalPath === "super-admin"
+      ? [
+          {
+            title: "Academies",
+            icon: FaUsers,
+            href: "/super-admin/academies",
+          },
+          {
+            title: "SaaS Plans",
+            icon: FaBookOpen,
+            href: "/super-admin/plans",
+          },
+          {
+            title: "Subscriptions",
+            icon: FaMoneyBillWave,
+            href: "/super-admin/subscriptions",
+          },
+          {
+            title: "Audit Logs",
+            icon: FaCertificate,
+            href: "/super-admin/audit-logs",
+          },
+        ]
+      : []),
+    ...(portalPath === "parent-panel"
+      ? [
+          {
+            title: "Attendance",
+            icon: FaCheckCircle,
+            href: "/parent-panel/attendance",
+          },
+          {
+            title: "Fee Status",
+            icon: FaMoneyBillWave,
+            href: "/parent-panel/fees",
+          },
+        ]
+      : []),
     ...(portalPath === "admin-panel"
       ? [
           {
@@ -170,6 +238,8 @@ export default function Navbar() {
 
   // Hide global website navbar on dedicated portal pages
   if (
+    pathname?.startsWith("/super-admin") ||
+    pathname?.startsWith("/parent-panel") ||
     pathname?.startsWith("/admin-panel") ||
     pathname?.startsWith("/student-profile") ||
     pathname?.startsWith("/teacher-panel") ||
@@ -179,20 +249,19 @@ export default function Navbar() {
   }
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-xs transition-all">
+    <>
+      <header className="fixed top-0 left-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-xs transition-all">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-20">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-[#D6451B] shadow-md shadow-orange-200/60 transition group-hover:scale-105">
-            <img
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-[#D6451B] shadow-md shadow-orange-200/60 transition group-hover:scale-105 p-1.5">
+            <Image
               src="/icon1.png"
               alt="MyAcademy"
+              width={32}
+              height={32}
               className="h-8 w-8 object-contain"
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
             />
-            <FaGraduationCap className="text-white text-xl" />
           </div>
 
           <div>
@@ -256,9 +325,11 @@ export default function Navbar() {
                 className="flex items-center gap-3 rounded-full border border-slate-200 bg-white p-1.5 pr-4 transition hover:border-[#D6451B] hover:shadow-md"
               >
                 {user.profileImage?.url ? (
-                  <img
+                  <Image
                     src={user.profileImage.url}
-                    alt={user.fullName}
+                    alt={user.fullName || "User"}
+                    width={36}
+                    height={36}
                     className="h-9 w-9 rounded-full object-cover ring-2 ring-orange-100"
                   />
                 ) : (
@@ -272,7 +343,7 @@ export default function Navbar() {
                     {capitalizeFirstLetter(user?.fullName || "User")}
                   </p>
                   <p className="text-[10px] font-medium capitalize text-[#D6451B]">
-                    {user?.role} Portal
+                    {isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role} Portal
                   </p>
                 </div>
 
@@ -297,9 +368,11 @@ export default function Navbar() {
                     <div className="bg-gradient-to-r from-[#D6451B] via-orange-600 to-orange-500 p-4 text-white">
                       <div className="flex items-center gap-3">
                         {user.profileImage?.url ? (
-                          <img
+                          <Image
                             src={user.profileImage.url}
                             alt=""
+                            width={48}
+                            height={48}
                             className="h-12 w-12 rounded-full border-2 border-white object-cover"
                           />
                         ) : (
@@ -315,7 +388,7 @@ export default function Navbar() {
                             {user?.email}
                           </p>
                           <span className="mt-1 inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
-                            {user?.role}
+                            {isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role}
                           </span>
                         </div>
                       </div>
@@ -360,7 +433,7 @@ export default function Navbar() {
               href={`/${portalPath}/dashboard`}
               className="flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-bold text-[#D6451B]"
             >
-              <span>{user?.role}</span>
+              <span>{isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role}</span>
             </Link>
           ) : (
             <Link
@@ -372,65 +445,83 @@ export default function Navbar() {
           )}
 
           <button
-            onClick={() => setOpen(!open)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:bg-slate-50"
+            type="button"
+            onClick={() => setOpen((prev) => !prev)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:bg-slate-50 cursor-pointer active:scale-95"
             aria-label="Toggle Navigation Menu"
           >
             {open ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
           </button>
         </div>
       </div>
+    </header>
 
-      {/* Mobile Drawer Menu */}
-      <AnimatePresence>
-        {open && (
+    {/* Mobile Drawer Menu rendered OUTSIDE <header> to escape backdrop-filter containing block */}
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[9999] lg:hidden">
+          {/* Backdrop overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
             onClick={() => setOpen(false)}
-          >
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 350, damping: 35 }}
-              className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Drawer Top */}
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white shadow-xs">
-                    <FaGraduationCap className="text-lg" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">MyAcademy</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#D6451B]">
-                      Academy Portal
-                    </p>
-                  </div>
-                </div>
+          />
 
-                <button
-                  onClick={() => setOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
-                >
-                  <FaTimes />
-                </button>
+          {/* Slide-out Drawer */}
+          <motion.aside
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 350, damping: 35 }}
+            className="fixed top-0 right-0 bottom-0 w-full max-w-sm h-full bg-white shadow-2xl flex flex-col justify-between overflow-hidden z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drawer Top */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 shrink-0 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 shadow-xs p-1.5">
+                  <Image
+                    src="/icon1.png"
+                    alt="MyAcademy"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7 object-contain"
+                  />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900">MyAcademy</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#D6451B]">
+                    Academy Portal
+                  </p>
+                </div>
               </div>
 
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 cursor-pointer"
+                aria-label="Close menu"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Scrollable middle container */}
+            <div className="flex-1 overflow-y-auto">
               {/* Drawer User Card */}
               <div className="p-5 border-b border-slate-100 bg-slate-50/70">
                 {user ? (
                   <div className="rounded-2xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 text-white shadow-md">
                     <div className="flex items-center gap-3">
                       {user.profileImage?.url ? (
-                        <img
+                        <Image
                           src={user.profileImage.url}
                           alt=""
+                          width={48}
+                          height={48}
                           className="h-12 w-12 rounded-full border-2 border-white object-cover"
                         />
                       ) : (
@@ -446,7 +537,7 @@ export default function Navbar() {
                           {user?.email}
                         </p>
                         <span className="mt-1.5 inline-block rounded-full bg-white/25 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
-                          {user?.role} Portal
+                          {isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role} Portal
                         </span>
                       </div>
                     </div>
@@ -477,7 +568,7 @@ export default function Navbar() {
               </div>
 
               {/* Drawer Links */}
-              <div className="flex-1 px-4 py-4 space-y-6">
+              <div className="px-4 py-4 space-y-6">
                 <div>
                   <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
                     {user ? `${user.role} Navigation` : "Explore Academy"}
@@ -518,32 +609,34 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Drawer Footer */}
-              <div className="border-t border-slate-200 p-4 bg-slate-50">
-                {user ? (
-                  <button
-                    onClick={handleLogout}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white py-3 text-sm font-bold text-rose-600 transition hover:bg-rose-50"
-                  >
-                    <FaSignOutAlt />
-                    <span>Log Out</span>
-                  </button>
-                ) : (
-                  <div className="text-center">
-                    <p className="text-xs text-slate-500">
-                      Need help enrolling? Call +91 98787 61488
-                    </p>
-                  </div>
-                )}
-                <p className="mt-3 text-center text-[10px] text-slate-400">
-                  © 2026 MyAcademy. All rights reserved.
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
+            {/* Drawer Footer */}
+            <div className="border-t border-slate-200 p-4 bg-slate-50 shrink-0">
+              {user ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white py-3 text-sm font-bold text-rose-600 transition hover:bg-rose-50 cursor-pointer"
+                >
+                  <FaSignOutAlt />
+                  <span>Log Out</span>
+                </button>
+              ) : (
+                <div className="text-center">
+                  <p className="text-xs text-slate-500">
+                    Need help enrolling? Call +91 98787 61488
+                  </p>
+                </div>
+              )}
+              <p className="mt-3 text-center text-[10px] text-slate-400">
+                &copy; 2026 MyAcademy. All rights reserved.
+              </p>
+            </div>
+          </motion.aside>
+        </div>
+      )}
+    </AnimatePresence>
+  </>
+);
 }

@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaChartLine,
   FaUsers,
+  FaUserFriends,
   FaChalkboardTeacher,
   FaBookOpen,
   FaLayerGroup,
@@ -19,6 +21,9 @@ import {
   FaSignOutAlt,
   FaShieldAlt,
   FaGlobe,
+  FaCrown,
+  FaFileAlt,
+  FaClipboardList,
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
@@ -26,8 +31,11 @@ import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
 const adminNavItems = [
   { name: "Dashboard", href: "/admin-panel/dashboard", icon: FaChartLine },
   { name: "Students", href: "/admin-panel/student", icon: FaUsers },
+  { name: "Parent Links", href: "/admin-panel/parents", icon: FaUserFriends },
   { name: "Teachers", href: "/admin-panel/teachers", icon: FaChalkboardTeacher },
   { name: "Courses", href: "/admin-panel/courses", icon: FaBookOpen },
+  { name: "Exams & Results", href: "/admin-panel/exams", icon: FaFileAlt },
+  { name: "Homework", href: "/admin-panel/homework", icon: FaClipboardList },
   { name: "Fees & Finance", href: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave },
   { name: "Admin Profile", href: "/admin-panel/profile", icon: FaUserCircle },
   { name: "Settings", href: "/admin-panel/settings", icon: FaCog },
@@ -38,6 +46,7 @@ export default function AdminDrawerNav({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logoutMutation = useLogoutMutation();
+  const isSuperAdmin = user?.platformRole === "super_admin" || user?.role === "super_admin";
 
   const closeDrawer = () => setMobileOpen(false);
 
@@ -58,8 +67,14 @@ export default function AdminDrawerNav({ children }) {
             <FaBars className="text-base text-slate-800" />
           </button>
           <Link href="/admin-panel/dashboard" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-bold shadow-xs">
-              <FaShieldAlt className="text-xs" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#D6451B] to-orange-500 shadow-xs p-1">
+              <Image
+                src="/icon1.png"
+                alt="MyAcademy"
+                width={24}
+                height={24}
+                className="h-5 w-5 object-contain"
+              />
             </div>
             <span className="font-extrabold text-slate-900 tracking-tight text-sm sm:text-base">Admin Portal</span>
           </Link>
@@ -96,8 +111,14 @@ export default function AdminDrawerNav({ children }) {
               <div className="flex flex-col min-h-0 overflow-hidden flex-1">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-bold shadow-xs">
-                      <FaShieldAlt className="text-sm" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 shadow-xs p-1.5">
+                      <Image
+                        src="/icon1.png"
+                        alt="MyAcademy"
+                        width={26}
+                        height={26}
+                        className="h-6 w-6 object-contain"
+                      />
                     </div>
                     <div>
                       <h2 className="font-extrabold text-sm text-slate-900">Admin Panel</h2>
@@ -114,8 +135,27 @@ export default function AdminDrawerNav({ children }) {
                 </div>
 
                 <nav className="mt-4 space-y-1 overflow-y-auto flex-1 pr-1">
+                  {isSuperAdmin && (
+                    <div className="mb-3 px-1">
+                      <Link
+                        href="/super-admin/dashboard"
+                        onClick={closeDrawer}
+                        className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-[#D6451B] to-rose-600 text-white text-xs font-extrabold shadow-sm hover:opacity-95 transition-all"
+                      >
+                        <span className="flex items-center gap-2">
+                          <FaCrown className="text-sm text-amber-200" />
+                          <span>Super Admin Console</span>
+                        </span>
+                        <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">Switch ?</span>
+                      </Link>
+                    </div>
+                  )}
                   {adminNavItems.map((item) => {
-                    const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href === "/admin-panel/fees/dashboard"
+                        ? pathname?.startsWith("/admin-panel/fees")
+                        : pathname?.startsWith(item.href + "/"));
                     const Icon = item.icon;
                     return (
                       <Link
@@ -171,12 +211,21 @@ export default function AdminDrawerNav({ children }) {
         )}
       </AnimatePresence>
 
+      {/* Desktop Sidebar Spacer to preserve flex layout */}
+      <div className="hidden lg:block w-72 shrink-0" aria-hidden="true" />
+
       {/* Desktop Fixed Sidebar (>= 1024px) */}
-      <aside className="hidden lg:flex flex-col justify-between w-72 shrink-0 border-r border-slate-200/80 bg-white p-6 h-screen sticky top-0 overflow-hidden">
+      <aside className="hidden lg:flex flex-col justify-between w-72 shrink-0 border-r border-slate-200/80 bg-white p-6 fixed inset-y-0 left-0 z-30 overflow-hidden">
         <div className="flex flex-col min-h-0 overflow-hidden flex-1">
           <div className="flex items-center gap-3.5 pb-6 border-b border-slate-100 shrink-0">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-extrabold shadow-xs">
-              <FaShieldAlt className="text-lg" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D6451B] to-orange-500 shadow-xs p-2">
+              <Image
+                src="/icon1.png"
+                alt="MyAcademy"
+                width={32}
+                height={32}
+                className="h-7 w-7 object-contain"
+              />
             </div>
             <div>
               <h1 className="font-extrabold text-slate-900 text-base tracking-tight">Admin Console</h1>
@@ -187,8 +236,26 @@ export default function AdminDrawerNav({ children }) {
           </div>
 
           <nav className="mt-6 space-y-1.5 overflow-y-auto flex-1 pr-1">
+            {isSuperAdmin && (
+              <div className="mb-3 px-1">
+                <Link
+                  href="/super-admin/dashboard"
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-[#D6451B] to-rose-600 text-white text-xs font-extrabold shadow-sm hover:opacity-95 transition-all"
+                >
+                  <span className="flex items-center gap-2">
+                    <FaCrown className="text-sm text-amber-200" />
+                    <span>Super Admin Console</span>
+                  </span>
+                  <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold">Switch ?</span>
+                </Link>
+              </div>
+            )}
             {adminNavItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/admin-panel/dashboard" && pathname?.startsWith(item.href));
+              const isActive =
+                pathname === item.href ||
+                (item.href === "/admin-panel/fees/dashboard"
+                  ? pathname?.startsWith("/admin-panel/fees")
+                  : item.href !== "/admin-panel/dashboard" && pathname?.startsWith(item.href));
               const Icon = item.icon;
               return (
                 <Link

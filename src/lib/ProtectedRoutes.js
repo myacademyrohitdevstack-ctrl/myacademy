@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
-import StudentLoading from "@/app/student-profile/components/StudentLoading";
 import Loading from "@/app/Components/ui/Loading";
 
 export default function ProtectedRoute({
@@ -18,6 +17,14 @@ export default function ProtectedRoute({
     user,
   } = useAuthStore();
 
+  const isSuperAdmin =
+    user?.platformRole === "super_admin" || user?.role === "super_admin";
+
+  const hasRole =
+    roles.length === 0 ||
+    roles.includes(user?.role) ||
+    roles.includes(user?.platformRole);
+
   useEffect(() => {
     if (!isInitialized) return;
 
@@ -26,10 +33,17 @@ export default function ProtectedRoute({
       return;
     }
 
-    if (roles.length && !roles.includes(user?.role)) {
+    // A Super Admin operates exclusively at the platform level
+    // and should always be redirected to the Super Admin platform rather than the regular Admin panel
+    if (isSuperAdmin && !roles.includes("super_admin")) {
+      router.replace("/super-admin/dashboard");
+      return;
+    }
+
+    if (!hasRole) {
       router.replace("/");
     }
-  }, [isAuthenticated, isInitialized, user, roles, router]);
+  }, [isAuthenticated, isInitialized, user, roles, hasRole, isSuperAdmin, router]);
 
   if (!isInitialized) {
     return <Loading type={roles[0]} />;
@@ -39,7 +53,12 @@ export default function ProtectedRoute({
     return null;
   }
 
-  if (roles.length && !roles.includes(user?.role)) {
+  // Prevent flash of regular admin / other portal view for super admin
+  if (isSuperAdmin && !roles.includes("super_admin")) {
+    return null;
+  }
+
+  if (!hasRole) {
     return null;
   }
 
