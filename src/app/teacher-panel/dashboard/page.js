@@ -2,7 +2,7 @@
 import React from 'react'
 import DashboardPage from './DashboardPage'
 
-export default function page() {
+export default function Page() {
   return (
 <DashboardPage></DashboardPage>
   )

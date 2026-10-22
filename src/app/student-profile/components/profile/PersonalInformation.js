@@ -19,10 +19,10 @@ export default function PersonalInformation({
   mode = "",
 }) {
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md sm:p-6 lg:p-8">
+    <section className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-6 lg:p-8 shadow-xs hover:shadow-md transition-all duration-300">
       {/* Header */}
       <div className="mb-6 flex items-start gap-4 sm:mb-8">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-lg text-[#D6451B]">
+        <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-orange-100 text-base sm:text-lg text-[#D6451B]">
           <FaIdCard />
         </div>
 

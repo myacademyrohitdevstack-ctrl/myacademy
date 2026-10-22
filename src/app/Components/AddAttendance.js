@@ -2,332 +2,224 @@
 
 import { useMarkAttendence } from "@/app/mutations/Attendence";
 import { useGetBatchStudents } from "@/Hooks/useGetBatchStudents";
-
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FaClipboardCheck,
   FaSave,
   FaCheck,
   FaTimes,
+  FaCalendarAlt,
 } from "react-icons/fa";
 
 export default function AttendancePage() {
-    const searchParmas=useSearchParams()
-    const batchId=searchParmas.get("batchId")
-        const {data}=useGetBatchStudents(batchId)
-        const markAtttendenceMutation=useMarkAttendence()
-        const [date, setDate] = useState(
-  new Date().toISOString().split("T")[0]
-);
-  const [students, setStudents] = useState([]);
-  useEffect(()=>{
-    if(!data) return
- setStudents(data)
-  },[batchId,data])
+  const searchParams = useSearchParams();
+  const batchId = searchParams.get("batchId");
+  const { data } = useGetBatchStudents(batchId);
+  const markAtttendenceMutation = useMarkAttendence();
+
+  const [date, setDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusOverrides, setStatusOverrides] = useState({});
+
+  // Derive students list directly from data & overrides without triggering cascading renders
+  const rawStudents = (data || []).map((student) => ({
+    ...student,
+    status: statusOverrides[student._id] || "present",
+  }));
+
+  const students = searchTerm
+    ? rawStudents.filter((s) =>
+        s.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : rawStudents;
 
   const handleStatusChange = (id, status) => {
-    setStudents((prev) =>
-      prev.map((student) =>
-        student._id === id
-          ? { ...student, status }
-          : student
-      )
-    );
+    setStatusOverrides((prev) => ({
+      ...prev,
+      [id]: status,
+    }));
   };
 
   const markAllPresent = () => {
-    setStudents((prev) =>
-      prev.map((student) => ({
-        ...student,
-        status: "present",
-      }))
-    );
+    const next = {};
+    (data || []).forEach((s) => {
+      next[s._id] = "present";
+    });
+    setStatusOverrides(next);
   };
 
   const markAllAbsent = () => {
-    setStudents((prev) =>
-      prev.map((student) => ({
-        ...student,
-        status: "absent",
-      }))
-    );
+    const next = {};
+    (data || []).forEach((s) => {
+      next[s._id] = "absent";
+    });
+    setStatusOverrides(next);
   };
 
-  const presentCount = students.filter(
-    (s) => s.status === "present"
-  ).length;
+  const presentCount = rawStudents.filter((s) => s.status === "present").length;
+  const absentCount = rawStudents.filter((s) => s.status === "absent").length;
 
-  const absentCount = students.filter(
-    (s) => s.status === "absent"
-  ).length;
-
- const handleSubmit = async () => {
-
+  const handleSubmit = async () => {
     const payload = {
       batch: batchId,
       date,
-      records: students.map((student) => ({
+      records: rawStudents.map((student) => ({
         student: student._id,
         status: student.status,
       })),
     };
 
-
-  await markAtttendenceMutation.mutateAsync(payload)
-
- 
-};
-  useEffect(() => {
-  if (!data) return;
-
-  setStudents(
-    data.map((student) => ({
-      ...student,
-      status: "present",
-    }))
-  );
-}, [data]);
+    await markAtttendenceMutation.mutateAsync(payload);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Hero Banner */}
+      <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <span className="rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider">
+              Attendance Register
+            </span>
+            <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight">
+              Mark Batch Attendance
+            </h1>
+            <p className="mt-2 text-xs sm:text-sm text-orange-100 font-medium">
+              Record daily student presence, calculate batch statistics, and log attendance into student profiles.
+            </p>
+          </div>
 
-        {/* Hero */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:min-w-[340px]">
+            <div className="rounded-2xl bg-white/10 p-3.5 sm:p-4 backdrop-blur-sm border border-white/20">
+              <p className="text-xs text-orange-100 font-medium">Total Enrolled</p>
+              <h3 className="mt-1 text-2xl sm:text-3xl font-extrabold">
+                {rawStudents.length}
+              </h3>
+            </div>
 
-     <div className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-6 text-white shadow-xl lg:p-8">
-  <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="rounded-2xl bg-white/10 p-3.5 sm:p-4 backdrop-blur-sm border border-white/20">
+              <p className="text-xs text-orange-100 font-medium">Present Today</p>
+              <h3 className="mt-1 text-2xl sm:text-3xl font-extrabold text-white">
+                {presentCount}
+              </h3>
+            </div>
 
-    {/* Left Side */}
-    <div>
-      <span className="rounded-full bg-white/20 px-4 py-2 text-sm font-medium">
-        Attendance Management
-      </span>
-
-      <h1 className="mt-4 text-3xl font-bold lg:text-5xl">
-        Spoken English Mastery
-      </h1>
-
-      <p className="mt-2 text-orange-100 text-lg">
-        Weekend Batch
-      </p>
-    </div>
-
-    {/* Right Side */}
-    <div className="grid grid-cols-2 gap-4 lg:min-w-[380px]">
-      <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-        <p className="text-sm text-orange-100">
-          Total Students
-        </p>
-        <h3 className="mt-1 text-3xl font-bold">
-          {students.length}
-        </h3>
+            <div className="col-span-2">
+              <div className="relative">
+                <FaCalendarAlt className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/60 text-xs" />
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full rounded-xl border border-white/30 bg-white/15 pl-10 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-white outline-none backdrop-blur-md [color-scheme:dark]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-        <p className="text-sm text-orange-100">
-          Present Today
-        </p>
-        <h3 className="mt-1 text-3xl font-bold">
-          {presentCount}
-        </h3>
-      </div>
-
-      <div className="col-span-2">
-       <input
-  type="date"
-  value={date}
-  onChange={(e) => setDate(e.target.value)}
-  className="
-    w-full rounded-2xl
-    border border-white/20
-    bg-white/10
-    px-4 py-3
-    text-white
-    outline-none
-    backdrop-blur-sm
-    [color-scheme:dark]
-  "
-/>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-        {/* Stats */}
-
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <StatCard
-            title="Total Students"
-            value={students.length}
-          />
-
-          <StatCard
-            title="Present"
-            value={presentCount}
-          />
-
-          <StatCard
-            title="Absent"
-            value={absentCount}
+      {/* Quick Action Buttons */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="w-full sm:w-72">
+          <input
+            type="text"
+            placeholder="Search student by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs sm:text-sm outline-none focus:border-[#D6451B]"
           />
         </div>
 
-        {/* Actions */}
-
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <div className="flex w-full sm:w-auto items-center gap-2">
           <button
             onClick={markAllPresent}
-            className="
-              rounded-xl bg-green-600
-              px-5 py-3
-              font-medium text-white
-              transition hover:bg-green-700 placeholder:text-white
-            "
+            className="flex-1 sm:flex-initial rounded-xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition hover:bg-emerald-700 shadow-xs"
           >
             Mark All Present
           </button>
 
           <button
             onClick={markAllAbsent}
-            className="
-              rounded-xl bg-red-600
-              px-5 py-3
-              font-medium text-white
-              transition hover:bg-red-700
-            "
+            className="flex-1 sm:flex-initial rounded-xl bg-rose-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition hover:bg-rose-700 shadow-xs"
           >
             Mark All Absent
           </button>
         </div>
+      </div>
 
-        {/* Students */}
-
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm lg:p-6">
-
-          <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-xl font-bold sm:text-2xl">
-              Students
-            </h2>
-
-            <input
-              type="text"
-              placeholder="Search student..."
-              className="
-                w-full rounded-xl
-                border border-slate-200
-                px-4 py-3
-                outline-none
-                transition
-                focus:border-[#D6451B]
-                lg:w-80
-              "
-            />
-          </div>
-
-          <div className="space-y-4">
-            {students?.map((student) => (
-              <div
-                key={student?._id}
-                className="
-                  rounded-2xl border border-slate-200
-                  bg-white p-4 shadow-sm
-                  transition-all duration-300
-                  hover:border-[#D6451B]
-                  hover:shadow-md
-                  lg:flex lg:items-center lg:justify-between
-                "
-              >
-                <div>
-                  <h3 className="font-semibold text-slate-800">
-                    {student?.fullName}
-                  </h3>
-
-                  <p className="text-sm text-slate-500">
-                    {student?.email}
-                  </p>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-2 lg:mt-0 lg:w-[260px]">
-                  <button
-                    onClick={() =>
-                      handleStatusChange(
-                        student._id,
-                        "present"
-                      )
-                    }
-                    className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition ${
-                      student.status === "present"
-                        ? "bg-green-600 text-white"
-                        : "bg-green-50 text-green-600"
-                    }`}
-                  >
-                    <FaCheck />
-                    Present
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      handleStatusChange(
-                        student._id,
-                        "absent"
-                      )
-                    }
-                    className={`flex items-center justify-center gap-2 rounded-xl py-3 px-3 text-sm font-medium transition ${
-                      student.status === "absent"
-                        ? "bg-red-600 text-white"
-                        : "bg-red-50 text-red-600"
-                    }`}
-                  >
-                    <FaTimes />
-                    Absent
-                  </button>
-                </div>
+      {/* Students List */}
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-xs">
+        <div className="space-y-3">
+          {students.map((student) => (
+            <div
+              key={student?._id}
+              className="rounded-xl sm:rounded-2xl border border-slate-200/80 bg-slate-50/50 p-3 sm:p-4 transition-all hover:border-[#D6451B] hover:bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+            >
+              <div className="min-w-0 flex-1">
+                <h4 className="font-bold text-slate-900 text-sm sm:text-base">
+                  {student?.fullName}
+                </h4>
+                <p className="text-xs text-slate-500 truncate">{student?.email}</p>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Save */}
+              <div className="grid grid-cols-2 gap-2 sm:w-[240px]">
+                <button
+                  type="button"
+                  onClick={() => handleStatusChange(student._id, "present")}
+                  className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition ${
+                    student.status === "present"
+                      ? "bg-emerald-600 text-white shadow-xs"
+                      : "bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100"
+                  }`}
+                >
+                  <FaCheck className="text-xs" />
+                  <span>Present</span>
+                </button>
 
-        <div className="sticky bottom-4 z-20 mt-6 flex justify-end">
-          <button
-            onClick={handleSubmit}
-            disabled={markAtttendenceMutation.isPending}
-            className="
-              flex w-full items-center justify-center gap-2
-              rounded-2xl bg-[#D6451B]
-              px-8 py-4
-              font-semibold text-white
-              shadow-lg
-              transition hover:bg-[#bf3b14]
-              sm:w-auto
-            "
-          >
-            <FaSave />
-           {!markAtttendenceMutation.isPending? "Save Attendance":"Saving...."}
-          </button>
+                <button
+                  type="button"
+                  onClick={() => handleStatusChange(student._id, "absent")}
+                  className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition ${
+                    student.status === "absent"
+                      ? "bg-rose-600 text-white shadow-xs"
+                      : "bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100"
+                  }`}
+                >
+                  <FaTimes className="text-xs" />
+                  <span>Absent</span>
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {students.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">
+              No students found for this batch.
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  );
-}
 
-function StatCard({ title, value }) {
-  return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm lg:p-6">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B] lg:h-14 lg:w-14">
-        <FaClipboardCheck />
+      {/* Sticky Bottom Save Action Bar */}
+      <div className="sticky bottom-4 z-30 flex justify-end">
+        <button
+          onClick={handleSubmit}
+          disabled={markAtttendenceMutation.isPending}
+          className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-[#D6451B] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:bg-[#bf3b14] disabled:opacity-40"
+        >
+          <FaSave />
+          <span>
+            {markAtttendenceMutation.isPending
+              ? "Saving Records..."
+              : "Save Attendance Records"}
+          </span>
+        </button>
       </div>
-
-      <h2 className="mt-4 text-3xl font-bold lg:text-4xl">
-        {value}
-      </h2>
-
-      <p className="mt-2 text-slate-500">
-        {title}
-      </p>
     </div>
   );
 }

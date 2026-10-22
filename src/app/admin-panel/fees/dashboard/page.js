@@ -1,7 +1,7 @@
 import React from 'react'
 import FeeDashboard from './dashboard'
 
-export default function page() {
+export default function Page() {
   return (
   <FeeDashboard></FeeDashboard>
   )

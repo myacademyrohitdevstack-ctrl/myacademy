@@ -1,24 +1,24 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { FaSave, FaUserGraduate, FaBookOpen, FaVoicemail, FaEnvelope, FaPhone, FaPhoneAlt, FaLock } from "react-icons/fa";
+import { FaSave, FaUserGraduate, FaBookOpen,  FaEnvelope,  FaPhoneAlt, FaLock } from "react-icons/fa";
 
 import Input from "@/app/student-profile/components/profile/Input";
 import Select from "@/app/student-profile/components/profile/Select";
 import { useAdminGetAllCourses } from "@/Hooks/useAdminGetCourses";
 import { useAdminGetAllBatches } from "@/Hooks/useAdminGetBatches";
-import { useAdminCreateStuent } from "@/app/mutations/AdminMutations";
+import { useAdminCreateStuent, useAdminCreateTeacher } from "@/app/mutations/AdminMutations";
 
 // import { zodResolver } from "@hookform/resolvers/zod";
 // import { createStudentSchema } from "@/schemas/createStudentSchema";
 // import { useCreateStudentMutation } from "@/app/mutations/studentMutations";
 
-export default function AddStudentForm() {
+export default function AddStudentForm({role}) {
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting, },
+    formState: { errors, isSubmitting },
   } = useForm({
     // resolver: zodResolver(createStudentSchema),
     mode: "onBlur",
@@ -41,7 +41,7 @@ export default function AddStudentForm() {
   const { data: batches } =
     useAdminGetAllBatches(courseSlug);
   const createStudentMutation = useAdminCreateStuent();
-
+  const createTeacherMuation=useAdminCreateTeacher()
   const onSubmit = async (data) => {
 const payload={
     fullName:data.name,
@@ -49,10 +49,15 @@ const payload={
     phone:data.phone,
     courseId:data.course,
     batchId:data.batch,
-    password:data.password
+    password:data.password,
 }
+if(role==="student"){
 
-    await createStudentMutation.mutateAsync(payload);
+  await createStudentMutation.mutateAsync(payload);
+}
+else{
+ await createTeacherMuation.mutateAsync(payload);
+}
   };
 
   return (
@@ -104,7 +109,7 @@ const payload={
 
       {/* Course Assignment */}
 
-      <div>
+    {role==="student" &&  <div>
         <h2 className="mb-4 text-xl font-bold text-slate-800">
           Course Assignment
         </h2>
@@ -135,7 +140,7 @@ const payload={
   }
           />
         </div>
-      </div>
+      </div>}
 
       {/* Submit */}
 

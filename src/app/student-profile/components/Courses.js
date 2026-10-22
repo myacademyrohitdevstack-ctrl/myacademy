@@ -33,7 +33,7 @@ if(isLoading) return <CoursesSkeleton></CoursesSkeleton>
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.4 }}
-  className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#D6451B] via-orange-500 to-orange-400 p-6 shadow-xl sm:p-8 lg:p-10"
+  className="relative overflow-hidden rounded-2xl sm:rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] via-orange-500 to-orange-400 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
 >
   <div className="absolute inset-0">
     <div className="absolute -right-10 -top-10 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
@@ -46,7 +46,7 @@ if(isLoading) return <CoursesSkeleton></CoursesSkeleton>
         Student Portal
       </span>
 
-      <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+      <h1 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
         My Courses
       </h1>
 
@@ -123,7 +123,7 @@ if(isLoading) return <CoursesSkeleton></CoursesSkeleton>
 className="
 group
 overflow-hidden
-rounded-3xl
+rounded-2xl sm:rounded-3xl
 border
 border-slate-200
 bg-white
@@ -137,7 +137,7 @@ hover:shadow-xl
 >
   {/* Thumbnail */}
 
-  <div className="relative h-52 overflow-hidden bg-gradient-to-br from-[#D6451B] to-orange-500">
+  <div className="relative h-36 sm:h-48 overflow-hidden bg-gradient-to-br from-[#D6451B] to-orange-500">
     {course?.thumbnail?.url ? (
       <img
         src={course.thumbnail.url}
@@ -193,7 +193,7 @@ group-hover:scale-105
 
   {/* Content */}
 
- <div className="space-y-5 p-5 sm:p-6">
+ <div className="space-y-3.5 p-3.5 sm:p-5">
     {/* Title */}
 
     <h2 className="line-clamp-2 text-xl font-bold text-slate-900">
@@ -289,7 +289,7 @@ p-4
       </div>
 
       {batches?.length === 0 && (
-        <div className="rounded-3xl bg-white p-12 text-center shadow-lg">
+        <div className="rounded-2xl sm:rounded-3xl bg-white p-12 text-center shadow-lg">
           <h2 className="text-2xl font-bold">
             No courses found
           </h2>

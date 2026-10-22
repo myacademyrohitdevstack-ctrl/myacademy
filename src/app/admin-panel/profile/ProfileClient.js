@@ -81,15 +81,15 @@ export default function ProfileClient() {
 };
 
   return (
-    <div className="py-28">
-    <div className="space-y-8 max-w-7xl mx-auto px-4">
+    <div className="py-2 sm:py-4">
+    <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white"
+        className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
       >
-        <h1 className="text-4xl font-bold">
+        <h1 className="text-2xl font-extrabold sm:text-3xl lg:text-4xl">
           My Profile
         </h1>
 

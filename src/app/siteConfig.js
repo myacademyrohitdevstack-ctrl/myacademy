@@ -1,13 +1,13 @@
 const SITE_CONFIG = {
-  siteName: "Inquisitive Mind Academy",
+  siteName: "MyAcademy",
 
   whatsappNumber: "919878761488",
 
-  email: "inquisitivemindacademy@gmail.com",
+  email: "contact@myacademy.com",
 
   phone: "+91 98787 61488",
 
-  address: "Punjab, India",
+  address: "India",
 
   socialLinks: {
     facebook: "",

@@ -1,7 +1,7 @@
 import React from 'react'
 import CoursesPage from './CoursesPage'
 
-export default function page() {
+export default function Page() {
   return (
   <CoursesPage></CoursesPage>
   )

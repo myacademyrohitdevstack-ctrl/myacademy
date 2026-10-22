@@ -74,14 +74,14 @@ logoutMutation.mutate()
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50">
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-0 space-y-8">
+    <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-6 md:px-0 space-y-4 sm:space-y-6">
 
       {/* Hero */}
 
    <motion.div
   initial={{ opacity: 0, y: 10 }}
   animate={{ opacity: 1, y: 0 }}
-  className="rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 px-5 py-6 text-white shadow-xl sm:px-8 sm:py-8"
+  className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
 >
   <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
     Settings
@@ -94,7 +94,7 @@ logoutMutation.mutate()
 
       {/* Security */}
 
-<div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg sm:p-8">
+<div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
   <div className="flex items-center gap-3">
     <FaLock className="text-xl text-[#D6451B] sm:text-2xl" />
 
@@ -174,7 +174,7 @@ logoutMutation.mutate()
 
       {/* Notifications */}
 
-  <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg sm:p-8 relative">
+  <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs relative">
     <CommingSoon></CommingSoon>
   <div className="flex items-center gap-3">
     <FaBell className="text-xl text-[#D6451B] sm:text-2xl" />
@@ -201,7 +201,7 @@ logoutMutation.mutate()
 
       {/* Preferences */}
 
-   <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg sm:p-8 relative">
+   <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs relative">
        <CommingSoon></CommingSoon>
   <div className="flex items-center gap-3">
     <FaGlobe className="text-xl text-[#D6451B] sm:text-2xl" />
@@ -257,7 +257,7 @@ logoutMutation.mutate()
 
       {/* Account */}
 
-   <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg sm:p-8">
+   <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
   <div className="flex items-center gap-3">
     <FaUserShield className="text-xl text-[#D6451B] sm:text-2xl" />
 

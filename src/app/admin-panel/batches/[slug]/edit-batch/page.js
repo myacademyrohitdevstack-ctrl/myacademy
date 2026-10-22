@@ -4,7 +4,7 @@ import EditBatchPage from './EditBatchPage'
 import { useSearchParams } from 'next/navigation'
 
 
-export default function page() {
+export default function Page() {
   const searchParams=useSearchParams()
   const batchId=searchParams.get("batchId") 
   if(!batchId) return 

@@ -6,21 +6,23 @@ import { toast } from "sonner";
 import {
   FaEnvelope,
   FaLock,
-  FaGoogle,
   FaArrowRight,
   FaSpinner,
+  FaGraduationCap,
+  FaEye,
+  FaEyeSlash,
+  FaCheckCircle,
 } from "react-icons/fa";
 import { useLoginMutation } from "../mutations/AuthenticationMutations";
 import Link from "next/link";
 
 export default function LoginPage() {
-
-   const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
-  // const { handleError } = useContext(AuthContext);
   const loginMutation = useLoginMutation();
 
   const handleChange = ({ target: { name, value } }) => {
@@ -31,18 +33,17 @@ export default function LoginPage() {
 
   const validate = () => {
     if (!formData.email.trim()) {
-      return "Email Cannot be Empty";
+      return "Email cannot be empty";
     }
     if (!emailRegex.test(formData.email.trim())) {
-      return "Enter a valid Email";
+      return "Please enter a valid email address";
     }
     if (!formData.password) {
-      return "Password Cannot be empty";
+      return "Password cannot be empty";
     }
     if (formData.password.length < 8) {
-      return "Password length cannot be less than 8";
+      return "Password length must be at least 8 characters";
     }
-
     return null;
   };
 
@@ -50,11 +51,9 @@ export default function LoginPage() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
     const error = validate();
-
     if (error) {
-      toast.error(error); 
+      toast.error(error);
       return;
     }
 
@@ -65,102 +64,136 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white ">
+    <section className="relative min-h-screen overflow-hidden bg-slate-50 pt-20 pb-12 px-3 sm:px-6">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-orange-100/50 via-transparent to-transparent pointer-events-none" />
 
-      {/* Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,69,27,0.08),transparent_50%)]" />
-
-      <div className="relative mx-auto flex min-h-screen max-w-md items-center px-5 py-12">
-
+      <div className="relative mx-auto flex min-h-[calc(100vh-140px)] max-w-md items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
           className="w-full"
         >
-          {/* Logo */}
+          {/* Header & Academy Icon */}
           <div className="text-center">
-           
+            <Link
+              href="/"
+              className="inline-flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white shadow-md shadow-orange-500/25 transition hover:scale-105"
+            >
+              <FaGraduationCap className="text-3xl" />
+            </Link>
 
-            <h1 className="mt-6 text-3xl font-bold text-slate-900">
+            <h1 className="mt-5 text-2xl sm:text-3xl font-extrabold text-slate-900">
               Welcome Back
             </h1>
-
-            <p className="mt-3 text-sm text-slate-500">
-              Login to continue your learning journey.
+            <p className="mt-1.5 text-xs sm:text-sm text-slate-500">
+              Log in to access your academy batches, classes & resources.
             </p>
           </div>
 
           {/* Form Card */}
-          <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl">
+          <div className="mt-5 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-7 shadow-lg">
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Email Input */}
+              <div>
+                <label
+                  htmlFor="login-email"
+                  className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+                  <input
+                    type="email"
+                    name="email"
+                    id="login-email"
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="student@example.com"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-[#D6451B] focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  />
+                </div>
+              </div>
 
-            {/* Email */}
-            <div className="relative">
-              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              {/* Password Input */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label
+                    htmlFor="login-password"
+                    className="block text-xs font-bold text-slate-700 uppercase tracking-wider"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    href="/forget-password"
+                    className="text-xs font-semibold text-[#D6451B] hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    id="login-password"
+                    autoComplete="current-password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3.5 pl-11 pr-11 text-sm text-slate-900 outline-none transition focus:border-[#D6451B] focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
 
-              <input
-                type="email"
-                name="email"
-             onChange={handleChange}
-              id="login-email"
-              autoComplete="email"
-                placeholder="Email Address"
-                className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
-              />
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={!isFormValid || loginMutation.isPending}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#D6451B] to-orange-500 py-3.5 text-sm font-bold text-white shadow-md shadow-orange-500/20 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {loginMutation.isPending ? (
+                  <FaSpinner className="animate-spin text-lg" />
+                ) : (
+                  <>
+                    <span>Sign In to Portal</span>
+                    <FaArrowRight className="text-xs" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Portal Role Guide Helper */}
+            <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50/50 p-3.5 text-center">
+              <p className="text-[11px] font-semibold text-slate-600">
+                Are you a Student, Trainer, or Administrator?
+              </p>
+              <p className="mt-0.5 text-[11px] text-[#D6451B]">
+                Your account will automatically navigate to your authorized dashboard.
+              </p>
             </div>
-
-            {/* Password */}
-            <div className="relative mt-4">
-              <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-
-              <input
-                type="password"
-                placeholder="Password"
-                name="password"
-                onChange={handleChange}
-                id="login-password"
-                 autoComplete="current-password"
-                className="w-full rounded-2xl border border-slate-200 py-3.5 pl-12 pr-4 outline-none focus:border-[#D6451B]"
-              />
-            </div>
-
-            {/* Forgot Password */}
-            <div className="mt-3 text-right">
-              <span className="text-xs font-medium text-[#D6451B] cursor-pointer hover:underline">
-                Forgot password?
-              </span>
-            </div>
-
-            {/* Submit */}
-            <button
-            disabled={!isFormValid || loginMutation.isPending}
-              onClick={handleLogin}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D6451B] py-3.5 font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              {loginMutation.isPending ?<FaSpinner className="text-white animate-spin"></FaSpinner>: "Login"}
-             
-            </button>
-
-            {/* Divider */}
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-slate-200" />
-              <span className="text-xs text-slate-400">OR</span>
-              <div className="h-px flex-1 bg-slate-200" />
-            </div>
-
-            {/* Google */}
-            <button disabled className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 py-3.5 hover:bg-slate-50 disabled:opacity-30">
-              <FaGoogle />
-              Continue with Google
-            </button>
           </div>
 
-          {/* Footer */}
-          <p className="mt-6 text-center text-sm text-slate-500">
-            Don’t have an account?
-            <Link href='/signup' className="ml-2 font-medium text-[#D6451B] cursor-pointer hover:underline">
-              Sign up
+          {/* Footer Navigation */}
+          <div className="mt-6 text-center text-xs text-slate-500">
+            <span>Don&apos;t have an account yet?</span>
+            <Link
+              href="/signup"
+              className="ml-1.5 font-bold text-[#D6451B] hover:underline"
+            >
+              Enroll Now
             </Link>
-          </p>
+          </div>
         </motion.div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import BatchesClient from '@/app/Components/Batches'
-export default async function page({params}) {
+export default async function Page({params}) {
   const {slug}= await params
   const permissions={
     canEdit:false,

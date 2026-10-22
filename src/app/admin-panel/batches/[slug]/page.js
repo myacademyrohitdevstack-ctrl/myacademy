@@ -1,11 +1,11 @@
 import React from 'react'
 
-
-export default async function page({params}) {
+import BatchesClient from '@/app/Components/Batches'
+export default async function Page({params}) {
   const {slug}= await params
   const permissions={
-    canEdit:false,
-    canDelete:false
+    canEdit:true,
+    canDelete:true
   }
   if(!slug) return
   return <BatchesClient slug={slug} permissions={permissions}></BatchesClient>

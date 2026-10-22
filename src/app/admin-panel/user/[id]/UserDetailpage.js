@@ -102,13 +102,13 @@ const user={approvalStatus:"approved",status:"active"}
   }
   if(isLoading) return
   return (
-    <div className="  py-24">
+    <div className="py-2 sm:py-4 px-3 sm:px-6">
       {/* Header */}
-<div className="max-w-6xl mx-auto space-y-8 py-10">
+<div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white shadow-xl w-full"
+        className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg w-full"
       >
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
@@ -118,7 +118,7 @@ const user={approvalStatus:"approved",status:"active"}
               Back to Users
             </button>
 
-            <h1 className="text-4xl font-bold">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               User Profile
             </h1>
 
@@ -133,14 +133,14 @@ const user={approvalStatus:"approved",status:"active"}
 
       {/* Profile Card */}
 
-      <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm">
         <div className="flex flex-col items-center gap-6 md:flex-row">
-          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#D6451B]/10 text-4xl font-bold text-[#D6451B]">
+          <div className="flex h-16 w-16 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-[#D6451B]/10 text-2xl sm:text-4xl font-bold text-[#D6451B]">
             R
           </div>
 
           <div className="flex-1">
-            <h2 className="text-3xl font-bold">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">
               {data?.fullName} {`(${capitalizeFirstLetter(data?.role)})`}
             </h2>
 
@@ -173,7 +173,7 @@ const user={approvalStatus:"approved",status:"active"}
 
       {/* Personal Information */}
 
-   <section className={`rounded-[30px] border border-slate-200 bg-white px-8 pb-20 pt-8 shadow-lg`}>
+   <section className={`rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm`}>
  
        <div className="mb-8">
          <h2 className="text-2xl font-bold">
@@ -244,7 +244,7 @@ const user={approvalStatus:"approved",status:"active"}
 
       {/* Account Information */}
 
-      <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm">
         <h2 className="mb-8 text-2xl font-bold">
           Account Information
         </h2>
@@ -261,7 +261,7 @@ const user={approvalStatus:"approved",status:"active"}
 
       {/* Actions */}
 
-    <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl">
+    <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm">
   <h2 className="mb-8 text-2xl font-bold">
     Account Actions
   </h2>

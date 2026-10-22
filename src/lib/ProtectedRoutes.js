@@ -32,7 +32,7 @@ export default function ProtectedRoute({
   }, [isAuthenticated, isInitialized, user, roles, router]);
 
   if (!isInitialized) {
-    return <Loading />;
+    return <Loading type={roles[0]} />;
   }
 
   if (!isAuthenticated) {

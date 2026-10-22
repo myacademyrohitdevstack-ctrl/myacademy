@@ -1,596 +1,443 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   FaSearch,
   FaPlus,
-  FaUsers,
-  FaUserGraduate,
-  FaCheckCircle,
-  FaClock,
-  FaEye,
   FaEdit,
   FaTrash,
+  FaFilter,
+  FaUserCheck,
+  FaUserGraduate,
+  FaUndo,
 } from "react-icons/fa";
-import Link from "next/link";
+
 import { useAdminStudent } from "@/Hooks/useAdminStudents";
 import useDebounce from "@/Hooks/useDebounce";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
-import { useRouter } from "next/navigation";
 import { useAdminDeleteUser } from "@/app/mutations/AdminMutations";
 
+import PortalCard from "@/app/Components/portal-ui/PortalCard";
+import PortalTable from "@/app/Components/portal-ui/PortalTable";
+import PortalInput from "@/app/Components/portal-ui/PortalInput";
+import PortalSelect from "@/app/Components/portal-ui/PortalSelect";
+import PortalBadge from "@/app/Components/portal-ui/PortalBadge";
+import PortalButton from "@/app/Components/portal-ui/PortalButton";
+
 export default function Students() {
-  const router=useRouter()
-  const [page,setPage]=useState(1)
+  const router = useRouter();
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-const [filters, setFilters] = useState({
-  search: "",
-  status: "",
-  approvalStatus: "",
-  role:""
-});
-const deleteUserMutation=useAdminDeleteUser()
+  const [filters, setFilters] = useState({
+    status: "",
+    approvalStatus: "",
+    role: "",
+  });
+
   const debouncedSearch = useDebounce(search, 500);
-  const {data,isLoading}=useAdminStudent(page,filters.search,filters.status,filters.approvalStatus,filters.role)
-  const users=data?.users || []
-  const pagination=data?.pagination || {}
-useEffect(() => {
-  setFilters(prev=>({...prev,search:debouncedSearch}))
-}, [debouncedSearch]);
+  const deleteUserMutation = useAdminDeleteUser();
+  const { data, isLoading, isFetching } = useAdminStudent(
+    page,
+    debouncedSearch,
+    filters.status,
+    filters.approvalStatus,
+    filters.role
+  );
 
-  if(isLoading) return
-  return (
-    <div className="space-y-8 mx-auto max-w-7xl py-24 px-4 md:px-0">
+  const users = data?.users || [];
+  const pagination = data?.pagination || {};
 
-      {/* Hero */}
+  const handleStatusChange = (e) => {
+    setPage(1);
+    setFilters((prev) => ({ ...prev, status: e.target.value }));
+  };
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white shadow-xl"
-      >
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+  const handleApprovalChange = (e) => {
+    setPage(1);
+    setFilters((prev) => ({ ...prev, approvalStatus: e.target.value }));
+  };
 
-          <div>
+  const handleRoleChange = (e) => {
+    setPage(1);
+    setFilters((prev) => ({ ...prev, role: e.target.value }));
+  };
 
-            <span className="rounded-full bg-white/20 px-4 py-2 text-sm">
-              Student Management
-            </span>
+  const handleResetFilters = () => {
+    setSearch("");
+    setPage(1);
+    setFilters({
+      status: "",
+      approvalStatus: "",
+      role: "",
+    });
+  };
 
-            <h1 className="mt-6 text-4xl font-bold">
-              Manage Students
-            </h1>
+  const hasActiveFilters = Boolean(
+    filters.status || filters.approvalStatus || filters.role || search
+  );
+  const activeCount = [
+    filters.status,
+    filters.approvalStatus,
+    filters.role,
+    search,
+  ].filter(Boolean).length;
 
-            <p className="mt-3 max-w-2xl text-orange-100">
-              Add new students, update their information, assign courses,
-              manage batches and monitor learning progress.
-            </p>
+  const handleDelete = (userId, name) => {
+    if (confirm(`Are you sure you want to delete ${name || "this student"}?`)) {
+      deleteUserMutation.mutate(userId);
+    }
+  };
 
+  const columns = [
+    {
+      header: "Student Name",
+      key: "fullName",
+      render: (student) => (
+        <div className="flex items-center gap-3 min-w-0 max-w-[260px]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 font-bold text-[#D6451B] border border-orange-200 text-sm shadow-xs">
+            {student.fullName?.charAt(0) || "S"}
           </div>
+          <div className="min-w-0 flex-1">
+            <h4
+              className="font-bold text-slate-900 text-sm leading-snug truncate"
+              title={student.fullName}
+            >
+              {student.fullName}
+              <span className="ml-2 inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200/60">
+                {capitalizeFirstLetter(student.role)}
+              </span>
+            </h4>
+            <p className="text-[11px] text-slate-400 font-medium">
+              ID #{student._id?.toString().slice(-6).toUpperCase()}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Contact Info",
+      key: "email",
+      render: (student) => (
+        <div className="max-w-[220px] xl:max-w-[280px] min-w-0">
+          <p
+            className="font-semibold text-slate-800 text-xs sm:text-sm break-all leading-snug"
+            title={student.email}
+          >
+            {student.email}
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5 truncate">
+            {student.phone || "No phone"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      header: "Approval",
+      key: "approvalStatus",
+      render: (student) => (
+        <PortalBadge variant={student.approvalStatus} size="sm">
+          {student.approvalStatus}
+        </PortalBadge>
+      ),
+    },
+    {
+      header: "Account Status",
+      key: "status",
+      render: (student) => (
+        <PortalBadge variant={student.status} size="sm">
+          {student.status}
+        </PortalBadge>
+      ),
+    },
+    {
+      header: "Actions",
+      key: "actions",
+      align: "right",
+      render: (student) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => router.push(`/admin-panel/user/${student._id}`)}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B] border border-orange-200/70 hover:bg-orange-100 transition-colors shadow-2xs cursor-pointer"
+            title="Edit User"
+          >
+            <FaEdit className="text-xs" />
+          </button>
+          <button
+            onClick={() => handleDelete(student._id, student.fullName)}
+            disabled={deleteUserMutation.isPending}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-200/70 hover:bg-rose-100 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
+            title="Delete User"
+          >
+            <FaTrash className="text-xs" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
-          <Link href="/admin-panel/add-student" className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 font-semibold text-[#D6451B] hover:scale-105 transition">
+  return (
+    <div className="space-y-4 sm:space-y-5 max-w-7xl mx-auto px-3 sm:px-6">
+      {/* Executive Compact Hero Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] via-orange-500 to-amber-500 p-4 sm:p-6 text-white shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
+      >
+        <div className="absolute -right-8 -top-8 h-40 sm:h-52 w-40 sm:w-52 rounded-full bg-white/15 blur-2xl pointer-events-none" />
 
-            <FaPlus />
-
-            Add Student
-
-          </Link>
-
+        <div className="relative">
+          <span className="inline-flex rounded-full bg-white/20 border border-white/30 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+            Administration
+          </span>
+          <h1 className="mt-1.5 text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white">
+            Student Management
+          </h1>
+          <p className="mt-1 text-orange-100 font-medium text-xs sm:text-sm max-w-xl">
+            Monitor, approve, update, and manage student accounts across all cohorts.
+          </p>
         </div>
 
+        <PortalButton
+          variant="secondary"
+          size="sm"
+          icon={FaPlus}
+          onClick={() => router.push("/admin-panel/add-user?role=student")}
+          className="w-full sm:w-auto shrink-0 shadow-xs"
+        >
+          Add New Student
+        </PortalButton>
       </motion.div>
 
-    
+      {/* Filter and Search Bar */}
+      <PortalCard padding="p-3.5 sm:p-5" className="relative overflow-hidden shadow-xs border border-slate-200/80">
+        {isFetching && (
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D6451B] via-orange-400 to-amber-400 animate-pulse z-10" />
+        )}
 
-      {/* Filters */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B] border border-orange-200/70 text-xs shadow-2xs">
+                <FaFilter />
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-slate-800">
+                Filter & Search
+              </span>
+              {hasActiveFilters && (
+                <span className="inline-flex items-center rounded-full bg-orange-100 border border-orange-200 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-[#D6451B]">
+                  {activeCount} active
+                </span>
+              )}
+            </div>
 
-      <div className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D6451B] hover:text-orange-700 transition-colors cursor-pointer"
+              >
+                <FaUndo className="text-[10px]" />
+                <span>Reset Filters</span>
+              </button>
+            )}
+          </div>
 
-        <div className="grid gap-4 lg:grid-cols-4">
-
-          <div className="relative">
-
-            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-
-            <input
+          <div className="grid gap-2.5 sm:gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <PortalInput
+              icon={FaSearch}
+              placeholder="Search by name, email..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search students..."
-              className="w-full rounded-2xl border border-slate-200 py-3 pl-12 pr-4 outline-none focus:border-[#D6451B]"
+              isLoading={isFetching && Boolean(search)}
+              onChange={(e) => {
+                setPage(1);
+                setSearch(e.target.value);
+              }}
             />
 
+            <PortalSelect
+              icon={FaFilter}
+              value={filters.status}
+              isLoading={isFetching}
+              onChange={handleStatusChange}
+            >
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="blocked">Blocked</option>
+            </PortalSelect>
+
+            <PortalSelect
+              icon={FaUserCheck}
+              value={filters.approvalStatus}
+              isLoading={isFetching}
+              onChange={handleApprovalChange}
+            >
+              <option value="">All Approvals</option>
+              <option value="approved">Approved</option>
+              <option value="pending">Pending Approval</option>
+              <option value="rejected">Rejected</option>
+            </PortalSelect>
+
+            <PortalSelect
+              icon={FaUserGraduate}
+              value={filters.role}
+              isLoading={isFetching}
+              onChange={handleRoleChange}
+            >
+              <option value="">All Roles</option>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+            </PortalSelect>
           </div>
-
-          <select className="rounded-2xl border border-slate-200 p-3 outline-none">
-
-            <option>All Courses</option>
-
-            <option>General English</option>
-
-            <option>IELTS</option>
-
-            <option>Business English</option>
-
-          </select>
-
-          <select className="rounded-2xl border border-slate-200 p-3 outline-none">
-
-            <option>All Batches</option>
-
-            <option>Morning</option>
-
-            <option>Evening</option>
-
-            <option>Weekend</option>
-
-          </select>
-
-          <select className="rounded-2xl border border-slate-200 p-3 outline-none"
- value={filters.status}
-  onChange={(e) =>
-    setFilters((prev) => ({
-      ...prev,
-      status: e.target.value,
-    }))
-  }
->
-  <option value="all">All Status</option>
-  <option value="active">Active</option>
-  <option value="blocked">Blocked</option>
-  <option value="pending">Pending</option>
-
-          </select>
-          <select
-          className="rounded-2xl border border-slate-200 p-3 outline-none"
-  value={filters.approvalStatus}
-  onChange={(e) =>
-    setFilters((prev) => ({
-      ...prev,
-      approvalStatus: e.target.value,
-    }))
-  }
->
-  <option value="all">All Approval Status</option>
-  <option value="pending">Pending</option>
-  <option value="approved">Approved</option>
-  <option value="rejected">Rejected</option>
-</select>
-          <select
-          className="rounded-2xl border border-slate-200 p-3 outline-none"
-  value={filters.role}
-  onChange={(e) =>
-    setFilters((prev) => ({
-      ...prev,
-      role: e.target.value,
-    }))
-  }
->
-  <option value="all">All</option>
-  <option value="teacher">Teacher</option>
-  <option value="student">Student</option>
-=
-</select>
-
         </div>
+      </PortalCard>
 
-      </div>
-            {/* Students Table */}
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl"
-      >
-        {/* Table Header */}
-
-        <div className="flex items-center justify-between border-b border-slate-200 p-6">
-
-          <div>
-
-            <h2 className="text-2xl font-bold text-slate-900">
-              Students List
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Showing {users?.length} students
-            </p>
-
-          </div>
-
-          <button className="rounded-2xl bg-[#D6451B] px-5 py-3 text-white transition hover:opacity-90">
-            Export
-          </button>
-
-        </div>
-
-        {/* Desktop Table */}
-
-        <div className="hidden overflow-x-auto lg:block">
-
-          <table className="w-full">
-
-            <thead className="bg-slate-50">
-
-              <tr>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-                  Student
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-                  Contact
-                </th>
-
-               
-<th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-  Approval
-</th>
-
-<th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">
-  Status
-</th>
-              
-
-                <th className="px-6 py-4 text-right text-sm font-semibold text-slate-600">
-                  Actions
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {users
-                .map((student) => (
-                  <motion.tr
-                    key={student._id}
-                    whileHover={{ backgroundColor: "#fff7f4" }}
-                    className="border-b border-slate-100 last:border-none"
-                  >
-
-                    {/* Student */}
-
-                    <td className="px-6 py-5">
-
-                      <div className="flex items-center gap-4">
-
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6451B]/10 text-lg font-bold text-[#D6451B]">
-
-                          {student.fullName.charAt(0)}
-
-                        </div>
-
-                        <div>
-
-                          <h3 className="font-semibold text-slate-900">
-                            {student.fullName}{` (${capitalizeFirstLetter(student.role)})`}
-                          </h3>
-
-                          <p className="text-sm text-slate-500">
-                            ID #{student._id.toString().padStart(4, "0")}
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                    </td>
-
-                    {/* Contact */}
-
-                    <td className="px-6 py-5">
-
-                      <p className="font-medium">
-                        {student.email}
-                      
-                      </p>
-
-                      <p className="mt-1 text-sm text-slate-500">
-                        {student.phone}
-                      </p>
-                   
-
-                    </td>
-
-                   
-<td className="px-6 py-5">
-  <span
-    className={`rounded-full px-4 py-2 text-sm font-medium ${
-      student.approvalStatus === "approved"
-        ? "bg-green-100 text-green-700"
-        : student.approvalStatus === "pending"
-        ? "bg-yellow-100 text-yellow-700"
-        : "bg-red-100 text-red-700"
-    }`}
-  >
-    {student.approvalStatus}
-  </span>
-</td>
-                    {/* Status */}
-
-                    <td className="px-6 py-5">
-
-                      <span
-                        className={`rounded-full px-4 py-2 text-sm font-medium ${
-                          student.status === "active"
-                            ? "bg-green-100 text-green-700":
-                            student.status === "pending"
-                            ? "bg-yellow-100 text-yellow-700"
-                            :"bg-red-100 text-red-700"
-                        }`}
+      {/* Main Student Data Table */}
+      <div className="space-y-3.5">
+        <PortalTable
+          columns={columns}
+          data={users}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          emptyTitle="No students found"
+          emptyDescription="No student records matched your search parameters."
+          renderMobileCard={(student) => (
+            <div className="space-y-2.5 min-w-0 w-full">
+              {/* Header: Avatar, Name, Role, ID & Status Badge */}
+              <div className="flex items-start justify-between gap-2.5 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 font-bold text-[#D6451B] border border-orange-200 text-sm shadow-xs">
+                    {student.fullName?.charAt(0) || "S"}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h4
+                        className="font-bold text-slate-900 text-sm leading-snug truncate"
+                        title={student.fullName}
                       >
-                        {student.status}
+                        {student.fullName}
+                      </h4>
+                      <span className="inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200/60">
+                        {capitalizeFirstLetter(student.role)}
                       </span>
-
-                    </td>
-
-                    {/* Actions */}
-
-                    <td className="px-6 py-5">
-
-                      <div className="flex justify-end gap-3">
-
-
-                        <button onClick={()=>{router.push(`/admin-panel/user/${student._id}`)}} className="rounded-xl cursor-pointer bg-orange-50 p-3 text-[#D6451B] transition hover:scale-105">
-
-                          <FaEdit />
-
-                        </button>
-
-                        <button onClick={()=>{deleteUserMutation.mutate(student._id)}} className="rounded-xl cursor-pointer bg-red-50 p-3 text-red-600  hover:scale-105 active:scale-90 transition-all">
-
-                          <FaTrash />
-
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </motion.tr>
-                ))}
-
-            </tbody>
-         
-
-          </table>
-
-        </div>
-
-        {/* Mobile Cards */}
-
-        <div className="space-y-5 p-5 lg:hidden">
-
-          {users
-            .map((student) => (
-
-              <div
-                key={student._id}
-                className="rounded-3xl border border-slate-200 p-5"
-              >
-
-                <div className="flex items-center gap-4">
-
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6451B]/10 font-bold text-[#D6451B]">
-
-                    {student?.fullName.charAt(0)}
-
+                    </div>
+                    <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+                      ID #{student._id?.toString().slice(-6).toUpperCase()}
+                    </p>
                   </div>
-
-                  <div>
-
-                    <h3 className="font-semibold">
-                      {student?.fullName}
-                    </h3>
-
-                    {/* <p className="text-sm text-slate-500">
-                      {student?.course}
-                    </p> */}
-
-                  </div>
-
                 </div>
-
-             <div className="mt-5 space-y-2 text-sm">
-  <p>
-    <span className="font-semibold">Email:</span>{" "}
-    {student?.email}
-  </p>
-
-  <p>
-    <span className="font-semibold">Phone:</span>{" "}
-    {student?.phone}
-  </p>
-
-  {/* <p>
-    <span className="font-semibold">Batch:</span>{" "}
-    {student?.batch}
-  </p> */}
-
-  <div className="flex flex-wrap gap-2 pt-2">
-    <span
-      className={`rounded-full px-3 py-1 text-xs font-medium ${
-        student.approvalStatus === "approved"
-          ? "bg-green-100 text-green-700"
-          : student.approvalStatus === "pending"
-          ? "bg-yellow-100 text-yellow-700"
-          : "bg-red-100 text-red-700"
-      }`}
-    >
-      {student.approvalStatus}
-    </span>
-
-    <span
-      className={`rounded-full px-3 py-1 text-xs font-medium ${
-        student.status === "active"
-          ? "bg-blue-100 text-blue-700"
-          : "bg-red-100 text-red-700"
-      }`}
-    >
-      {student.status}
-    </span>
-  </div>
-</div>
-
-                <div className="mt-5 flex gap-3">
-
-                
-
-                  <button onClick={()=>{router.push(`/admin-panel/user/${student._id}`)}} className="flex-1 rounded-xl bg-orange-50 py-3 text-[#D6451B]">
-
-                    <FaEdit className="mx-auto" />
-
-                  </button>
-
-                  <button className="flex-1 rounded-xl bg-red-50 py-3 text-red-600">
-
-                    <FaTrash className="mx-auto" />
-
-                  </button>
-
+                <div className="shrink-0">
+                  <PortalBadge variant={student.status} size="sm">
+                    {student.status}
+                  </PortalBadge>
                 </div>
-
               </div>
 
-            ))}
+              {/* Contact Info: Email & Phone */}
+              <div className="rounded-xl bg-slate-50/90 p-2.5 border border-slate-100 space-y-1.5 min-w-0">
+                <div className="flex items-start gap-2 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0 w-12 pt-0.5">
+                    Email
+                  </span>
+                  <span
+                    className="text-xs font-semibold text-slate-800 break-all leading-relaxed select-all min-w-0 flex-1"
+                    title={student.email}
+                  >
+                    {student.email}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 min-w-0 pt-1.5 border-t border-slate-200/60">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0 w-12">
+                    Phone
+                  </span>
+                  <span className="text-xs font-semibold text-slate-700 truncate">
+                    {student.phone || "No phone provided"}
+                  </span>
+                </div>
+              </div>
 
-        </div>
+              {/* Approval Status Row */}
+              <div className="flex items-center justify-between gap-2 pt-0.5 text-xs">
+                <span className="text-xs font-semibold text-slate-500">
+                  Approval Status
+                </span>
+                <PortalBadge variant={student.approvalStatus} size="sm">
+                  {student.approvalStatus}
+                </PortalBadge>
+              </div>
 
-      </motion.div>
-            {/* Footer */}
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 pt-1">
+                <PortalButton
+                  variant="orangeOutline"
+                  size="sm"
+                  icon={FaEdit}
+                  className="flex-1 justify-center shadow-xs"
+                  onClick={() => router.push(`/admin-panel/user/${student._id}`)}
+                >
+                  Edit Details
+                </PortalButton>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(student._id, student.fullName)}
+                  disabled={deleteUserMutation.isPending}
+                  className="inline-flex items-center justify-center gap-1.5 px-3 min-h-[36px] rounded-xl bg-rose-50 border border-rose-200 text-rose-600 font-bold text-xs hover:bg-rose-100 active:scale-[0.98] transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                  title="Delete Student"
+                >
+                  <FaTrash className="text-xs" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          )}
+        />
 
-    {users.length !== 0 &&  <div className="flex flex-col items-center justify-between gap-5 rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg md:flex-row">
+        {/* Compact Pagination Footer */}
+        {users.length > 0 && pagination.totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+            <p className="text-xs font-semibold text-slate-500 text-center sm:text-left">
+              Showing Page <span className="text-slate-900 font-bold">{pagination.page}</span> of{" "}
+              <span className="text-slate-900 font-bold">{pagination.totalPages}</span> ({pagination.total} total students)
+            </p>
 
-     <p className="text-sm text-slate-500">
-  Showing{" "}
-  <span className="font-semibold">
-    {(pagination.page - 1) * pagination.limit + 1}
-  </span>
-  -
-  <span className="font-semibold">
-    {Math.min(
-      pagination.page * pagination.limit,
-      pagination.total
-    )}
-  </span>{" "}
-  of{" "}
-  <span className="font-semibold">
-    {pagination.total}
-  </span>{" "}
-  students
-</p>
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-1.5">
+              <PortalButton
+                variant="outline"
+                size="sm"
+                disabled={!pagination.hasPreviousPage}
+                onClick={() => setPage((prev) => prev - 1)}
+              >
+                Previous
+              </PortalButton>
 
-        {/* Pagination */}
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <button
+                  key={pageNum}
+                  onClick={() => setPage(pageNum)}
+                  className={`h-8 w-8 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    page === pageNum
+                      ? "bg-[#D6451B] text-white font-extrabold shadow-xs"
+                      : "border border-slate-200 text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              ))}
 
-        <div className="flex items-center gap-2">
-
-        <button
-  disabled={!pagination.hasPreviousPage}
-  onClick={() => setPage((prev) => prev - 1)}
-  className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
->
-  Previous
-</button>
-
-         {Array.from(
-  { length: pagination.totalPages },
-  (_, i) => i + 1
-).map((pageNumber) => (
-  <button
-    key={pageNumber}
-    onClick={() => setPage(pageNumber)}
-    className={`h-10 w-10 rounded-xl ${
-      page === pageNumber
-        ? "bg-[#D6451B] text-white"
-        : "border border-slate-200 hover:bg-slate-50"
-    }`}
-  >
-    {pageNumber}
-  </button>
-))}
-
-      <button
-  disabled={!pagination.hasNextPage}
-  onClick={() => setPage((prev) => prev + 1)}
-  className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
->
-  Next
-</button>
-
-          
-
-        </div>
-
-      </div>}
-
-      {/* Empty State */}
-
-      {users.length === 0 && (
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="rounded-[32px] border border-dashed border-slate-300 bg-white py-20 text-center shadow-lg"
-        >
-
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-orange-50 text-4xl text-[#D6451B]">
-
-            <FaUserGraduate />
-
+              <PortalButton
+                variant="outline"
+                size="sm"
+                disabled={!pagination.hasNextPage}
+                onClick={() => setPage((prev) => prev + 1)}
+              >
+                Next
+              </PortalButton>
+            </div>
           </div>
-
-          <h2 className="mt-6 text-2xl font-bold text-slate-900">
-            No Students Found
-          </h2>
-
-          <p className="mx-auto mt-3 max-w-md text-slate-500">
-            You haven't added any students yet.
-            Start by creating your first student profile.
-          </p>
-
-          <button className="mt-8 rounded-2xl bg-[#D6451B] px-8 py-4 font-semibold text-white hover:opacity-90">
-
-            Add Student
-
-          </button>
-
-        </motion.div>
-
-      )}
-
-    </div>
-  );
-}
-
-/* ---------- Reusable Stat Card ---------- */
-
-function Stat({ title, value, icon, color }) {
-  return (
-    <motion.div
-      whileHover={{ y: -6 }}
-      className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-lg"
-    >
-
-      <div className="flex items-center justify-between">
-
-        <div
-          className={`flex h-14 w-14 items-center justify-center rounded-2xl text-xl ${color}`}
-        >
-          {icon}
-        </div>
-
+        )}
       </div>
-
-      <h2 className="mt-6 text-4xl font-bold text-slate-900">
-        {value}
-      </h2>
-
-      <p className="mt-2 text-slate-500">
-        {title}
-      </p>
-
-    </motion.div>
+    </div>
   );
 }

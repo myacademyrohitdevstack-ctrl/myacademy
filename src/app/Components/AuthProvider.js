@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useAuthStore from "@/store/authStore";
-import StudentLoading from "../student-profile/components/StudentLoading";
+import PortalLoading from "./portal-ui/PortalLoading";
 
 export default function AuthProvider({ children }) {
   const login = useAuthStore((state) => state.login);
@@ -39,7 +39,7 @@ export default function AuthProvider({ children }) {
   }, []);
 
   if (loading) {
-    return <StudentLoading />;
+    return <PortalLoading />;
   }
 
   return children;

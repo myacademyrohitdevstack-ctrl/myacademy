@@ -57,21 +57,22 @@ export default function BatchDetailsPage({permissions}) {
  if(batchLoading) return <Loading></Loading> 
 
   return (
-    <div className="py-28">
-<div className="mx-auto max-w-7xl space-y-6 px-4  sm:px-6 lg:px-8">
+    <div className="py-2 sm:py-4 w-full min-w-0">
+<div className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-1 sm:px-6 lg:px-8 w-full min-w-0">
       {/* Hero */}
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="
-          rounded-[32px]
+          rounded-2xl sm:rounded-3xl
           bg-gradient-to-r
           from-[#D6451B]
           to-orange-500
-          p-8
+          p-4 sm:p-6 lg:p-8
           text-white
           shadow-xl
+          w-full min-w-0 overflow-hidden
         "
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -80,7 +81,7 @@ export default function BatchDetailsPage({permissions}) {
               Batch Details
             </span>
 
-            <h1 className="mt-5 text-4xl font-bold">
+            <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
               {batch?.name}
             </h1>
 
@@ -109,7 +110,7 @@ export default function BatchDetailsPage({permissions}) {
 
       {/* Stats */}
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4 w-full min-w-0">
       
 
         <StatCard
@@ -145,8 +146,8 @@ export default function BatchDetailsPage({permissions}) {
       {/* Tabs */}
 
  
-  <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-   <div className="grid  grid-cols-4 gap-1">
+  <div className="rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm w-full min-w-0">
+   <div className="grid grid-cols-4 gap-1 w-full min-w-0">
 
       <button
         onClick={() => setActiveTab("notes")}
@@ -247,7 +248,7 @@ export default function BatchDetailsPage({permissions}) {
           key={note._id}
           className="
             group overflow-hidden
-            rounded-3xl border border-slate-200
+            rounded-2xl sm:rounded-3xl border border-slate-200
             bg-white p-4 shadow-sm
             transition-all duration-300
             hover:-translate-y-1
@@ -957,7 +958,7 @@ export default function BatchDetailsPage({permissions}) {
 
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 
-      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
         <p className="text-sm text-slate-500">
           Total Classes
         </p>
@@ -967,7 +968,7 @@ export default function BatchDetailsPage({permissions}) {
         </h3>
       </div>
 
-      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
         <p className="text-sm text-slate-500">
           Average Attendance
         </p>
@@ -977,7 +978,7 @@ export default function BatchDetailsPage({permissions}) {
         </h3>
       </div>
 
-      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
         <p className="text-sm text-slate-500">
           Present Today
         </p>
@@ -987,7 +988,7 @@ export default function BatchDetailsPage({permissions}) {
         </h3>
       </div>
 
-      <div className="rounded-3xl border bg-white p-5 shadow-sm">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
         <p className="text-sm text-slate-500">
           Absent Today
         </p>
@@ -1001,7 +1002,7 @@ export default function BatchDetailsPage({permissions}) {
 
     {/* History */}
 
-    <div className="rounded-3xl border bg-white shadow-sm">
+    <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-xs">
 
       <div className="border-b p-6">
         <h3 className="text-xl font-bold">
@@ -1101,7 +1102,7 @@ export default function BatchDetailsPage({permissions}) {
    
      
 
-      <div className="rounded-3xl border bg-white p-6 shadow-sm">
+      <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-xs">
 
         <h3 className="font-bold">
           Attendance Insights
@@ -1166,28 +1167,28 @@ export function StatCard({
     <motion.div
       whileHover={{ y: -5 }}
       className="
-        rounded-[30px]
+        rounded-xl sm:rounded-2xl
         border border-slate-200
         bg-white
-        p-6
-        shadow-lg
+        p-3 sm:p-4
+        shadow-xs
       "
     >
       <div
         className={`
-          flex h-14 w-14 items-center
+          flex h-9 w-9 sm:h-11 sm:w-11 items-center
           justify-center rounded-2xl
-          text-2xl ${color}
+          text-sm sm:text-lg ${color}
         `}
       >
         {icon}
       </div>
 
-      <h2 className="mt-6 text-4xl font-bold">
+      <h2 className="mt-2.5 text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
         {value}
       </h2>
 
-      <p className="mt-2 text-slate-500">
+      <p className="mt-0.5 text-xs font-semibold text-slate-500 truncate">
         {title}
       </p>
     </motion.div>

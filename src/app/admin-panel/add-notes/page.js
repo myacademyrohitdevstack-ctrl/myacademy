@@ -2,63 +2,44 @@
 
 import AddNoteForm from "@/app/Components/AddNoteForm";
 import { motion } from "framer-motion";
-
 import { FaBookOpen } from "react-icons/fa";
 
-
 export default function AddNotes() {
-  
   return (
-    <div className="py-24 ">
-      {/* Hero */}
-<div className="mx-auto max-w-6xl space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="
-          rounded-[30px]
-          bg-gradient-to-r
-          from-[#D6451B]
-          to-orange-500
-          p-8
-          text-white
-          shadow-xl
-        "
-      >
-        <div className="flex items-center gap-4">
-          <div className="rounded-2xl bg-white/20 p-4">
-            <FaBookOpen className="text-3xl" />
+    <div className="py-2 sm:py-4">
+      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
+        >
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-white/20 text-white shrink-0">
+              <FaBookOpen className="text-xl sm:text-2xl" />
+            </div>
+
+            <div>
+              <h1 className="text-xl sm:text-3xl font-extrabold">
+                Publish New Notes
+              </h1>
+
+              <p className="mt-1 text-xs sm:text-sm text-orange-100 font-normal">
+                Upload chapter PDFs, study materials, and revision workbooks for students.
+              </p>
+            </div>
           </div>
+        </motion.div>
 
-          <div>
-            <h1 className="text-4xl font-bold">
-              Publish New Notes
-            </h1>
-
-            <p className="mt-2 text-orange-100">
-             Add a new Notes for Students
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Form */}
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="
-          rounded-[30px]
-          border
-          border-slate-200
-          bg-white
-          p-8
-          shadow-lg
-        "
-      >
-        <AddNoteForm></AddNoteForm>
-      </motion.div>
+        {/* Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-xs"
+        >
+          <AddNoteForm />
+        </motion.div>
       </div>
     </div>
   );

@@ -69,3 +69,6 @@ export  function adminGetAllAnnoucements(){
 export  function adminCreateStudent(data){
     return api.post(`/admin/create-student`,data)
 }
+export  function adminCreateTeacher(data){
+    return api.post(`/admin/create-teacher`,data)
+}

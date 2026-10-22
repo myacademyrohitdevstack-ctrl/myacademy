@@ -6,7 +6,7 @@ export default function ProfileSkeleton() {
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-0">
 
         {/* Hero */}
-        <div className="rounded-[32px] bg-slate-200 p-6 sm:p-8 lg:p-10">
+        <div className="rounded-2xl sm:rounded-3xl bg-slate-200 p-4 sm:p-6 lg:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
 
             <div className="flex-1">

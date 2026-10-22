@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-
 import {
   FaBars,
   FaTimes,
@@ -13,517 +12,538 @@ import {
   FaVideo,
   FaCog,
   FaSignOutAlt,
-  FaInfoCircle,
-  FaPhoneAlt,
   FaUsers,
-  FaBullhorn,
   FaChalkboardTeacher,
-  FaSearch,
+  FaMoneyBillWave,
+  FaCertificate,
+  FaGraduationCap,
+  FaPhoneAlt,
+  FaCheckCircle,
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
-import {  useLogoutMutation } from "../mutations/AuthenticationMutations";
+import { useLogoutMutation } from "../mutations/AuthenticationMutations";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const logoutMutation=useLogoutMutation()
-
+  const logoutMutation = useLogoutMutation();
   const [open, setOpen] = useState(false);
-
   const [profileOpen, setProfileOpen] = useState(false);
-
   const profileRef = useRef(null);
- const user=useAuthStore((state)=>state.user)
+  const user = useAuthStore((state) => state.user);
+  const pathname = usePathname();
 
-const links = [
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
-
-];
-useEffect(() => {
-
-  const handler = (e) => {
-
-    if (
-      profileRef.current &&
-      !profileRef.current.contains(e.target)
-    ) {
-      setProfileOpen(false);
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
+  // Determine portal path based on user role
+  const portalPath =
+    user?.role === "admin"
+      ? "admin-panel"
+      : user?.role === "teacher"
+      ? "teacher-panel"
+      : "student-profile";
+
+  // Dynamic Navigation Links based on authentication
+  const guestLinks = [
+    { name: "Home", path: "/" },
+    { name: "Features", path: "/#features" },
+    { name: "Fees & Finance", path: "/#fees" },
+    { name: "Attendance", path: "/#attendance" },
+    { name: "Batches", path: "/#batches" },
+    { name: "Portals", path: "/#portals" },
+  ];
+
+  const studentLinks = [
+    { name: "Dashboard", path: "/student-profile/dashboard", icon: FaHome },
+    { name: "My Batches", path: "/student-profile/batches", icon: FaUsers },
+    { name: "Live Classes", path: "/student-profile/classes", icon: FaVideo },
+    { name: "My Courses", path: "/student-profile/courses", icon: FaBookOpen },
+    { name: "Certificates", path: "/student-profile/certificates", icon: FaCertificate },
+  ];
+
+  const adminLinks = [
+    { name: "Dashboard", path: "/admin-panel/dashboard", icon: FaHome },
+    { name: "Students", path: "/admin-panel/student", icon: FaUsers },
+    { name: "Teachers", path: "/admin-panel/teachers", icon: FaChalkboardTeacher },
+    { name: "Courses", path: "/admin-panel/courses", icon: FaBookOpen },
+    { name: "Fees", path: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave },
+  ];
+
+  const teacherLinks = [
+    { name: "Dashboard", path: "/teacher-panel/dashboard", icon: FaHome },
+    { name: "My Batches", path: "/teacher-panel/batches", icon: FaUsers },
+    { name: "Courses", path: "/teacher-panel/courses", icon: FaBookOpen },
+    { name: "Attendance", path: "/teacher-panel/mark-attendence", icon: FaCheckCircle },
+  ];
+
+  const currentNavLinks = !user
+    ? guestLinks
+    : user.role === "admin"
+    ? adminLinks
+    : user.role === "teacher"
+    ? teacherLinks
+    : studentLinks;
+
+  // Profile dropdown menu items
+  const profileItems = [
+    {
+      title: "Dashboard",
+      icon: FaHome,
+      href: `/${portalPath}/dashboard`,
+    },
+    {
+      title: "My Profile",
+      icon: FaUserCircle,
+      href: `/${portalPath}/profile`,
+    },
+    {
+      title: "Courses",
+      icon: FaBookOpen,
+      href: `/${portalPath}/courses`,
+    },
+    ...(portalPath === "student-profile"
+      ? [
+          {
+            title: "My Batches",
+            icon: FaUsers,
+            href: `/${portalPath}/batches`,
+          },
+          {
+            title: "Live Classes",
+            icon: FaVideo,
+            href: `/${portalPath}/classes`,
+          },
+        ]
+      : []),
+    ...(portalPath === "admin-panel"
+      ? [
+          {
+            title: "Students",
+            icon: FaUsers,
+            href: `/${portalPath}/student`,
+          },
+          {
+            title: "Teachers",
+            icon: FaChalkboardTeacher,
+            href: `/${portalPath}/teachers`,
+          },
+          {
+            title: "Fee Management",
+            icon: FaMoneyBillWave,
+            href: `/${portalPath}/fees/dashboard`,
+          },
+        ]
+      : []),
+    {
+      title: "Settings",
+      icon: FaCog,
+      href: `/${portalPath}/settings`,
+    },
+  ];
+
+  const handleLogout = () => {
+    setProfileOpen(false);
+    setOpen(false);
+    logoutMutation.mutate();
   };
 
-  document.addEventListener(
-    "mousedown",
-    handler
-  );
+  // Hide global website navbar on dedicated portal pages
+  if (
+    pathname?.startsWith("/admin-panel") ||
+    pathname?.startsWith("/student-profile") ||
+    pathname?.startsWith("/teacher-panel") ||
+    pathname?.startsWith("/teacher-profile")
+  ) {
+    return null;
+  }
 
-  return () =>
-    document.removeEventListener(
-      "mousedown",
-      handler
-    );
-
-}, []);
-const path =
-  user?.role === "admin"
-    ? "admin-panel"
-    : user?.role === "teacher"
-    ? "teacher-panel"
-    : "student-profile";
-
-const profileItems = [
-  {
-    title: "Dashboard",
-    icon: FaHome,
-    href: `/${path}/dashboard`,
-  },
-  {
-    title: "My Profile",
-    icon: FaUserCircle,
-    href: `/${path}/profile`,
-  },
-    {
-          title: "My Courses",
-          icon: FaBookOpen,
-          href: `/${path}/courses`,
-        },
-
-  ...(path === "student-profile"
-    ? [
-        {
-          title: "My Batches",
-          icon: FaUsers,
-          href: `/${path}/batches`,
-        }
-      ]
-    : []),
-  ...(path === "admin-panel"
-    ? [
-        {
-          title: "My Students",
-          icon: FaUsers,
-          href: `/${path}/student`,
-        }
-      ]
-    : []),
- 
-  {
-    title: "Settings",
-    icon: FaCog,
-    href: `/${path}/settings`,
-  },
-];
-const ProfileItem = ({
-  href,
-  icon: Icon,
-  title,
-}) => (
-  <Link
-    href={href}
-    className="flex items-center gap-4 rounded-xl px-4 py-3 transition hover:bg-orange-50"
-  >
-    <Icon className="text-[#D6451B]" />
-
-    <span className="text-sm font-medium">
-      {title}
-    </span>
-  </Link>
-);
-
-const handleLogout=()=>{
-logoutMutation.mutate()
-}
   return (
-<header
-  className={`fixed top-0 left-0 z-50 w-full border-b border-slate-200/60 transition-all ${
-    open
-      ? "bg-white"
-      : "bg-white/90 backdrop-blur-md"
-  }`}
->
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <img
-            src="/icon1.png"
-            alt="Inquisitive Mind Academy"
-            className="h-11 w-11 object-contain"
-          />
+    <header className="fixed top-0 left-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-xs transition-all">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-20">
+        {/* Brand Logo */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-[#D6451B] shadow-md shadow-orange-200/60 transition group-hover:scale-105">
+            <img
+              src="/icon1.png"
+              alt="MyAcademy"
+              className="h-8 w-8 object-contain"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+            <FaGraduationCap className="text-white text-xl" />
+          </div>
 
           <div>
-            <h2 className="text-sm font-bold text-slate-900">
-              My Academy
-            </h2>
-
-            <p className="text-[10px] tracking-[0.35em] text-[#D6451B]">
-              ACADEMY
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 group-hover:text-[#D6451B] transition">
+                MyAcademy
+              </h2>
+              <span className="hidden sm:inline-flex rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-extrabold text-[#D6451B] uppercase tracking-wider">
+                SaaS
+              </span>
+            </div>
+            <p className="text-[10px] font-medium tracking-[0.2em] text-[#D6451B] uppercase">
+              Academy Management
             </p>
           </div>
         </Link>
 
-        {/* Desktop Menu */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {links.map((item) => {
-  const Icon = item.icon;
-
-  return (
-    <Link
-      key={item.name}
-      href={item.path}
-      className="flex items-center gap-4 rounded-2xl px-4 py-4 hover:bg-orange-50"
-    >
-      <Icon className="text-[#D6451B]" />
-      {item.name}
-    </Link>
-  );
-})}
-        </nav>
-
-     {/* Desktop Actions */}
-<div className="hidden lg:flex items-center gap-5">
-
-  {!user ? (
-    <>
-      <Link
-        href="/login"
-        className="text-sm font-medium text-slate-600 transition hover:text-[#D6451B]"
-      >
-        Login
-      </Link>
-
-      <Link
-        href="/signup"
-        className="rounded-full bg-[#D6451B] px-6 py-2.5 text-sm font-semibold text-white transition hover:shadow-lg hover:shadow-orange-200"
-      >
-        Enroll Now
-      </Link>
-    </>
-  ) : (
-    <div
-      className="relative"
-      ref={profileRef}
-    >
-      {/* Profile Button */}
-      <button
-        onClick={() => setProfileOpen(!profileOpen)}
-        className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-2 transition hover:border-[#D6451B] hover:shadow-lg"
-      >
-        {user.profileImage ? (
-          <img
-            src={user?.profileImage?.url}
-            alt={user?.fullName}
-            className="h-11 w-11 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-[#D6451B] to-orange-500 text-lg font-bold text-white">
-            {user.fullName.charAt(0).toUpperCase()}
-          </div>
-        )}
-
-        <div className="hidden text-left xl:block">
-          <h3 className="text-sm font-semibold text-slate-900">
-            {capitalizeFirstLetter(user?.fullName)}
-          </h3>
-
-          <p className="text-xs capitalize text-slate-500">
-            {user.role}
-          </p>
-        </div>
-
-        <FaChevronDown
-          className={`text-sm text-slate-500 transition ${
-            profileOpen ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-
-      {/* Dropdown */}
-      <AnimatePresence>
-        {profileOpen && (
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 10,
-              scale: 0.98,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-            }}
-            exit={{
-              opacity: 0,
-              y: 10,
-              scale: 0.98,
-            }}
-           transition={{
-  duration: 0.2,
-  ease: "easeOut",
-}}
-            className="absolute right-0 mt-4 w-80 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl"
-          >
-            {/* Header */}
-<div className="bg-gradient-to-r from-[#D6451B] via-[#e65a2d] to-orange-500 p-6 text-white">
-
-  <div className="flex items-center gap-4">
-
-    {user?.profileImage?.url ? (
-      <img
-        src={user.profileImage.url}
-        className="h-16 w-16 rounded-full border-2 border-white object-cover"
-      />
-    ) : (
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-2xl font-bold backdrop-blur">
-        {user.fullName.charAt(0)}
-      </div>
-    )}
-
-    <div>
-
-      <h2 className="text-lg font-semibold">
-        {user.fullName}
-      </h2>
-
-      <p className="text-sm text-orange-100">
-        {user.email}
-      </p>
-
-      <span className="mt-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-medium capitalize">
-        {user.role}
-      </span>
-
-    </div>
-
-  </div>
-
-</div>
-<div className="space-y-1 p-3">
-
-  {profileItems?.map((item) => (
-    <ProfileItem
-      key={item.title}
-      {...item}
-    />
-  ))}
-
-</div>
-<div className="border-t border-slate-100 p-3">
-
-  <button
-  onClick={handleLogout}
-    className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-red-600 transition hover:bg-red-50"
-  >
-    <FaSignOutAlt />
-
-    <span  className="font-medium">
-      Logout
-    </span>
-
-  </button>
-
-</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )}
-</div>
-
-        {/* Mobile Toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="text-xl text-slate-900 lg:hidden"
-          aria-label="Toggle Menu"
-        >
-          {open ? <FaTimes /> : <FaBars />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-     <AnimatePresence>
-  {open && (
-    <motion.div
-      initial={{ x: "100%" }}
-      animate={{ x: 0 }}
-      exit={{ x: "100%" }}
-      transition={{ duration: 0.28 }}
-      className="fixed inset-0 z-[60] bg-white overf lg:hidden"
-    >
-      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-
-  <Link
-    href="/"
-    onClick={() => setOpen(false)}
-    className="flex items-center gap-3"
-  >
-    <img
-      src="/icon1.png"
-      className="h-10 w-10"
-    />
-
-    <div>
-
-      <h2 className="font-bold">
-        Inquisitive Mind
-      </h2>
-
-      <p className="text-[10px] tracking-[0.35em] text-[#D6451B]">
-        ACADEMY
-      </p>
-
-    </div>
-
-  </Link>
-
-  <button
-    onClick={() => setOpen(false)}
-    className="rounded-full p-2 hover:bg-slate-100"
-  >
-    <FaTimes size={22} />
-  </button>
-
-</div>
-<div className="px-6 pt-6">
-
-  {user ? (
-
-    <div className="rounded-3xl bg-gradient-to-r from-[#D6451B] via-[#e65a2d] to-orange-500 p-6 text-white shadow-xl">
-
-      <div className="flex items-center gap-4">
-
-        {user.profileImage.url ? (
-          <img
-            src={user.profileImage.url}
-            className="h-16 w-16 rounded-full border-2 border-white object-cover"
-          />
-        ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-2xl font-bold">
-            {user.fullName[0]}
-          </div>
-        )}
-
-        <div>
-
-          <h2 className="text-lg font-semibold">
-            {user.fullName}
-          </h2>
-
-          <p className="text-sm text-orange-100">
-            {user.email}
-          </p>
-
-          <span className="mt-2 inline-block rounded-full bg-white/20 px-3 py-1 text-xs capitalize">
-            {user.role}
-          </span>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  ) : (
-
-    <div className="space-y-3">
-
-      <Link
-        href="/login"
-        onClick={() => setOpen(false)}
-        className="block rounded-2xl border py-4 text-center font-semibold"
-      >
-        Login
-      </Link>
-
-      <Link
-        href="/signup"
-        onClick={() => setOpen(false)}
-        className="block rounded-2xl bg-[#D6451B] py-4 text-center font-semibold text-white"
-      >
-        Enroll Now
-      </Link>
-
-    </div>
-
-  )}
-
-</div>
-<div className="flex h-[calc(100vh-80px)] flex-col">
-
-  {/* Scrollable Content */}
-  <div className="flex-1 overflow-y-auto px-6 py-6">
-
-    <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
-      Navigation
-    </h3>
-
-    <div className="space-y-2">
-      {links.map((item) => (
-        <Link
-          key={item.name}
-          href={item.path}
-          onClick={() => setOpen(false)}
-          className="flex items-center rounded-2xl px-4 py-4 font-medium transition hover:bg-orange-50 hover:text-[#D6451B]"
-        >
-          {item.name}
-        </Link>
-      ))}
-    </div>
-
-    {user && (
-      <>
-        <h3 className="mt-8 mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
-          Account
-        </h3>
-
-        <div className="space-y-2">
-          {profileItems.map((item) => {
-            const Icon = item.icon;
-
+        {/* Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {currentNavLinks.map((item) => {
+            const isActive = pathname === item.path || (item.path !== "/" && pathname?.startsWith(item.path));
             return (
               <Link
-                key={item.title}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-4 rounded-2xl px-4 py-4 font-medium transition hover:bg-orange-50"
+                key={item.name}
+                href={item.path}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  isActive
+                    ? "bg-orange-50 text-[#D6451B] font-bold"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                }`}
               >
-                <Icon className="text-[#D6451B]" />
-
-                <span>{item.title}</span>
+                {item.icon && <item.icon className="text-sm opacity-80" />}
+                {item.name}
               </Link>
             );
           })}
+        </nav>
+
+        {/* Desktop User Actions */}
+        <div className="hidden lg:flex items-center gap-4">
+          {!user ? (
+            <div className="flex items-center gap-3">
+              <Link
+                href="/login"
+                className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-[#D6451B] hover:bg-orange-50"
+              >
+                Student Login
+              </Link>
+
+              <Link
+                href="/signup"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-500/20 transition hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/30"
+              >
+                <span>Enroll Now</span>
+              </Link>
+            </div>
+          ) : (
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-3 rounded-full border border-slate-200 bg-white p-1.5 pr-4 transition hover:border-[#D6451B] hover:shadow-md"
+              >
+                {user.profileImage?.url ? (
+                  <img
+                    src={user.profileImage.url}
+                    alt={user.fullName}
+                    className="h-9 w-9 rounded-full object-cover ring-2 ring-orange-100"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#D6451B] to-orange-500 text-sm font-bold text-white shadow-xs">
+                    {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
+
+                <div className="text-left">
+                  <p className="text-xs font-bold text-slate-800 leading-tight">
+                    {capitalizeFirstLetter(user?.fullName || "User")}
+                  </p>
+                  <p className="text-[10px] font-medium capitalize text-[#D6451B]">
+                    {user?.role} Portal
+                  </p>
+                </div>
+
+                <FaChevronDown
+                  className={`text-xs text-slate-400 transition-transform duration-200 ${
+                    profileOpen ? "rotate-180 text-[#D6451B]" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Profile Dropdown */}
+              <AnimatePresence>
+                {profileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="absolute right-0 mt-3 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl z-50"
+                  >
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-[#D6451B] via-orange-600 to-orange-500 p-4 text-white">
+                      <div className="flex items-center gap-3">
+                        {user.profileImage?.url ? (
+                          <img
+                            src={user.profileImage.url}
+                            alt=""
+                            className="h-12 w-12 rounded-full border-2 border-white object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-lg font-bold backdrop-blur">
+                            {user?.fullName?.charAt(0)?.toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <h3 className="truncate text-sm font-bold">
+                            {user?.fullName}
+                          </h3>
+                          <p className="truncate text-xs text-orange-100">
+                            {user?.email}
+                          </p>
+                          <span className="mt-1 inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
+                            {user?.role}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="p-2 space-y-1">
+                      {profileItems.map((item) => (
+                        <Link
+                          key={item.title}
+                          href={item.href}
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-[#D6451B]"
+                        >
+                          <item.icon className="text-[#D6451B] text-sm" />
+                          <span>{item.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Logout */}
+                    <div className="border-t border-slate-100 p-2">
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50"
+                      >
+                        <FaSignOutAlt className="text-sm" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
-      </>
-    )}
-  </div>
 
-  {/* Bottom */}
-  <div className="border-t border-slate-200 bg-white p-6">
+        {/* Mobile Header Buttons */}
+        <div className="flex items-center gap-2 lg:hidden">
+          {user ? (
+            <Link
+              href={`/${portalPath}/dashboard`}
+              className="flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-bold text-[#D6451B]"
+            >
+              <span>{user?.role}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-lg bg-[#D6451B] px-3.5 py-1.5 text-xs font-semibold text-white"
+            >
+              Login
+            </Link>
+          )}
 
-    {user ? (
-      <button onClick={handleLogout} className="flex w-full items-center justify-center gap-3 rounded-2xl border border-red-200 py-4 font-semibold text-red-600 transition hover:bg-red-50">
-        <FaSignOutAlt />
-        Logout
-      </button>
-    ) : (
-      <Link
-        href="/login"
-        className="block rounded-2xl bg-[#D6451B] py-4 text-center font-semibold text-white"
-      >
-        Login
-      </Link>
-    )}
+          <button
+            onClick={() => setOpen(!open)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:bg-slate-50"
+            aria-label="Toggle Navigation Menu"
+          >
+            {open ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
+          </button>
+        </div>
+      </div>
 
-    <p className="mt-6 text-center text-sm text-slate-400">
-      © 2026 Inquisitive Mind Academy
-    </p>
+      {/* Mobile Drawer Menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+            onClick={() => setOpen(false)}
+          >
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 350, damping: 35 }}
+              className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drawer Top */}
+              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white shadow-xs">
+                    <FaGraduationCap className="text-lg" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900">MyAcademy</h3>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#D6451B]">
+                      Academy Portal
+                    </p>
+                  </div>
+                </div>
 
-  </div>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+                >
+                  <FaTimes />
+                </button>
+              </div>
 
-</div>
-    </motion.div>
-  )}
-</AnimatePresence>
+              {/* Drawer User Card */}
+              <div className="p-5 border-b border-slate-100 bg-slate-50/70">
+                {user ? (
+                  <div className="rounded-2xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 text-white shadow-md">
+                    <div className="flex items-center gap-3">
+                      {user.profileImage?.url ? (
+                        <img
+                          src={user.profileImage.url}
+                          alt=""
+                          className="h-12 w-12 rounded-full border-2 border-white object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-lg font-bold">
+                          {user?.fullName?.charAt(0)?.toUpperCase()}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate font-bold text-white">
+                          {user?.fullName}
+                        </h4>
+                        <p className="truncate text-xs text-orange-100">
+                          {user?.email}
+                        </p>
+                        <span className="mt-1.5 inline-block rounded-full bg-white/25 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                          {user?.role} Portal
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-slate-500 text-center mb-3">
+                      Access your interactive batches, notes & study portal
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        href="/login"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center justify-center rounded-xl border border-slate-300 bg-white py-3 text-center text-sm font-bold text-slate-800 transition hover:border-[#D6451B]"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        href="/signup"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center justify-center rounded-xl bg-[#D6451B] py-3 text-center text-sm font-bold text-white shadow-xs transition hover:bg-orange-700"
+                      >
+                        Enroll Now
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
 
+              {/* Drawer Links */}
+              <div className="flex-1 px-4 py-4 space-y-6">
+                <div>
+                  <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                    {user ? `${user.role} Navigation` : "Explore Academy"}
+                  </p>
+                  <div className="space-y-1">
+                    {currentNavLinks.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.path}
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-[#D6451B]"
+                      >
+                        {item.icon && <item.icon className="text-[#D6451B] text-base" />}
+                        <span>{item.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {user && (
+                  <div>
+                    <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                      Account & Preferences
+                    </p>
+                    <div className="space-y-1">
+                      {profileItems.map((item) => (
+                        <Link
+                          key={item.title}
+                          href={item.href}
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-[#D6451B]"
+                        >
+                          <item.icon className="text-slate-400 text-sm" />
+                          <span>{item.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="border-t border-slate-200 p-4 bg-slate-50">
+                {user ? (
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white py-3 text-sm font-bold text-rose-600 transition hover:bg-rose-50"
+                  >
+                    <FaSignOutAlt />
+                    <span>Log Out</span>
+                  </button>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-xs text-slate-500">
+                      Need help enrolling? Call +91 98787 61488
+                    </p>
+                  </div>
+                )}
+                <p className="mt-3 text-center text-[10px] text-slate-400">
+                  © 2026 MyAcademy. All rights reserved.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

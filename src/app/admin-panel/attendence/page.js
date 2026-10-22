@@ -87,8 +87,8 @@ const percentage =
     if (isLoading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-28">
-      <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 py-3 sm:py-6">
+      <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-3 sm:px-6 lg:px-8">
                 {/* Back */}
 
         <button
@@ -105,11 +105,11 @@ const percentage =
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="
-            rounded-[32px]
+            rounded-2xl sm:rounded-3xl
             bg-gradient-to-r
             from-[#D6451B]
             to-orange-500
-            p-8
+            p-4 sm:p-6 lg:p-8
             text-white
             shadow-xl
           "
@@ -122,7 +122,7 @@ const percentage =
                 Attendance Details
               </span>
 
-              <h1 className="mt-5 text-4xl font-bold">
+              <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
                 {attendance?.batch?.name || "Batch Attendance"}
               </h1>
 
@@ -145,7 +145,7 @@ const percentage =
                 Attendance
               </p>
 
-              <h2 className="mt-2 text-5xl font-bold">
+              <h2 className="mt-2 text-2xl sm:text-4xl lg:text-5xl font-bold">
                 {percentage}%
               </h2>
 
@@ -160,7 +160,7 @@ const percentage =
 
         {/* Stats */}
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
 
           <StatCard
             title="Students"
@@ -238,7 +238,7 @@ const percentage =
           animate={{ opacity: 1, y: 0 }}
           className="
             overflow-hidden
-            rounded-3xl
+            rounded-xl sm:rounded-2xl
             border
             border-slate-200
             bg-white
@@ -248,7 +248,7 @@ const percentage =
 
           {/* Header */}
 
-          <div className="bg-gradient-to-r from-orange-50 to-white p-5">
+          <div className="bg-gradient-to-r from-orange-50 to-white p-3.5 sm:p-4">
 
             <div className="flex items-start gap-4">
 
@@ -257,7 +257,7 @@ const percentage =
                 <img
                   src={record.student.profileImage.url}
                   alt={record.student.fullName}
-                  className="h-16 w-16 rounded-2xl object-cover"
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover"
                 />
 
               ) : (
@@ -393,7 +393,7 @@ const percentage =
 
 <div className="hidden  lg:block">
 
-  <div className="overflow-hidden w-fit rounded-[28px] border border-slate-200 bg-white shadow-lg">
+  <div className="overflow-hidden w-fit rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-sm">
 
     <div className="overflow-x-auto">
 
@@ -462,8 +462,8 @@ const percentage =
                       <div
                         className="
                           flex
-                          h-14
-                          w-14
+                          h-9 sm:h-11
+                          w-9 sm:w-11
                           items-center
                           justify-center
                           rounded-2xl
@@ -682,7 +682,7 @@ const percentage =
         Overall Attendance
       </p>
 
-      <h3 className="mt-2 text-5xl font-bold text-[#D6451B]">
+      <h3 className="mt-2 text-2xl sm:text-4xl lg:text-5xl font-bold text-[#D6451B]">
         {percentage}%
       </h3>
 
@@ -878,13 +878,13 @@ function EmptyState() {
         flex-col
         items-center
         justify-center
-        rounded-[32px]
+        rounded-2xl sm:rounded-3xl
         border-2
         border-dashed
         border-slate-300
         bg-white
         px-6
-        py-20
+        py-10 sm:py-16
         text-center
       "
     >
@@ -933,11 +933,11 @@ function StatCard({
         duration: 0.2,
       }}
       className="
-        rounded-[30px]
+        rounded-xl sm:rounded-2xl
         border
         border-slate-200
         bg-white
-        p-6
+        p-3 sm:p-4
         shadow-sm
         transition-all
         hover:shadow-lg
@@ -946,8 +946,8 @@ function StatCard({
       <div
         className={`
           flex
-          h-14
-          w-14
+          h-9 sm:h-11
+          w-9 sm:w-11
           items-center
           justify-center
           rounded-2xl
@@ -958,11 +958,11 @@ function StatCard({
         {icon}
       </div>
 
-      <h2 className="mt-6 text-4xl font-bold text-slate-900">
+      <h2 className="mt-2.5 text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
         {value}
       </h2>
 
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="mt-0.5 text-xs font-semibold text-slate-500 truncate">
         {title}
       </p>
     </motion.div>

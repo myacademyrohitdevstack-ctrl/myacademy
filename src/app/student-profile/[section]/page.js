@@ -1,11 +1,12 @@
-import React from 'react'
-import StudentPortala from './StudentClient'
-import ProtectedRoute from '@/lib/ProtectedRoutes'
+import React from "react";
+import StudentPortal from "./StudentClient";
+import ProtectedRoute from "@/lib/ProtectedRoutes";
 
-export default async function page({params}) {
-  const {section}=await params
+export default async function Page({ params }) {
+  const { section } = await params;
   return (
-    <ProtectedRoute roles={["student"]}><StudentPortala section={section}></StudentPortala></ProtectedRoute>
-   
-  )
+    <ProtectedRoute roles={["student"]}>
+      <StudentPortal section={section} />
+    </ProtectedRoute>
+  );
 }

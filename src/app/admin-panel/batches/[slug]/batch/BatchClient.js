@@ -55,19 +55,19 @@ export default function BatchDetailsPage() {
  if(batchLoading) return <Loading></Loading> 
 
   return (
-    <div className="py-28">
-<div className="mx-auto max-w-7xl space-y-6 px-4  sm:px-6 lg:px-8">
+    <div className="py-2 sm:py-4">
+<div className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-3 sm:px-6 lg:px-8">
       {/* Hero */}
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="
-          rounded-[32px]
+          rounded-2xl sm:rounded-3xl
           bg-gradient-to-r
           from-[#D6451B]
           to-orange-500
-          p-8
+          p-4 sm:p-6 lg:p-8
           text-white
           shadow-xl
         "
@@ -78,7 +78,7 @@ export default function BatchDetailsPage() {
               Batch Details
             </span>
 
-            <h1 className="mt-5 text-4xl font-bold">
+            <h1 className="mt-4 sm:mt-5 text-2xl sm:text-3xl lg:text-4xl font-bold">
               {batch?.name}
             </h1>
 
@@ -107,7 +107,7 @@ export default function BatchDetailsPage() {
 
       {/* Stats */}
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
       
 
         <StatCard
@@ -1164,28 +1164,28 @@ export function StatCard({
     <motion.div
       whileHover={{ y: -5 }}
       className="
-        rounded-[30px]
+        rounded-xl sm:rounded-2xl
         border border-slate-200
         bg-white
-        p-6
+        p-3 sm:p-4
         shadow-lg
       "
     >
       <div
         className={`
-          flex h-14 w-14 items-center
-          justify-center rounded-2xl
-          text-2xl ${color}
+          flex h-9 w-9 sm:h-11 sm:w-11 items-center
+          justify-center rounded-xl
+          text-lg sm:text-xl ${color}
         `}
       >
         {icon}
       </div>
 
-      <h2 className="mt-6 text-4xl font-bold">
+      <h2 className="mt-2 sm:mt-3 text-lg sm:text-2xl font-bold">
         {value}
       </h2>
 
-      <p className="mt-2 text-slate-500">
+      <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-500 font-medium truncate">
         {title}
       </p>
     </motion.div>

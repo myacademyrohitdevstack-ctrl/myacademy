@@ -17,7 +17,7 @@ export default function EditBatchPage({batchId}) {
 const {data:batch}=useGetBatchById(batchId)
 const [trainers,seTtrainers]=useState([])
 const [students,setStudents]=useState([])
-const [selectedStudents, setSelectedStudents] = useState([]);
+const [studentCache, setStudentCache] = useState({});
   const { register, handleSubmit, watch,reset, setValue,formState:{isSubmitting,errors,isDirty} } = useForm({
     resolver:zodResolver(editBatchSchema),
     mode:"onBlur",
@@ -64,16 +64,36 @@ reset({
   trainers:
     batch?.trainers?.map((t) => t._id) || [],
 });
-setSelectedStudents(batch.students.map((t) => t._id) || []);
+setStudentCache(
+  Object.fromEntries(
+    (batch.students || []).map((student) => [
+      student._id,
+      student,
+    ])
+  )
+);
 },[batch,reset])
-useEffect(()=>{
-  console.log(studentsData)
-  if(!studentsData || !trainersData) return 
-  
-   seTtrainers(trainersData?.users)
-   setStudents(studentsData?.users)
-  
-},[trainersData,studentsData])
+useEffect(() => {
+
+  if (!studentsData || !trainersData) return;
+
+  seTtrainers(trainersData.users);
+
+  setStudents(studentsData.users);
+
+  setStudentCache((prev) => {
+
+    const next = { ...prev };
+
+    studentsData.users.forEach((student) => {
+      next[student._id] = student;
+    });
+
+    return next;
+
+  });
+
+}, [studentsData, trainersData]);
 
 
 const selectedStudentIds = watch("students") || [];
@@ -88,24 +108,25 @@ const addStudent = (student) => {
     { shouldDirty: true }
   );
 
-  setSelectedStudents((prev) => [
-    ...prev,
-    student,
-  ]);
+ setStudentCache((prev)=>({
+
+...prev,
+
+[student._id]:student
+
+}));
 };
 
 const removeStudent = (studentId) => {
+
   setValue(
     "students",
     selectedStudentIds.filter(
-      (id) => id !== studentId
+      id => id !== studentId
     ),
     { shouldDirty: true }
   );
 
-  setSelectedStudents((prev) =>
-    prev.filter((s) => s._id !== studentId)
-  );
 };
 
 
@@ -133,10 +154,10 @@ console.log(data)
 };
 if(isLoading) return
   return (
-    <div className="py-28 space-y-8">
+    <div className="py-2 sm:py-4 space-y-4 sm:space-y-6 px-3 sm:px-6">
       <div className="  max-w-7xl mx-auto">
-      <div className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white">
-        <h1 className="text-4xl font-bold">Edit Batch</h1>
+      <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Edit Batch</h1>
         <p className="mt-2 text-orange-100">
           Update batch details, students and trainers.
         </p>
@@ -144,7 +165,7 @@ if(isLoading) return
 
       <form onSubmit={handleSubmit(onSubmit,(error)=>console.log(error))} className="space-y-8">
         <div className="grid gap-8 ">
-          <div className="rounded-[32px] bg-white p-8 shadow-lg">
+          <div className="rounded-2xl sm:rounded-3xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm border border-slate-200">
             <h2 className="text-2xl font-bold mb-6">Batch Information</h2>
 
             <div className="space-y-5">
@@ -315,7 +336,7 @@ if(isLoading) return
             </div>
           </div>
 
-    <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg">
+    <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm">
   <div className="flex items-center justify-between">
     <div>
       <h2 className="text-2xl font-bold text-slate-900">
@@ -442,7 +463,7 @@ if(isLoading) return
 </div>
         </div>
 
- <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg">
+ <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm">
   <div className="flex items-center justify-between">
     <div>
       <h2 className="text-2xl font-bold text-slate-900">
@@ -463,9 +484,15 @@ if(isLoading) return
 
   <div className="mt-8 grid gap-4 md:grid-cols-2">
    
-      {selectedStudents.map((student) => (
+      {selectedStudentIds.map((id)=>{
+
+const student=studentCache[id];
+
+if(!student) return null;
+
+return(
         <div
-          key={student._id}
+          key={id}
           className="
             flex items-center justify-between
             rounded-3xl border border-slate-200
@@ -509,7 +536,7 @@ if(isLoading) return
             <FaTrash />
           </button>
         </div>
-      ))}
+      )})}
   </div>
 
   {/* Available Students */}

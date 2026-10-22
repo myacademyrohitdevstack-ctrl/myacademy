@@ -1,7 +1,7 @@
 import React from 'react'
 import UserDetailsPage from './UserDetailpage'
 
-export default async function page({params}) {
+export default async function Page({params}) {
   const {id}=await params
   if(!id) return
   return (

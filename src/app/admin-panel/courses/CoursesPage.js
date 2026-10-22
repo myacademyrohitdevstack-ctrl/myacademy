@@ -1,6 +1,6 @@
 "use client"
-import Courses from '@/app/admin-panel/courses/page'
 
+import Courses from '@/app/Components/Courses'
 import { useAdminGetAllCourses } from '@/Hooks/useAdminGetCourses'
 import { useAdminGetStats } from '@/Hooks/useAdminGetStats'
 import React from 'react'

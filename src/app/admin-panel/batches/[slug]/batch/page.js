@@ -1,12 +1,15 @@
 
 
 import React from 'react'
-import BatchDetailsPage from './BatchClient'
+import BatchDetailsPage from '@/app/Components/Batch'
 
 
-export default  function page() {
-
+export default function Page() {
+  const permissions={
+    canEdit:true,
+    canDelete:true
+  }
   return (
-   <BatchDetailsPage ></BatchDetailsPage>
+   <BatchDetailsPage permissions={permissions} ></BatchDetailsPage>
   )
 }

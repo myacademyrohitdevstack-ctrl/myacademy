@@ -3,7 +3,7 @@ import handleError from "@/Utils/handleError"
 
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { adminApproveUserApi, adminBlockUserApi, adminCreateStudent, adminDeleteAnnouncementApi, adminDeleteUserByIdApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
+import { adminApproveUserApi, adminBlockUserApi, adminCreateStudent, adminCreateTeacher, adminDeleteAnnouncementApi, adminDeleteUserByIdApi, adminGetUserById, adminRejectUserApi, adminUnblockUserApi, adminUpdateUserById } from "../api/adminApi"
 import queryClient from "@/lib/queryClient"
 import { useRouter } from "next/navigation"
 
@@ -128,6 +128,28 @@ export const useAdminCreateStuent=()=>{
 });
      toast.success(data.message)
      router.push('/admin-panel/student')
+
+        },
+     onError:(error)=> handleError(error)
+    
+
+    })
+}
+export const useAdminCreateTeacher=()=>{
+    const router=useRouter()
+    return useMutation({
+        mutationFn:async(data)=>{
+          const response=await  adminCreateTeacher(data)
+          return response.data
+        },
+         retry:false,
+         onSuccess:(data)=>{
+           
+            queryClient.invalidateQueries({
+  queryKey: ["Admin-Student-List"],
+});
+     toast.success(data.message)
+     router.push('/admin-panel/teachers')
 
         },
      onError:(error)=> handleError(error)

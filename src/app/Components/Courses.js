@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import {
   FaBookOpen,
-  FaSearch,
   FaPlus,
   FaUsers,
   FaClock,
@@ -12,441 +11,247 @@ import {
   FaEye,
   FaGraduationCap,
 } from "react-icons/fa";
-
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { useRouter } from "next/navigation";
-
 import CoursesSkeleton from "@/app/Skeletons/CourseSkeleton";
 
-export default function Courses({courses,courseLoading,stats,statsLoading,role,permission}) {
-  const router=useRouter()
-  
-if( courseLoading || statsLoading) return <CoursesSkeleton></CoursesSkeleton>
+export default function Courses({
+  courses,
+  courseLoading,
+  stats,
+  statsLoading,
+  role,
+  permission = {},
+}) {
+  const router = useRouter();
+
+  if (courseLoading || statsLoading) return <CoursesSkeleton />;
+
   return (
- <div className="mx-auto max-w-7xl space-y-6 px-4 py-28 sm:px-6 lg:px-8 ">
-
+    <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-3 py-3 sm:px-6 lg:px-8">
       {/* Hero */}
-
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-className="rounded-[24px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-5 text-white shadow-xl sm:p-8"      >
-
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
+      >
+        <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-
-            <span className="rounded-full bg-white/20 px-4 py-2 text-sm">
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
               Course Management
             </span>
 
-          <h1 className="mt-4 text-2xl font-bold sm:text-4xl">
+            <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
               Manage Courses
             </h1>
 
-            <p className="mt-3 max-w-2xl text-orange-100">
-              Create, edit and organize all academy courses, assign trainers,
-              manage pricing and monitor enrollments.
+            <p className="mt-2 text-xs sm:text-sm lg:text-base max-w-2xl text-orange-100 leading-relaxed font-normal">
+              Create, edit and organize academy courses, assign trainers, manage pricing and monitor student enrollments.
             </p>
-
           </div>
 
-          <button onClick={()=>{router.push(`/admin-panel/add-course`)}}  className="
-flex w-full items-center justify-center gap-3
-rounded-2xl bg-white px-6 py-4
-font-semibold text-[#D6451B]
-lg:w-auto
-">
-
-            <FaPlus />
-
-            Add Course
-
+          <button
+            onClick={() => router.push(`/${role === "admin" ? "admin-panel" : "teacher-panel"}/add-course`)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition lg:w-auto shrink-0"
+          >
+            <FaPlus className="text-xs" />
+            <span>Add Course</span>
           </button>
-
         </div>
-
       </motion.div>
 
       {/* Stats */}
-
-    <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
         <Stat
           title="Courses"
-          value={stats?.totalCourses}
+          value={stats?.totalCourses || 0}
           icon={<FaBookOpen />}
           color="bg-blue-50 text-blue-600"
         />
 
-    <Stat
+        <Stat
           title="Students"
-          value={stats?.totalStudents}
+          value={stats?.totalStudents || 0}
           icon={<FaUsers />}
           color="bg-green-50 text-green-600"
         />
 
-         { role==="admin" &&  <Stat
-          title="Trainers"
-          value={stats?.totalTeachers}
-          icon={<FaGraduationCap />}
-          color="bg-orange-50 text-[#D6451B]"
-        />}
+        {role === "admin" && (
+          <Stat
+            title="Trainers"
+            value={stats?.totalTeachers || 0}
+            icon={<FaGraduationCap />}
+            color="bg-orange-50 text-[#D6451B]"
+          />
+        )}
 
         <Stat
           title="Batches"
-         value={stats?.totalBatches}
+          value={stats?.totalBatches || 0}
           icon={<FaClock />}
           color="bg-purple-50 text-purple-600"
         />
-
       </div>
 
-      {/* Filters */}
-
-      {/* <div className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg">
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-
-          <div className="relative">
-
-            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"/>
-
-            <input
-              placeholder="Search courses..."
-              value={search}
-              onChange={(e)=>setSearch(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 py-3 pl-12 pr-4 outline-none focus:border-[#D6451B]"
-            />
-
-          </div>
-
-          <select className="rounded-2xl border border-slate-200 p-3">
-
-            <option>All Categories</option>
-
-            <option>English</option>
-
-            <option>IELTS</option>
-
-            <option>Professional</option>
-
-          </select>
-
-          <select className="rounded-2xl border border-slate-200 p-3">
-
-            <option>All Trainers</option>
-
-            <option>John Smith</option>
-
-            <option>Emma Johnson</option>
-
-          </select>
-
-      <button className="h-12 rounded-2xl bg-[#D6451B] text-white">
-            Apply Filters
-          </button>
-
-        </div>
-
-      </div> */}
-            {/* Courses Grid */}
-
-   <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-
-        {courses
-          ?.map((course) => (
-
+      {/* Courses Grid */}
+      <div className="grid gap-3.5 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {courses?.map((course) => (
           <motion.div
-  key={course._id}
-  whileHover={{ y: -5 }}
-  transition={{ duration: 0.25 }}
-  className="
-    overflow-hidden
-    rounded-3xl
-    border border-slate-200
-    bg-white
-    shadow-sm
-    transition-all
-    hover:shadow-xl
-  "
->
-  {/* Thumbnail */}
+            key={course._id}
+            whileHover={{ y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              {/* Thumbnail */}
+              <div className="relative h-36 sm:h-48 overflow-hidden bg-gradient-to-br from-[#D6451B] to-orange-500">
+                {course?.thumbnail?.url ? (
+                  <img
+                    src={course.thumbnail.url}
+                    alt={course.title}
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <FaBookOpen className="text-4xl sm:text-5xl text-white/50" />
+                  </div>
+                )}
 
-  <div className="relative h-44 overflow-hidden sm:h-52 bg-gradient-to-br from-[#D6451B] to-orange-500">
-    {course?.thumbnail?.url ? (
-      <img
-        src={course.thumbnail.url}
-        alt={course.title}
-        className="h-full w-full object-cover"
-      />
-    ) : (
-      <div className="flex h-full items-center justify-center">
-        <FaBookOpen className="text-6xl text-white/60" />
+                <span className="absolute left-3 top-3 rounded-full bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-[#D6451B] shadow-xs">
+                  {course?.category || "Course"}
+                </span>
+
+                <span
+                  className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold ${
+                    course?.enrollmentOpen
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {course?.enrollmentOpen ? "Open" : "Closed"}
+                </span>
+              </div>
+
+              {/* Content */}
+              <div className="p-3.5 sm:p-5">
+                <h2 className="line-clamp-2 text-sm sm:text-base font-bold text-slate-900">
+                  {capitalizeFirstLetter(course?.title)}
+                </h2>
+
+                <p className="mt-1.5 line-clamp-2 text-xs text-slate-500 min-h-[32px]">
+                  {course?.shortDescription || "Structured academy curriculum."}
+                </p>
+
+                {/* Metrics */}
+                <div className="mt-3.5 grid grid-cols-2 gap-2">
+                  <div className="rounded-xl bg-slate-50 p-2.5 border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-500">Price</p>
+                    <p className="mt-0.5 font-extrabold text-xs sm:text-sm text-[#D6451B]">
+                      ₹{course?.price || 0}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-slate-50 p-2.5 border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-500">Duration</p>
+                    <p className="mt-0.5 font-bold text-xs sm:text-sm text-slate-800">
+                      {course?.durationInMonths} Months
+                    </p>
+                  </div>
+                </div>
+
+                {/* Meta Pills */}
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+                  <span className="text-[11px] font-medium">Level: <strong className="capitalize text-slate-800">{course?.level}</strong></span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${
+                      course?.status === "published"
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                    }`}
+                  >
+                    {course?.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-3.5 sm:p-5 pt-0 border-t border-slate-100 mt-2 flex gap-2">
+              <button
+                onClick={() =>
+                  router.push(
+                    `/${role === "admin" ? "admin-panel" : "teacher-panel"}/batches/${course?.slug}`
+                  )
+                }
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-blue-50 py-2 sm:py-2.5 text-xs font-bold text-blue-600 hover:bg-blue-100 transition"
+                title="View Batches"
+              >
+                <FaEye className="text-xs" />
+                <span>Batches</span>
+              </button>
+
+              {permission.canEdit && (
+                <button
+                  className="flex items-center justify-center px-3 rounded-xl bg-orange-50 py-2 sm:py-2.5 text-xs font-bold text-[#D6451B] hover:bg-orange-100 transition"
+                  title="Edit Course"
+                >
+                  <FaEdit className="text-xs" />
+                </button>
+              )}
+
+              {permission.canDelete && (
+                <button
+                  className="flex items-center justify-center px-3 rounded-xl bg-red-50 py-2 sm:py-2.5 text-xs font-bold text-red-600 hover:bg-red-100 transition"
+                  title="Delete Course"
+                >
+                  <FaTrash className="text-xs" />
+                </button>
+              )}
+            </div>
+          </motion.div>
+        ))}
       </div>
-    )}
-
-    {/* Category */}
-
-    <span
-      className="
-        absolute left-4 top-4
-        rounded-full bg-white
-        px-3 py-1
-        text-xs font-semibold
-        text-[#D6451B]
-      "
-    >
-      {course?.category || "Course"}
-    </span>
-
-    {/* Enrollment */}
-
-    <span
-      className={`
-        absolute right-4 top-4
-        rounded-full px-3 py-1
-        text-xs font-semibold
-        ${
-          course?.enrollmentOpen
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-700"
-        }
-      `}
-    >
-      {course?.enrollmentOpen
-        ? "Open"
-        : "Closed"}
-    </span>
-  </div>
-
-  {/* Content */}
-
-  <div className="p-5">
-    {/* Title */}
-
-  <h2 className="line-clamp-2 text-lg font-bold text-slate-900 sm:text-xl">
-      {capitalizeFirstLetter(course?.title)}
-    </h2>
-
-    {/* Description */}
-
-    <p className="mt-3 min-h-15 line-clamp-3 text-sm text-slate-500">
-      {course?.shortDescription}
-    </p>
-
-    {/* Stats */}
-
-    <div className="mt-5 grid grid-cols-2 gap-3">
-      <div className="rounded-2xl bg-slate-50 p-3">
-        <p className="text-xs text-slate-500">
-          Price
-        </p>
-
-        <p className="mt-1 font-bold text-[#D6451B]">
-          ₹{course?.price}
-        </p>
-      </div>
-
-      <div className="rounded-2xl bg-slate-50 p-3">
-        <p className="text-xs text-slate-500">
-          Duration
-        </p>
-
-        <p className="mt-1 font-semibold">
-          {course?.durationInMonths} Months
-        </p>
-      </div>
-    </div>
-
-    {/* Meta */}
-
-    <div className="mt-5 space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-slate-500">
-          Level
-        </span>
-
-        <span className="rounded-lg bg-orange-50 px-3 py-1 text-sm font-medium text-[#D6451B] capitalize">
-          {course?.level}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-slate-500">
-          Language
-        </span>
-
-        <span className="font-medium">
-          {course?.language}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-slate-500">
-          Status
-        </span>
-
-        <span
-          className={`
-            rounded-lg px-3 py-1 text-sm font-medium capitalize
-            ${
-              course?.status === "published"
-                ? "bg-green-100 text-green-700"
-                : course?.status === "draft"
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-slate-100 text-slate-700"
-            }
-          `}
-        >
-          {course?.status}
-        </span>
-      </div>
-    </div>
-
-    {/* Tags */}
-
-   
-
-    {/* Actions */}
-
- <div className="mt-5 flex gap-2  border-t border-slate-100 pt-4">
-      <button
-        onClick={() =>
-          router.push(
-            `/${role==="admin"?"admin-panel":"teacher-panel"}/batches/${course?.slug}`
-          )
-        }
-        className="
-          flex-1 flex items-center justify-center gap-2
-          rounded-xl bg-blue-50 py-3
-          text-blue-600 w-full
-        "
-      >
-        <FaEye />
-      </button>
-
-      { permission.canEdit && <button
-        className="
-          flex flex-1 items-center justify-center gap-2
-          rounded-xl bg-orange-50 py-3
-          text-[#D6451B]
-        "
-      >
-        <FaEdit />
-      </button>}
-
-     {permission.canDelete && <button
-        className="
-          flex flex-1 items-center justify-center gap-2
-          rounded-xl bg-red-50 py-3
-          text-red-600
-        "
-      >
-        <FaTrash />
-      </button>}
-    </div>
-  </div>
-</motion.div>
-
-          ))}
-
-      </div>
-        
-
-  
-
-      {/* Pagination */}
-
-      {/* <div className="flex flex-col items-center justify-between gap-5 rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg md:flex-row">
-
-        <p className="text-sm text-slate-500">
-          Showing 1 - {courses?.length} of {courses?.length} Courses
-        </p>
-
-        <div className="flex gap-2">
-
-          <button className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
-
-            Previous
-
-          </button>
-
-          <button className="h-10 w-10 rounded-xl bg-[#D6451B] text-white">
-
-            1
-
-          </button>
-
-          <button className="rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
-
-            Next
-
-          </button>
-
-        </div>
-
-      </div> */}
 
       {/* Empty State */}
-
       {courses?.length === 0 && (
-
-        <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-5 py-14 text-center shadow-lg sm:py-20">
-
-          <FaBookOpen className="mx-auto text-6xl text-[#D6451B]" />
-
-          <h2 className="mt-6 text-3xl font-bold">
-
+        <div className="rounded-2xl sm:rounded-3xl border border-dashed border-slate-300 bg-white p-8 sm:p-14 text-center shadow-xs">
+          <FaBookOpen className="mx-auto text-4xl text-[#D6451B]" />
+          <h2 className="mt-3 text-lg sm:text-xl font-bold text-slate-800">
             No Courses Found
-
           </h2>
-
-          <p className="mx-auto mt-3 max-w-md text-slate-500">
-
-            There are currently no courses available.
-            Click below to create your first course.
-
+          <p className="mx-auto mt-1 max-w-sm text-xs sm:text-sm text-slate-500">
+            There are currently no courses created. Click below to add your first course.
           </p>
-
-          <button onClick={()=>{router.push('/admin-panel/add-course')}} className="mt-8 rounded-2xl bg-[#D6451B] px-8 py-4 text-white">
-
+          <button
+            onClick={() => router.push(`/${role === "admin" ? "admin-panel" : "teacher-panel"}/add-course`)}
+            className="mt-5 rounded-xl bg-[#D6451B] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-orange-600 transition"
+          >
             Add Course
-
           </button>
-
         </div>
-
       )}
-
     </div>
-
   );
-
 }
-
-/* ---------- Reusable Stat Card ---------- */
 
 function Stat({ title, value, icon, color }) {
   return (
     <motion.div
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.25 }}
-   className="rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6"
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
+      className="rounded-xl sm:rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-xs"
     >
       <div
-        className={`flex h-14 w-14 items-center justify-center rounded-2xl text-2xl ${color}`}
+        className={`flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl text-sm sm:text-lg font-bold ${color}`}
       >
         {icon}
       </div>
 
-<h2 className="mt-4 text-2xl font-bold text-slate-900 sm:text-4xl">
-        {value}
+      <h2 className="mt-2.5 text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+        {value !== undefined && value !== null ? value : 0}
       </h2>
 
-      <p className="mt-2 text-slate-500">
-        {title}
-      </p>
+      <p className="mt-0.5 text-xs font-semibold text-slate-500 truncate">{title}</p>
     </motion.div>
   );
 }

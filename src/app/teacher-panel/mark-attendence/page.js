@@ -1,7 +1,7 @@
 import AttendancePage from '@/app/Components/AddAttendance'
 import React from 'react'
 
-export default function page() {
+export default function Page() {
   return (
   <AttendancePage></AttendancePage>
   )

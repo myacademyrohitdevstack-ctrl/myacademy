@@ -32,13 +32,13 @@ const certificates = [
 
 export default function Certificates() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6">
 
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white shadow-xl"
+        className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
       >
         <div className="flex items-center gap-5">
 
@@ -48,7 +48,7 @@ export default function Certificates() {
 
           <div>
 
-            <h1 className="text-4xl font-bold">
+            <h1 className="text-2xl font-extrabold sm:text-3xl lg:text-4xl">
               My Certificates
             </h1>
 
@@ -72,11 +72,11 @@ export default function Certificates() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             whileHover={{ y: -5 }}
-            className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg"
+            className="overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-xs"
           >
 
             {/* Top */}
-            <div className="bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white">
+            <div className="bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 text-white">
 
               <div className="flex items-center justify-between">
 
@@ -100,7 +100,7 @@ export default function Certificates() {
 
             {/* Body */}
 
-            <div className="space-y-5 p-8">
+            <div className="space-y-4 p-4 sm:p-6">
 
               <Info
                 icon={<FaCalendarAlt />}

@@ -43,14 +43,14 @@ const stats = [
 
 export default function StudentProfile() {
   return (
-    <div className="space-y-8 max-w-7xl mx-auto py-20">
+    <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto py-2 sm:py-4 px-3 sm:px-6">
 
       {/* Hero */}
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[32px] bg-gradient-to-r from-[#D6451B] to-orange-500 p-8 text-white shadow-xl"
+        className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
       >
 
         <div className="flex flex-wrap items-center justify-between gap-6">
@@ -65,7 +65,7 @@ export default function StudentProfile() {
 
             </button>
 
-            <h1 className="text-4xl font-bold">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               Student Profile
             </h1>
 
@@ -89,13 +89,14 @@ export default function StudentProfile() {
 
       {/* Profile Card */}
 
-      <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm">
 
         <div className="flex flex-col gap-8 lg:flex-row">
 
           <img
             src="/student.jpg"
-            className="h-40 w-40 rounded-full object-cover border-4 border-orange-100"
+            alt="Student Avatar"
+            className="h-20 w-20 sm:h-32 sm:w-32 rounded-full object-cover border-4 border-orange-100"
           />
 
           <div className="flex-1">
@@ -154,27 +155,27 @@ export default function StudentProfile() {
 
       {/* Stats */}
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
 
         {stats.map((item) => (
 
           <motion.div
             whileHover={{ y: -5 }}
             key={item.title}
-            className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-lg"
+            className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-sm"
           >
 
-            <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-xl ${item.color}`}>
+            <div className={`flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl text-base sm:text-xl ${item.color}`}>
 
               {item.icon}
 
             </div>
 
-            <h2 className="mt-6 text-4xl font-bold">
+            <h2 className="mt-2 sm:mt-4 text-lg sm:text-2xl lg:text-3xl font-extrabold">
               {item.value}
             </h2>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-500 font-medium truncate">
               {item.title}
             </p>
 
@@ -196,7 +197,7 @@ export default function StudentProfile() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
           >
 
             <h2 className="text-2xl font-bold">
@@ -244,7 +245,7 @@ export default function StudentProfile() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
           >
 
             <h2 className="text-2xl font-bold">
@@ -282,7 +283,7 @@ export default function StudentProfile() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
           >
 
             <h2 className="text-2xl font-bold">
@@ -340,7 +341,7 @@ export default function StudentProfile() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
           >
 
             <h2 className="text-2xl font-bold">
@@ -393,7 +394,7 @@ export default function StudentProfile() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
           >
 
             <h2 className="text-2xl font-bold">
@@ -443,7 +444,7 @@ export default function StudentProfile() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
           >
 
             <h2 className="text-2xl font-bold">
@@ -490,7 +491,7 @@ export default function StudentProfile() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+          className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
         >
           <h2 className="text-2xl font-bold">
             Attendance History
@@ -546,7 +547,7 @@ export default function StudentProfile() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+          className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
         >
 
           <h2 className="text-2xl font-bold">
@@ -604,7 +605,7 @@ export default function StudentProfile() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+        className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
       >
 
         <div className="flex items-center justify-between">
@@ -659,7 +660,7 @@ export default function StudentProfile() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-lg"
+        className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
       >
 
         <h2 className="text-2xl font-bold">

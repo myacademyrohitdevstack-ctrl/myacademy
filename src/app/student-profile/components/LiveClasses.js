@@ -49,7 +49,7 @@ export default function LiveClasses() {
 
 if(batchLoading) return <Loading></Loading>
   return (
-<div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+<div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
   <div className="space-y-6 sm:space-y-8">
 
     {/* Hero */}
@@ -57,7 +57,7 @@ if(batchLoading) return <Loading></Loading>
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#D6451B] via-[#e85b2f] to-orange-500 p-5 text-white shadow-xl sm:p-8 lg:p-10"
+      className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#D6451B] via-[#e85b2f] to-orange-500 p-4 sm:p-6 lg:p-8 text-white shadow-lg"
     >
       {/* Background Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,.18),transparent_55%)]" />
@@ -71,7 +71,7 @@ if(batchLoading) return <Loading></Loading>
             Student Batch
           </span>
 
-          <h1 className="mt-4 break-words text-2xl font-bold leading-tight sm:text-3xl lg:text-5xl">
+          <h1 className="mt-3 break-words text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl">
             {batch?.name}
           </h1>
 
@@ -201,7 +201,7 @@ if(batchLoading) return <Loading></Loading>
            key={note._id}
            className="
              group overflow-hidden
-             rounded-3xl border border-slate-200
+             rounded-2xl sm:rounded-3xl border border-slate-200
              bg-white p-4 shadow-sm
              transition-all duration-300
              hover:-translate-y-1
@@ -761,7 +761,7 @@ if(batchLoading) return <Loading></Loading>
 
     {/* Progress */}
 
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-6 shadow-xs">
 
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-slate-800">
@@ -804,7 +804,7 @@ if(batchLoading) return <Loading></Loading>
 
     {/* Recent Attendance */}
 
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-xs">
 
       <div className="border-b border-slate-200 p-5">
         <h3 className="text-lg font-bold">
@@ -864,7 +864,7 @@ if(batchLoading) return <Loading></Loading>
           </h3>
 
           <p className="mt-2 max-w-sm text-center text-sm text-slate-500">
-            Your attendance hasn't been marked yet. Once your trainer records attendance, it will appear here.
+            Your attendance hasn&apos;t been marked yet. Once your trainer records attendance, it will appear here.
           </p>
 
         </div>
