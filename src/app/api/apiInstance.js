@@ -1,23 +1,22 @@
 import useAuthStore from "@/store/authStore";
 import axios from "axios";
-// import { queryClient } from "./queryClient";
-
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API,
   withCredentials: true,
+  timeout: 10000, // 10s default timeout to safeguard against mobile network hangs
 });
 
 // REQUEST interceptor
 api.interceptors.request.use((config) => {
-
-  const token = useAuthStore.getState().accessToken;;
+  const token = useAuthStore.getState().accessToken;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
 // RESPONSE interceptor
 api.interceptors.response.use(
   (response) => response,
@@ -25,20 +24,19 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-  
     if (
       error.response?.status === 403 &&
-      error.response?.data.code==="TOKEN-EXPIRE"&&
+      error.response?.data?.code === "TOKEN-EXPIRE" &&
       !originalRequest._retry &&
       originalRequest.url !== "/auth/refresh-token"
     ) {
       originalRequest._retry = true;
-      const login=useAuthStore.getState().login
-      const logout=useAuthStore.getState().logout
+      const login = useAuthStore.getState().login;
+      const logout = useAuthStore.getState().logout;
       try {
         const res = await api.post("/auth/refresh-token");
 
-      login({
+        login({
           user: res.data.user,
           accessToken: res.data.accessToken,
         });
@@ -55,8 +53,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
-
 
 export default api;
