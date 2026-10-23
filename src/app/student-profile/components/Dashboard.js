@@ -2,6 +2,8 @@
 
 import { useStudentsAllAnnouncements } from "@/Hooks/useStudentAllAnnoucements";
 import { useStudentsAllClasses } from "@/Hooks/useStudentAllClasses";
+import { useStudentStatics } from "@/Hooks/useStudentsStatics";
+import { useGetStudentAttendenceDashboard } from "@/Hooks/useStudentAttendanceDashboard";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { formatISTDateTime } from "@/Utils/formatDate";
 import { motion } from "framer-motion";
@@ -14,9 +16,13 @@ import {
   FaChalkboardTeacher,
   FaUsers,
   FaStickyNote,
-  FaFilePdf,
+  FaCalendarCheck,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaClock,
+  FaExclamationTriangle,
+  FaShieldAlt,
 } from "react-icons/fa";
-import { useStudentStatics } from "@/Hooks/useStudentsStatics";
 import CommingSoon from "@/app/Components/ui/CommingSoon";
 import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
 
@@ -24,33 +30,62 @@ export default function Dashboard({ user }) {
   const { data: announcements, isLoading: announcementsLoading } = useStudentsAllAnnouncements();
   const { data: classes, isLoading: classesLoading } = useStudentsAllClasses();
   const { data: statics, isLoading: staticsLoading } = useStudentStatics();
+  const { data: attendanceData, isLoading: attendanceLoading } = useGetStudentAttendenceDashboard();
+
+  if (announcementsLoading || classesLoading || staticsLoading || attendanceLoading) {
+    return <DashboardSkeleton />;
+  }
+
+  const attendanceStats = attendanceData?.stats || {};
+  const attendanceProgress = attendanceData?.progress || {};
+  const recentAttendance = attendanceData?.recentAttendance || [];
+  const attendanceInsights = attendanceData?.insights || {};
+
+  const attendancePercentage =
+    attendanceStats.attendancePercentage !== null && attendanceStats.attendancePercentage !== undefined
+      ? attendanceStats.attendancePercentage
+      : null;
+
+  const isEligible = attendancePercentage === null || attendancePercentage >= (attendanceProgress.requiredAttendance || 75);
 
   const stats = [
     {
-      title: "Classes",
-      value: statics?.classes || 0,
-      icon: <FaChalkboardTeacher />,
+      title: "Attendance Rate",
+      value: attendancePercentage !== null ? `${attendancePercentage}%` : "No Records",
+      sub: attendanceStats.totalClasses
+        ? `${attendanceStats.present || 0} / ${attendanceStats.totalClasses} Present`
+        : "Academic sessions",
+      icon: <FaCalendarCheck />,
+      highlight: true,
+      color:
+        attendancePercentage !== null
+          ? attendancePercentage >= 75
+            ? "text-emerald-600"
+            : "text-rose-600"
+          : "text-slate-800",
     },
     {
-      title: "Batches",
+      title: "Enrolled Batches",
       value: statics?.batches || 0,
+      sub: "Active cohorts",
       icon: <FaUsers />,
+      color: "text-slate-800",
     },
     {
-      title: "Notes",
-      value: statics?.notes || 0,
+      title: "Live Classes",
+      value: statics?.classes || 0,
+      sub: "Scheduled links",
+      icon: <FaChalkboardTeacher />,
+      color: "text-slate-800",
+    },
+    {
+      title: "Notes & PDFs",
+      value: (statics?.notes || 0) + (statics?.pdfs || 0),
+      sub: "Study resources",
       icon: <FaStickyNote />,
-    },
-    {
-      title: "PDF Resources",
-      value: statics?.pdfs || 0,
-      icon: <FaFilePdf />,
+      color: "text-slate-800",
     },
   ];
-
-  if (announcementsLoading || classesLoading || staticsLoading) {
-    return <DashboardSkeleton />;
-  }
 
   return (
     <div className="py-2 sm:py-4">
@@ -72,7 +107,7 @@ export default function Dashboard({ user }) {
               </h1>
 
               <p className="mt-2 text-xs sm:text-sm lg:text-base max-w-xl text-orange-100 font-normal leading-relaxed">
-                Continue your learning journey, attend scheduled live batches, and access chapter study materials.
+                Continue your learning journey, monitor your classroom attendance, attend scheduled live batches, and access chapter study materials.
               </p>
 
               <Link
@@ -84,32 +119,40 @@ export default function Dashboard({ user }) {
               </Link>
             </div>
 
+            {/* Attendance Quick Badge in Hero */}
             <div className="rounded-2xl bg-white/15 p-4 sm:p-5 backdrop-blur-md lg:w-80 shrink-0 border border-white/20">
-              <p className="text-xs uppercase font-semibold text-orange-100 tracking-wider">
-                Current Course
-              </p>
-
-              <h2 className="mt-1 text-lg sm:text-xl font-bold">
-                General English
-              </h2>
-
-              <p className="text-xs text-orange-100">
-                Intermediate Level
-              </p>
-
-              <div className="mt-3.5 h-2.5 overflow-hidden rounded-full bg-white/30">
-                <div className="h-full w-[78%] rounded-full bg-white" />
+              <div className="flex items-center justify-between text-xs uppercase font-semibold text-orange-100 tracking-wider">
+                <span>Attendance Status</span>
+                <FaCalendarCheck className="text-white/80" />
               </div>
 
-              <div className="mt-2 flex justify-between text-xs font-semibold">
-                <span>Progress</span>
-                <span>78%</span>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold">
+                  {attendancePercentage !== null ? `${attendancePercentage}%` : "--%"}
+                </span>
+                <span className="text-xs text-orange-100">
+                  {attendanceStats.totalClasses
+                    ? `${attendanceStats.present || 0}/${attendanceStats.totalClasses} attended`
+                    : "No records yet"}
+                </span>
+              </div>
+
+              <div className="mt-3.5 h-2.5 overflow-hidden rounded-full bg-white/30">
+                <div
+                  className="h-full rounded-full bg-white transition-all duration-500"
+                  style={{ width: `${Math.min(100, attendancePercentage || 0)}%` }}
+                />
+              </div>
+
+              <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-orange-100">
+                <span>75% Minimum Required</span>
+                <span>{isEligible ? "✓ Eligible" : "⚠️ Shortage"}</span>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
           {stats.map((item, index) => (
             <motion.div
@@ -124,62 +167,276 @@ export default function Dashboard({ user }) {
                 {item.icon}
               </div>
 
-              <h3 className="mt-2.5 text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+              <h3 className={`mt-2.5 text-lg sm:text-2xl font-extrabold tracking-tight ${item.color}`}>
                 {item.value}
               </h3>
 
-              <p className="mt-0.5 text-xs font-semibold text-slate-500 truncate">
+              <p className="mt-0.5 text-xs font-semibold text-slate-700 truncate">
                 {item.title}
+              </p>
+              <p className="text-[11px] text-slate-400 truncate">
+                {item.sub}
               </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Course + Classes */}
-        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-          {/* Current Course */}
-          <motion.div
-            whileHover={{ y: -3 }}
-            className="relative rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs overflow-hidden"
-          >
-            <CommingSoon />
-            <h2 className="text-base sm:text-xl font-bold text-slate-900">
-              Current Course
-            </h2>
-
-            <p className="mt-1 text-xs sm:text-sm text-slate-500">
-              General English • Intermediate
-            </p>
-
-            <div className="mt-4 h-2.5 rounded-full bg-orange-100 overflow-hidden">
-              <div className="h-full w-[78%] rounded-full bg-gradient-to-r from-[#D6451B] to-orange-400" />
-            </div>
-
-            <div className="mt-4 flex justify-between text-xs sm:text-sm">
+        {/* ATTENDANCE OVERVIEW SECTION */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-xs"
+        >
+          {/* Card Header */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-50 text-xl text-[#D6451B]">
+                <FaCalendarCheck />
+              </div>
               <div>
-                <p className="text-slate-500">Current Module</p>
-                <h3 className="font-bold text-slate-900 mt-0.5">Module 8 / 10</h3>
-              </div>
-
-              <div className="text-right">
-                <p className="text-slate-500">Completion</p>
-                <h3 className="font-bold text-[#D6451B] mt-0.5">78%</h3>
+                <h2 className="text-base sm:text-xl font-bold text-slate-900">
+                  Classroom Attendance Overview
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Official records marked by instructors across all your cohorts
+                </p>
               </div>
             </div>
 
-            <button className="mt-6 rounded-xl bg-[#D6451B] px-5 py-2.5 text-xs sm:text-sm font-bold text-white hover:opacity-90 transition">
-              Continue Course
-            </button>
-          </motion.div>
+            {/* Standing Badge */}
+            <div className="self-start sm:self-auto">
+              {attendancePercentage === null ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+                  <FaClock className="text-[11px]" />
+                  <span>No Records Recorded</span>
+                </span>
+              ) : attendancePercentage >= 75 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-700">
+                  <FaCheckCircle className="text-[11px] text-emerald-600" />
+                  <span>Eligible for Examinations (75%+ Met)</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-bold text-rose-700">
+                  <FaExclamationTriangle className="text-[11px] text-rose-600" />
+                  <span>Attendance Shortage (&lt;75% Threshold)</span>
+                </span>
+              )}
+            </div>
+          </div>
 
+          {/* Metric Highlights Row */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {/* Overall Rate */}
+            <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-4">
+              <span className="text-xs font-semibold text-slate-500">Overall Regularity</span>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className={`text-2xl sm:text-3xl font-extrabold ${
+                  attendancePercentage !== null
+                    ? attendancePercentage >= 75
+                      ? "text-emerald-600"
+                      : "text-rose-600"
+                    : "text-slate-700"
+                }`}>
+                  {attendancePercentage !== null ? `${attendancePercentage}%` : "N/A"}
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">rate</span>
+              </div>
+              <p className="mt-1 text-[11px] text-slate-400">
+                Min. 75% required for exam hall ticket
+              </p>
+            </div>
+
+            {/* Present Count */}
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-emerald-800">Attended Classes</span>
+                <FaCheckCircle className="text-xs text-emerald-600" />
+              </div>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-2xl sm:text-3xl font-extrabold text-emerald-700">
+                  {attendanceStats.present || 0}
+                </span>
+                <span className="text-[11px] text-emerald-600 font-medium">classes</span>
+              </div>
+              <p className="mt-1 text-[11px] text-emerald-600/80">
+                Marked present by faculty
+              </p>
+            </div>
+
+            {/* Absent Count */}
+            <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-rose-800">Missed Classes</span>
+                <FaTimesCircle className="text-xs text-rose-600" />
+              </div>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-2xl sm:text-3xl font-extrabold text-rose-700">
+                  {attendanceStats.absent || 0}
+                </span>
+                <span className="text-[11px] text-rose-600 font-medium">absences</span>
+              </div>
+              <p className="mt-1 text-[11px] text-rose-600/80">
+                {attendanceStats.absent > 0 ? "Leaves or unexcused" : "Zero missed classes 🎉"}
+              </p>
+            </div>
+
+            {/* Active Streak */}
+            <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-orange-900">Current Streak</span>
+                <FaFire className="text-xs text-[#D6451B]" />
+              </div>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-2xl sm:text-3xl font-extrabold text-[#D6451B]">
+                  {attendanceInsights.currentStreak || 0}
+                </span>
+                <span className="text-[11px] text-[#D6451B] font-medium">sessions</span>
+              </div>
+              <p className="mt-1 text-[11px] text-orange-700/80">
+                {attendanceInsights.currentStreak > 0 ? "Consecutive classes attended" : "Attend next class to start streak"}
+              </p>
+            </div>
+          </div>
+
+          {/* Visual Progress Bar with 75% target indicator */}
+          <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+            <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+              <span>Attendance Progress vs Mandatory 75% Benchmark</span>
+              <span className={attendancePercentage >= 75 ? "text-emerald-600 font-bold" : "text-rose-600 font-bold"}>
+                {attendancePercentage !== null ? `${attendancePercentage}% Recorded` : "No Sessions Recorded"}
+              </span>
+            </div>
+
+            <div className="relative mt-3 h-3 w-full rounded-full bg-slate-200 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${
+                  (attendancePercentage || 0) >= 75
+                    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                    : "bg-gradient-to-r from-rose-500 to-amber-500"
+                }`}
+                style={{ width: `${Math.min(100, attendancePercentage || 0)}%` }}
+              />
+              {/* 75% threshold marker line */}
+              <div
+                className="absolute top-0 bottom-0 w-0.5 bg-slate-900/60 z-10"
+                style={{ left: "75%" }}
+                title="75% Required Benchmark"
+              />
+            </div>
+
+            <div className="mt-1.5 flex justify-between text-[10px] text-slate-400 font-medium">
+              <span>0%</span>
+              <span className="font-bold text-slate-700">75% (Exam Threshold)</span>
+              <span>100%</span>
+            </div>
+          </div>
+
+          {/* Recent Attendance Log (Last 10 records) */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-xs sm:text-sm font-bold text-slate-800">
+                Recent Class Sessions Log
+              </h3>
+              <span className="text-[11px] font-medium text-slate-400">
+                Showing last {recentAttendance.length} records
+              </span>
+            </div>
+
+            {recentAttendance.length === 0 ? (
+              <div className="py-8 text-center">
+                <FaCalendarCheck className="mx-auto text-3xl text-orange-200" />
+                <h4 className="mt-2 text-xs sm:text-sm font-bold text-slate-700">
+                  No Attendance Records Yet
+                </h4>
+                <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
+                  Once your instructors start taking batch attendance, your day-by-day attendance history will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-3 divide-y divide-slate-100">
+                {recentAttendance.map((item, idx) => {
+                  const isPresent = item.status === "present";
+                  const isAbsent = item.status === "absent";
+                  const recordDate = item.date
+                    ? new Date(item.date).toLocaleDateString("en-IN", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "Date N/A";
+
+                  return (
+                    <div
+                      key={item.attendanceId || idx}
+                      className="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50/80 rounded-lg transition"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm ${
+                            isPresent
+                              ? "bg-emerald-50 text-emerald-600"
+                              : isAbsent
+                              ? "bg-rose-50 text-rose-600"
+                              : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {isPresent ? (
+                            <FaCheckCircle />
+                          ) : isAbsent ? (
+                            <FaTimesCircle />
+                          ) : (
+                            <FaClock />
+                          )}
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">
+                            {item.batchName || "Classroom Session"}
+                          </p>
+                          <p className="text-[11px] text-slate-400">
+                            {recordDate}
+                          </p>
+                        </div>
+                      </div>
+
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
+                          isPresent
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : isAbsent
+                            ? "bg-rose-50 text-rose-700 border border-rose-200"
+                            : "bg-slate-100 text-slate-600 border border-slate-200"
+                        }`}
+                      >
+                        {item.status || "Unmarked"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Classes + Announcements Row */}
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Upcoming Classes */}
           <motion.div
             whileHover={{ y: -3 }}
             className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs"
           >
-            <h2 className="text-base sm:text-xl font-bold text-slate-900">
-              Upcoming Classes
-            </h2>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FaVideo className="text-[#D6451B]" />
+                <h2 className="text-base sm:text-xl font-bold text-slate-900">
+                  Upcoming Classes
+                </h2>
+              </div>
+              <span className="text-xs font-bold text-slate-400">
+                {classes?.length || 0} Scheduled
+              </span>
+            </div>
 
             {classes?.length > 0 ? (
               <div className="mt-4 space-y-3">
@@ -223,52 +480,20 @@ export default function Dashboard({ user }) {
                   No Upcoming Classes
                 </h3>
                 <p className="mt-1 text-xs text-slate-500 max-w-xs mx-auto">
-                  There are no scheduled classes right now. Check back later for new sessions.
+                  There are no scheduled live sessions right now. Check back later for new meetings.
                 </p>
               </div>
             )}
           </motion.div>
-        </div>
-
-        {/* Bottom */}
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-          {/* Streak */}
-          <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs relative overflow-hidden">
-            <CommingSoon />
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-xl text-[#D6451B]">
-                <FaFire />
-              </div>
-
-              <div>
-                <h2 className="text-base sm:text-xl font-bold text-slate-900">
-                  15 Day Streak 🔥
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Keep learning every day.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-orange-100">
-              <div className="h-full w-4/5 bg-gradient-to-r from-[#D6451B] to-orange-400" />
-            </div>
-
-            <p className="mt-2 text-xs font-semibold text-slate-500">
-              Weekly Goal: 8 / 10 Lessons
-            </p>
-          </div>
 
           {/* Announcements */}
           <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
-            <div className="flex items-center justify-between gap-3">
-              <div>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FaBullhorn className="text-[#D6451B]" />
                 <h2 className="text-base sm:text-xl font-bold text-slate-900">
                   Latest Announcements
                 </h2>
-                <p className="text-xs text-slate-500">
-                  Important academy updates
-                </p>
               </div>
 
               <div className="rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-bold text-[#D6451B]">
@@ -323,7 +548,7 @@ export default function Dashboard({ user }) {
                     No Announcements
                   </h3>
                   <p className="mt-0.5 text-xs text-slate-400">
-                    You&apos;re all caught up.
+                    You&apos;re all caught up with academy updates.
                   </p>
                 </div>
               )}

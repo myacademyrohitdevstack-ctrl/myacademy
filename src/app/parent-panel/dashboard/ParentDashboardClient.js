@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -10,28 +10,27 @@ import {
   FaBookOpen,
   FaBullhorn,
   FaChalkboardTeacher,
-  FaExclamationCircle,
   FaCheckCircle,
   FaTimesCircle,
   FaArrowRight,
   FaClock,
-  FaPhoneAlt,
-  FaEnvelope,
   FaSpinner,
+  FaFire,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { useMyChildren, useChildDashboard, useChildFees } from "@/Hooks/useParent";
 import ChildSwitcher from "../components/ChildSwitcher";
 
 export default function ParentDashboardClient() {
   const { data: childrenList, isLoading: isChildrenLoading } = useMyChildren();
-  const [selectedChildId, setSelectedChildId] = useState("");
+  const [selectedChildIdState, setSelectedChildIdState] = useState("");
 
-  useEffect(() => {
-    if (childrenList && childrenList.length > 0 && !selectedChildId) {
-      const firstId = childrenList[0]?.user?._id || childrenList[0]?._id;
-      setSelectedChildId(firstId);
-    }
-  }, [childrenList, selectedChildId]);
+  // Derive active child ID to avoid setState inside useEffect
+  const selectedChildId =
+    selectedChildIdState ||
+    childrenList?.[0]?.user?._id ||
+    childrenList?.[0]?._id ||
+    "";
 
   const { data: dashboardData, isLoading: isDashboardLoading } =
     useChildDashboard(selectedChildId);
@@ -42,14 +41,10 @@ export default function ParentDashboardClient() {
   );
 
   // Compute fees summary
-  const totalBalance = feesData?.fees?.reduce(
-    (sum, f) => sum + (f.balanceAmount || 0),
-    0
-  ) || 0;
-  const totalPaid = feesData?.payments?.reduce(
-    (sum, p) => sum + (p.amount || 0),
-    0
-  ) || 0;
+  const totalBalance =
+    feesData?.fees?.reduce((sum, f) => sum + (f.balanceAmount || 0), 0) || 0;
+  const totalPaid =
+    feesData?.payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
 
   if (isChildrenLoading) {
     return (
@@ -78,20 +73,41 @@ export default function ParentDashboardClient() {
 
   const {
     student,
-    profile,
     batches = [],
     attendance = [],
-    attendancePercentage,
+    attendancePercentage: rawPercentage,
+    attendanceSummary = {},
     announcements = [],
   } = dashboardData || {};
 
+  // Compute or fallback attendance summary metrics
+  const presentCount =
+    attendanceSummary.present ??
+    attendance.filter((r) => r.status === "present").length;
+  const absentCount =
+    attendanceSummary.absent ??
+    attendance.filter((r) => r.status === "absent").length;
+  const totalMarked =
+    attendanceSummary.total ?? presentCount + absentCount;
+  const currentStreak = attendanceSummary.currentStreak ?? 0;
+
+  const attendancePercentage =
+    rawPercentage !== null && rawPercentage !== undefined
+      ? rawPercentage
+      : totalMarked > 0
+      ? Math.round((presentCount / totalMarked) * 100)
+      : null;
+
+  const isEligible =
+    attendancePercentage === null || attendancePercentage >= 75;
+
   return (
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
-      {/* Child Switcher Component (Shown if parent has multiple children) */}
+      {/* Child Switcher Component */}
       <ChildSwitcher
         childrenList={childrenList}
         selectedChildId={selectedChildId}
-        onSelect={(id) => setSelectedChildId(id)}
+        onSelect={(id) => setSelectedChildIdState(id)}
       />
 
       {/* Hero Header */}
@@ -150,18 +166,20 @@ export default function ParentDashboardClient() {
             <span className="text-xs font-semibold">Attendance Rate</span>
             <FaCalendarCheck className="text-xs text-[#D6451B]" />
           </div>
-          <h3 className={`mt-2 text-xl sm:text-2xl font-extrabold ${
-            attendancePercentage !== null && attendancePercentage !== undefined
-              ? attendancePercentage >= 75
-                ? "text-emerald-600"
-                : "text-amber-600"
-              : "text-slate-700"
-          }`}>
-            {attendancePercentage !== null && attendancePercentage !== undefined
-              ? `${attendancePercentage}%`
-              : "No Records"}
+          <h3
+            className={`mt-2 text-xl sm:text-2xl font-extrabold ${
+              attendancePercentage !== null
+                ? attendancePercentage >= 75
+                  ? "text-emerald-600"
+                  : "text-rose-600"
+                : "text-slate-700"
+            }`}
+          >
+            {attendancePercentage !== null ? `${attendancePercentage}%` : "No Records"}
           </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Last 30 class sessions</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">
+            {totalMarked > 0 ? `${presentCount} / ${totalMarked} classes present` : "No sessions recorded"}
+          </p>
         </div>
 
         {/* Enrolled Batches */}
@@ -182,9 +200,11 @@ export default function ParentDashboardClient() {
             <span className="text-xs font-semibold">Pending Dues</span>
             <FaMoneyBillWave className="text-xs text-[#D6451B]" />
           </div>
-          <h3 className={`mt-2 text-xl sm:text-2xl font-extrabold ${
-            totalBalance > 0 ? "text-rose-600" : "text-emerald-600"
-          }`}>
+          <h3
+            className={`mt-2 text-xl sm:text-2xl font-extrabold ${
+              totalBalance > 0 ? "text-rose-600" : "text-emerald-600"
+            }`}
+          >
             ₹{totalBalance.toLocaleString("en-IN")}
           </h3>
           <p className="text-[11px] text-slate-400 mt-0.5">
@@ -213,8 +233,215 @@ export default function ParentDashboardClient() {
       ) : (
         /* Main 2-Column Content */
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-3 w-full min-w-0">
-          {/* Left Column (2 cols): Batches & Recent Attendance */}
+          {/* Left Column (2 cols): Batches & ATTENDANCE OVERVIEW */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6 min-w-0">
+            {/* ENHANCED ATTENDANCE OVERVIEW CARD */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-lg text-[#D6451B]">
+                    <FaCalendarCheck />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                      Classroom Attendance Overview & Regularity
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Day-by-day attendance marked by faculty across all cohorts
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  {attendancePercentage === null ? (
+                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
+                      No Records
+                    </span>
+                  ) : attendancePercentage >= 75 ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
+                      <FaCheckCircle className="text-[10px]" />
+                      <span>Exam Eligible (75%+ Met)</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[11px] font-bold text-rose-700">
+                      <FaExclamationTriangle className="text-[10px]" />
+                      <span>Shortage Warning (&lt;75%)</span>
+                    </span>
+                  )}
+
+                  <Link
+                    href={`/parent-panel/attendance?childId=${selectedChildId}`}
+                    className="text-xs font-bold text-[#D6451B] hover:underline flex items-center gap-1 ml-2"
+                  >
+                    <span>View All</span>
+                    <FaArrowRight className="text-[10px]" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Attendance Quick Metrics Bar */}
+              <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                  <span className="text-[11px] font-medium text-slate-500">Overall Regularity</span>
+                  <p
+                    className={`mt-1 text-xl sm:text-2xl font-extrabold ${
+                      attendancePercentage !== null
+                        ? attendancePercentage >= 75
+                          ? "text-emerald-600"
+                          : "text-rose-600"
+                        : "text-slate-700"
+                    }`}
+                  >
+                    {attendancePercentage !== null ? `${attendancePercentage}%` : "N/A"}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Min 75% required</p>
+                </div>
+
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3">
+                  <span className="text-[11px] font-medium text-emerald-800">Attended Classes</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-emerald-700">
+                    {presentCount}
+                  </p>
+                  <p className="text-[10px] text-emerald-600 mt-0.5">Marked present</p>
+                </div>
+
+                <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-3">
+                  <span className="text-[11px] font-medium text-rose-800">Missed Sessions</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-rose-700">
+                    {absentCount}
+                  </p>
+                  <p className="text-[10px] text-rose-600 mt-0.5">Absences recorded</p>
+                </div>
+
+                <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-3">
+                  <span className="text-[11px] font-medium text-orange-900">Current Streak</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
+                    {currentStreak}
+                  </p>
+                  <p className="text-[10px] text-orange-700 mt-0.5">Consecutive days</p>
+                </div>
+              </div>
+
+              {/* Benchmark Progress Bar */}
+              <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                  <span>Regularity vs Mandatory 75% Requirement</span>
+                  <span
+                    className={
+                      attendancePercentage >= 75
+                        ? "text-emerald-600 font-bold"
+                        : "text-rose-600 font-bold"
+                    }
+                  >
+                    {attendancePercentage !== null
+                      ? `${attendancePercentage}% Attended`
+                      : "No Sessions"}
+                  </span>
+                </div>
+
+                <div className="relative mt-2.5 h-2.5 w-full rounded-full bg-slate-200 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${
+                      (attendancePercentage || 0) >= 75
+                        ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                        : "bg-gradient-to-r from-rose-500 to-amber-500"
+                    }`}
+                    style={{
+                      width: `${Math.min(100, attendancePercentage || 0)}%`,
+                    }}
+                  />
+                  {/* 75% marker line */}
+                  <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-slate-900/60 z-10"
+                    style={{ left: "75%" }}
+                    title="75% Required Benchmark"
+                  />
+                </div>
+
+                <div className="mt-1 flex justify-between text-[10px] text-slate-400">
+                  <span>0%</span>
+                  <span className="font-semibold text-slate-700">75% (Min. Benchmark)</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              {/* Attendance Shortage Alert if < 75% */}
+              {attendancePercentage !== null && attendancePercentage < 75 && (
+                <div className="mt-3.5 rounded-xl border border-rose-200 bg-rose-50/80 p-3 text-xs text-rose-800 flex items-start gap-2.5">
+                  <FaExclamationTriangle className="text-rose-600 mt-0.5 shrink-0 text-sm" />
+                  <div>
+                    <span className="font-bold">Attention Required:</span>
+                    <p className="mt-0.5 text-rose-700 leading-relaxed text-[11px]">
+                      Your child&apos;s attendance is currently below the academy&apos;s 75% mandatory threshold. Regular attendance is required to remain eligible for term examinations and certificates.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Recent Classroom Attendance List */}
+              <div className="mt-5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
+                  Recent Attendance Records
+                </h4>
+
+                {attendance.length === 0 ? (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    No attendance records recorded for this student yet.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {attendance.slice(0, 8).map((record, idx) => {
+                      const isPresent = record.status === "present";
+                      const isAbsent = record.status === "absent";
+                      const recordDate = record.date
+                        ? new Date(record.date).toLocaleDateString("en-IN", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "Date N/A";
+
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-3.5 py-2.5 text-xs hover:bg-slate-100/60 transition"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {isPresent ? (
+                              <FaCheckCircle className="text-emerald-500 text-sm shrink-0" />
+                            ) : isAbsent ? (
+                              <FaTimesCircle className="text-rose-500 text-sm shrink-0" />
+                            ) : (
+                              <FaClock className="text-slate-400 text-sm shrink-0" />
+                            )}
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-800 truncate">
+                                {record.batchName || "Classroom Session"}
+                              </p>
+                              <p className="text-[11px] text-slate-400">{recordDate}</p>
+                            </div>
+                          </div>
+
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider shrink-0 ${
+                              isPresent
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : isAbsent
+                                ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                : "bg-slate-100 text-slate-600"
+                            }`}
+                          >
+                            {record.status || "Unmarked"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Enrolled Batches */}
             <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -262,75 +489,6 @@ export default function ParentDashboardClient() {
                       )}
                     </div>
                   ))}
-                </div>
-              )}
-            </div>
-
-            {/* Recent 10 Attendance Records */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <FaCalendarCheck className="text-[#D6451B]" />
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Recent Classroom Attendance
-                  </h3>
-                </div>
-                <Link
-                  href={`/parent-panel/attendance?childId=${selectedChildId}`}
-                  className="text-xs font-bold text-[#D6451B] hover:underline flex items-center gap-1"
-                >
-                  <span>View All</span>
-                  <FaArrowRight className="text-[10px]" />
-                </Link>
-              </div>
-
-              {attendance.length === 0 ? (
-                <div className="py-8 text-center text-slate-500 text-xs">
-                  No attendance records recorded for this student yet.
-                </div>
-              ) : (
-                <div className="mt-3.5 space-y-2">
-                  {attendance.slice(0, 10).map((record, idx) => {
-                    const isPresent = record.status === "present";
-                    const isAbsent = record.status === "absent";
-                    const recordDate = record.date
-                      ? new Date(record.date).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "Date N/A";
-
-                    return (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 px-3.5 py-2.5 text-xs"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          {isPresent ? (
-                            <FaCheckCircle className="text-emerald-500 text-sm" />
-                          ) : isAbsent ? (
-                            <FaTimesCircle className="text-rose-500 text-sm" />
-                          ) : (
-                            <FaClock className="text-slate-400 text-sm" />
-                          )}
-                          <span className="font-bold text-slate-800">{recordDate}</span>
-                        </div>
-
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
-                            isPresent
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : isAbsent
-                              ? "bg-rose-50 text-rose-700 border border-rose-200"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          {record.status || "Unmarked"}
-                        </span>
-                      </div>
-                    );
-                  })}
                 </div>
               )}
             </div>
