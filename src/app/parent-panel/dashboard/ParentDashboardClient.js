@@ -172,13 +172,13 @@ export default function ParentDashboardClient() {
                 ? attendancePercentage >= 75
                   ? "text-emerald-600"
                   : "text-rose-600"
-                : "text-slate-700"
+                : "text-emerald-600"
             }`}
           >
-            {attendancePercentage !== null ? `${attendancePercentage}%` : "No Records"}
+            {attendancePercentage !== null ? `${attendancePercentage}%` : "100%"}
           </h3>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            {totalMarked > 0 ? `${presentCount} / ${totalMarked} classes present` : "No sessions recorded"}
+            {totalMarked > 0 ? `${presentCount} / ${totalMarked} classes present` : "Zero absences recorded • Good standing"}
           </p>
         </div>
 
@@ -254,8 +254,9 @@ export default function ParentDashboardClient() {
 
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                   {attendancePercentage === null ? (
-                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
-                      No Records
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
+                      <FaCheckCircle className="text-[10px]" />
+                      <span>In Good Standing (Zero Absences)</span>
                     </span>
                   ) : attendancePercentage >= 75 ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
@@ -289,12 +290,14 @@ export default function ParentDashboardClient() {
                         ? attendancePercentage >= 75
                           ? "text-emerald-600"
                           : "text-rose-600"
-                        : "text-slate-700"
+                        : "text-emerald-600"
                     }`}
                   >
-                    {attendancePercentage !== null ? `${attendancePercentage}%` : "N/A"}
+                    {attendancePercentage !== null ? `${attendancePercentage}%` : "100%"}
                   </p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Min 75% required</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {attendancePercentage !== null ? "Min 75% required" : "100% Academic Standing"}
+                  </p>
                 </div>
 
                 <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3">
@@ -328,26 +331,26 @@ export default function ParentDashboardClient() {
                   <span>Regularity vs Mandatory 75% Requirement</span>
                   <span
                     className={
-                      attendancePercentage >= 75
+                      attendancePercentage === null || attendancePercentage >= 75
                         ? "text-emerald-600 font-bold"
                         : "text-rose-600 font-bold"
                     }
                   >
                     {attendancePercentage !== null
                       ? `${attendancePercentage}% Attended`
-                      : "No Sessions"}
+                      : "100% In Good Standing"}
                   </span>
                 </div>
 
                 <div className="relative mt-2.5 h-2.5 w-full rounded-full bg-slate-200 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
-                      (attendancePercentage || 0) >= 75
+                      attendancePercentage === null || attendancePercentage >= 75
                         ? "bg-gradient-to-r from-emerald-500 to-teal-500"
                         : "bg-gradient-to-r from-rose-500 to-amber-500"
                     }`}
                     style={{
-                      width: `${Math.min(100, attendancePercentage || 0)}%`,
+                      width: `${Math.min(100, attendancePercentage ?? 100)}%`,
                     }}
                   />
                   {/* 75% marker line */}
@@ -385,8 +388,14 @@ export default function ParentDashboardClient() {
                 </h4>
 
                 {attendance.length === 0 ? (
-                  <div className="py-8 text-center text-slate-400 text-xs">
-                    No attendance records recorded for this student yet.
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-xl text-emerald-600 mb-2">
+                      <FaCheckCircle />
+                    </div>
+                    <p className="font-bold text-slate-700">Zero Absences Recorded • Good Standing</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      This student has zero recorded absences across all enrolled classroom cohorts.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-2">

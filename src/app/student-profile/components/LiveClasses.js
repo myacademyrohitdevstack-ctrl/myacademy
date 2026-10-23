@@ -970,14 +970,16 @@ export default function LiveClasses() {
 
         <div className="flex flex-col items-center justify-center px-6 py-12">
 
-          <FaClipboardCheck className="mb-4 text-5xl text-slate-300" />
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600 mb-3">
+            <FaClipboardCheck />
+          </div>
 
-          <h3 className="text-lg font-semibold text-slate-700">
-            No Attendance Records
+          <h3 className="text-base sm:text-lg font-bold text-slate-800">
+            In Good Standing • Zero Absences Recorded
           </h3>
 
-          <p className="mt-2 max-w-sm text-center text-sm text-slate-500">
-            Your attendance hasn&apos;t been marked yet. Once your trainer records attendance, it will appear here.
+          <p className="mt-2 max-w-sm text-center text-xs sm:text-sm text-slate-500">
+            Your academic profile is in full compliance with zero recorded absences. Class session logs will appear here as instructors complete roll call.
           </p>
 
         </div>

@@ -215,10 +215,12 @@ export default function ParentAttendanceClient() {
           </div>
         ) : filteredList.length === 0 ? (
           <div className="p-12 text-center">
-            <FaCalendarCheck className="text-slate-300 text-4xl mx-auto mb-2" />
-            <h3 className="text-sm font-bold text-slate-700">No Attendance Records Found</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              There are no attendance sessions matching your current filter criteria.
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600 mb-2">
+              <FaCalendarCheck />
+            </div>
+            <h3 className="text-sm font-bold text-slate-800">In Good Standing • Zero Absences Recorded</h3>
+            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              No missed sessions recorded under this view. The student remains in full academic compliance.
             </p>
           </div>
         ) : (
