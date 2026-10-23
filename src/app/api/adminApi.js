@@ -36,6 +36,11 @@ export  function adminGetStats(){
     return api.get(`/admin/dashboard-stats`)
 }
 
+// SaaS Plan Subscription Usage
+export function adminGetSubscriptionUsageApi() {
+    return api.get(`/admin/subscription-usage`);
+}
+
 //batches
 export  function adminGetBatchApi(slug){
     return api.get(`/batches/${slug}/batches`)
@@ -83,4 +88,3 @@ export function adminBulkCreateStudents(data) {
 export function adminBulkCreateTeachers(data) {
   return api.post(`/admin/bulk-create-teachers`, data);
 }
-
