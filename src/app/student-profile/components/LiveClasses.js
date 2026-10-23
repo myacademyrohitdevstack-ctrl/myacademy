@@ -3,7 +3,7 @@
 import { useGetStudentClassLInks } from "@/Hooks/useGetStudentClassLinks";
 import { useGetStudentNotes } from "@/Hooks/useGetStudentNotes";
 import { motion } from "framer-motion";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Modal from "@/app/Components/ui/Modals";
 import dynamic from "next/dynamic";
@@ -31,9 +31,12 @@ import {
   FaClipboardCheck,
   FaCheck,
   FaTimes,
+  FaExclamationTriangle,
+  FaLayerGroup,
 } from "react-icons/fa";
 import { formatISTDateTime } from "@/Utils/formatDate";
 import { useGetStudentBatchById } from "@/Hooks/useGetStudentBatchById";
+import { useGetStudentBatches } from "@/Hooks/useGetStudentBatches";
 import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
 import { useAnnouncementByBatchId } from "@/Hooks/useAnnouncementByBatchId";
 import Loading from "@/app/Components/ui/Loading";
@@ -45,25 +48,93 @@ import { useGetStudentAttendenceDashboard } from "@/Hooks/useStudentAttendanceDa
 
 
 export default function LiveClasses() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(tabParam || "notes");
+  const [internalTab, setInternalTab] = useState("notes");
+  const activeTab = tabParam || internalTab;
+  const setActiveTab = setInternalTab;
   const batchId = searchParams.get("batchId");
 
-  useEffect(() => {
-    if (tabParam) {
-      setActiveTab(tabParam);
-    }
-  }, [tabParam]);
-  const {data:classLinks,isLoading:classLoading}=useGetStudentClassLInks(batchId,activeTab)
-  const {data:notes,isLoading:notesLoading}=useGetStudentNotes(batchId,activeTab)
-  const {data:batch,isLoading:batchLoading}=useGetStudentBatchById(batchId)
-    const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
-    const {data:attendance}=useGetStudentAttendenceDashboard()
-   const [pdfOpen,setPdfOpen]=useState(false)
-    const [pdfUrl,setPdfUrl]=useState("")
+  const { data: studentBatches, isLoading: batchesLoading } = useGetStudentBatches();
+  const { data: classLinks, isLoading: classLoading } = useGetStudentClassLInks(batchId, activeTab);
+  const { data: notes, isLoading: notesLoading } = useGetStudentNotes(batchId, activeTab);
+  const { data: batch, isLoading: batchLoading, isError: batchError } = useGetStudentBatchById(batchId);
+  const { data: announcements, isLoading: annoucementLoading } = useAnnouncementByBatchId(batchId, activeTab);
+  const { data: attendance } = useGetStudentAttendenceDashboard();
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState("");
 
-if(batchLoading) return <Loading></Loading>
+  // Auto-route to first batch if batchId not specified in URL
+  useEffect(() => {
+    if (!batchId && studentBatches?.length > 0) {
+      router.replace(`/student-profile/classes?batchId=${studentBatches[0]._id}`);
+    }
+  }, [batchId, studentBatches, router]);
+
+  if (batchLoading || (batchesLoading && !batchId)) return <Loading />;
+
+  // Case 1: Student has no assigned batches
+  if (!batchId && studentBatches?.length === 0) {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 py-12 text-center">
+        <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-8 sm:p-12 shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100 text-[#D6451B]">
+            <FaLayerGroup className="text-xl" />
+          </div>
+          <h2 className="mt-4 text-xl sm:text-2xl font-extrabold text-slate-900">
+            No Batches Assigned
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">
+            You are not currently enrolled in any active cohorts. When an administrator assigns you to a batch, its classes, notes, and schedules will appear here.
+          </p>
+          <div className="mt-6">
+            <button
+              onClick={() => router.push("/student-profile/dashboard")}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#D6451B] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#b93814] transition cursor-pointer"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Case 2: Inaccessible / Not found batch (e.g. cross-academy or deleted)
+  if (batchId && (batchError || !batch)) {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 py-12 text-center">
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+            <FaExclamationTriangle className="text-2xl" />
+          </div>
+          <h2 className="mt-5 text-xl sm:text-2xl font-extrabold text-slate-900">
+            Batch Not Found or Inaccessible
+          </h2>
+          <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+            The requested batch does not exist in your academy, or you do not have permission to access it. If you were sent this link from another academy or switched accounts, please return to your assigned cohorts.
+          </p>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => router.push("/student-profile/batches")}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#D6451B] px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-[#b93814] transition cursor-pointer"
+            >
+              <FaLayerGroup className="text-xs" />
+              <span>View My Batches</span>
+            </button>
+            <button
+              onClick={() => router.push("/student-profile/dashboard")}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
 <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
   <div className="space-y-6 sm:space-y-8">
@@ -209,9 +280,9 @@ if(batchLoading) return <Loading></Loading>
  
      {/* Notes Grid */}
  
-     <div className="mt-6 grid gap-5 md:grid-cols-2">
- 
-       {notes.map((note) => (
+     {notes?.length > 0 ? (
+       <div className="mt-6 grid gap-5 md:grid-cols-2">
+         {notes.map((note) => (
  
          <div
            key={note._id}
@@ -369,6 +440,14 @@ if(batchLoading) return <Loading></Loading>
        ))}
  
      </div>
+   ) : (
+     <div className="mt-6 rounded-2xl border border-dashed border-slate-300 py-12 text-center">
+       <h3 className="text-lg font-semibold text-slate-800">No Study Notes Yet</h3>
+       <p className="mt-2 text-sm text-slate-500">
+         Your instructors have not posted any notes for this batch yet.
+       </p>
+     </div>
+   )}
    </>
  )} {notesLoading && <NotesSkeleton></NotesSkeleton>}
  

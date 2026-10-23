@@ -15,6 +15,7 @@ import {
   FaSpinner,
   FaBullhorn,
   FaFileExcel,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import BulkImportModal from "@/app/Components/BulkImportModal";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -51,17 +52,13 @@ export default function BatchDetailsPage() {
     const searchParams = useSearchParams();
     const batchId = searchParams.get("batchId");
     const tabParam = searchParams.get("tab");
-    const [activeTab, setActiveTab] = useState(tabParam || "notes");
-
-    useEffect(() => {
-      if (tabParam) {
-        setActiveTab(tabParam);
-      }
-    }, [tabParam]);
+    const [internalTab, setInternalTab] = useState("notes");
+    const activeTab = tabParam || internalTab;
+    const setActiveTab = setInternalTab;
     const {data:notes,isLoading:notesLoading}=useAdminGetAllNotes(batchId,activeTab)
     const {data:classLinks,isLoading:classLoading}=useAdminGetAllLinks(batchId,activeTab)
-  const {data:batch,isLoading:batchLoading}=useAdminGetBatche(batchId)
-  const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
+    const {data:batch,isLoading:batchLoading,isError:batchError}=useAdminGetBatche(batchId)
+    const {data:announcements,isLoading:annoucementLoading}=useAnnouncementByBatchId(batchId,activeTab)
     const [pdfOpen,setPdfOpen]=useState(false)
     const [pdfUrl,setPdfUrl]=useState("")
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -72,7 +69,40 @@ export default function BatchDetailsPage() {
     const deleteClassLinkMutation=useDeleteClassLinkMutation()
     const deleteAnnoucementMutation=useDeleteAnnouncementtMutation()
     const deleteAttendance=useDeleteAttendance()
- if(batchLoading) return <BatchDetailsSkeleton /> 
+    if(batchLoading) return <BatchDetailsSkeleton /> 
+
+    if (!batchId || batchError || (!batchLoading && !batch)) {
+      return (
+        <div className="mx-auto w-full max-w-2xl px-4 py-12 text-center">
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+              <FaExclamationTriangle className="text-2xl" />
+            </div>
+            <h2 className="mt-5 text-xl sm:text-2xl font-extrabold text-slate-900">
+              Batch Not Found or Inaccessible
+            </h2>
+            <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+              This batch could not be found in your academy. It may have been deleted, or you might be logged into an account from a different academy.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => router.push("/admin-panel/courses")}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#D6451B] px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-[#b93814] transition cursor-pointer"
+              >
+                <FaBookOpen className="text-xs" />
+                <span>Back to Courses</span>
+              </button>
+              <button
+                onClick={() => router.push("/admin-panel/dashboard")}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+              >
+                Go to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    } 
 
   return (
     <div className="py-2 sm:py-4">
@@ -270,9 +300,9 @@ export default function BatchDetailsPage() {
 
     {/* Notes Grid */}
 
-    <div className="mt-6 grid gap-5 md:grid-cols-2">
-
-      {notes.map((note) => (
+    {notes?.length > 0 ? (
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        {notes.map((note) => (
 
         <div
           key={note._id}
@@ -466,6 +496,14 @@ export default function BatchDetailsPage() {
       ))}
 
     </div>
+  ) : (
+    <div className="mt-6 rounded-2xl border border-dashed border-slate-300 py-12 text-center">
+      <h3 className="text-lg font-semibold text-slate-800">No Study Notes Yet</h3>
+      <p className="mt-2 text-sm text-slate-500">
+        No notes have been added to this batch yet.
+      </p>
+    </div>
+  )}
   </>
 )}
 {notesLoading && <NotesSkeleton></NotesSkeleton>}
