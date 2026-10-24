@@ -1135,18 +1135,20 @@ export default function BatchDetailsPage({permissions}) {
                 </div>
 
                 <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end shrink-0">
-                  {permissions.canEdit && (
-                    <button
-                      onClick={() => {
-                        router.push(`/admin-panel/attendence?attendanceId=${item._id}`);
-                      }}
-                      className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-600 hover:bg-blue-100 transition shadow-xs cursor-pointer"
-                      title="View attendance details"
-                    >
-                      <FaEye className="text-xs" />
-                      <span>View</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={() => {
+                      router.push(
+                        user?.role === "teacher"
+                          ? `/teacher-panel/attendence?attendanceId=${item._id}`
+                          : `/admin-panel/attendence?attendanceId=${item._id}`
+                      );
+                    }}
+                    className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-600 hover:bg-blue-100 transition shadow-xs cursor-pointer"
+                    title="View attendance details"
+                  >
+                    <FaEye className="text-xs" />
+                    <span>View</span>
+                  </button>
 
                   {permissions.canDelete && (
                     <button

@@ -47,7 +47,7 @@ export default function Dashboard({
     },
     {
       action: "Announcement",
-      path: "/admin-panel/add-announcement",
+      path: `/${role === "teacher" ? "teacher" : "admin"}-panel/add-announcement`,
       permission: "canAddAnnouncement",
     },
   ];
@@ -292,22 +292,30 @@ export default function Dashboard({
           {/* Mobile Cards */}
           <div className="mt-4 space-y-3 sm:hidden">
             {recentStudents?.length > 0 ? (
-              recentStudents.map((item) => (
-                <div
-                  key={item?._id || item?.student?.email}
-                  className="rounded-xl border border-slate-100 bg-slate-50/70 p-3"
-                >
-                  <p className="font-bold text-xs text-slate-900">
-                    {item?.student?.fullName}
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    {item?.student?.email}
-                  </p>
-                  <p className="mt-1 text-[11px] font-semibold text-slate-600">
-                    Course: {item?.course?.title}
-                  </p>
-                </div>
-              ))
+              recentStudents.map((item, index) => {
+                const studentName = item?.student?.fullName || item?.fullName || item?.name || "Enrolled Student";
+                const studentEmail = item?.student?.email || item?.email || "";
+                const courseTitle = typeof item?.course === "object" ? (item?.course?.title || "General Cohort") : (item?.course || item?.batch || "General Cohort");
+
+                return (
+                  <div
+                    key={item?._id || item?.id || studentEmail || index}
+                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-3"
+                  >
+                    <p className="font-bold text-xs text-slate-900">
+                      {studentName}
+                    </p>
+                    {studentEmail && (
+                      <p className="text-[11px] text-slate-400">
+                        {studentEmail}
+                      </p>
+                    )}
+                    <p className="mt-1 text-[11px] font-semibold text-slate-600">
+                      Course: {courseTitle}
+                    </p>
+                  </div>
+                );
+              })
             ) : (
               <p className="text-xs text-slate-400 py-4 text-center">
                 No recent admissions.
@@ -327,27 +335,36 @@ export default function Dashboard({
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                 {recentStudents?.length > 0 ? (
-                  recentStudents.map((item) => (
-                    <tr
-                      key={item?._id || item?.student?.email}
-                      className="hover:bg-slate-50/70 transition-colors"
-                    >
-                      <td className="py-3">
-                        <div className="font-bold text-slate-900">
-                          {item?.student?.fullName}
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {item?.student?.email}
-                        </div>
-                      </td>
-                      <td className="py-3 text-slate-600 font-semibold">
-                        {item?.course?.title}
-                      </td>
-                      <td className="py-3 text-slate-400 text-xs">
-                        {formatISTDateTime(item?.createdAt)}
-                      </td>
-                    </tr>
-                  ))
+                  recentStudents.map((item, index) => {
+                    const studentName = item?.student?.fullName || item?.fullName || item?.name || "Enrolled Student";
+                    const studentEmail = item?.student?.email || item?.email || "";
+                    const courseTitle = typeof item?.course === "object" ? (item?.course?.title || "General Cohort") : (item?.course || item?.batch || "General Cohort");
+                    const dateValue = item?.createdAt || item?.enrolledAt;
+
+                    return (
+                      <tr
+                        key={item?._id || item?.id || studentEmail || index}
+                        className="hover:bg-slate-50/70 transition-colors"
+                      >
+                        <td className="py-3">
+                          <div className="font-bold text-slate-900">
+                            {studentName}
+                          </div>
+                          {studentEmail && (
+                            <div className="text-[11px] text-slate-400">
+                              {studentEmail}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 text-slate-600 font-semibold">
+                          {courseTitle}
+                        </td>
+                        <td className="py-3 text-slate-400 text-xs">
+                          {dateValue ? formatISTDateTime(dateValue) : "Recently"}
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td
@@ -447,7 +464,7 @@ export default function Dashboard({
                           onClick={() =>
                             router.push(
                               role === "teacher"
-                                ? "/teacher-panel/batches"
+                                ? `/teacher-panel/attendence?attendanceId=${session._id}`
                                 : `/admin-panel/attendence?attendanceId=${session._id}`
                             )
                           }

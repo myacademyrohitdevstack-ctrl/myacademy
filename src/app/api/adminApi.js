@@ -1,7 +1,8 @@
 import api from "./apiInstance";
 
-export  function adminGetAllStudentsApi(page,search,status,approvalStatus,role){
-    return api.get(`/admin/users?search=${search}&page=${page}&status=${status}&approvalStatus=${approvalStatus}&role=${role}`)
+export  function adminGetAllStudentsApi(page,search,status,approvalStatus,role,limit){
+    const limitParam = limit !== undefined && limit !== null ? `&limit=${limit}` : '';
+    return api.get(`/admin/users?search=${search || ""}&page=${page || 1}&status=${status || "all"}&approvalStatus=${approvalStatus || "all"}&role=${role || "all"}${limitParam}`)
 }
 export  function adminGetUserById(id){
     return api.get(`/admin/user/${id}`)

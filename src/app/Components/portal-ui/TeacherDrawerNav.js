@@ -24,7 +24,6 @@ import NotificationBell from "./NotificationBell";
 
 const teacherNavItems = [
   { name: "Dashboard", href: "/teacher-panel/dashboard", icon: FaChartLine },
-  { name: "My Batches", href: "/teacher-panel/batches", icon: FaUsers },
   { name: "My Courses", href: "/teacher-panel/courses", icon: FaBookOpen },
   { name: "Mark Attendance", href: "/teacher-panel/mark-attendence", icon: FaCheckCircle },
   { name: "Exams & Marks", href: "/teacher-panel/exams", icon: FaFileAlt },

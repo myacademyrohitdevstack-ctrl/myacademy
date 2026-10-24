@@ -45,13 +45,15 @@ export default function BatchesClient({ slug, permissions = {} }) {
             </p>
           </div>
 
-          <button
-            onClick={() => router.push("/admin-panel/add-batch")}
-            className="flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition shrink-0 self-start lg:self-auto"
-          >
-            <FaPlus className="text-xs" />
-            <span>Create Batch</span>
-          </button>
+          {user?.role === "admin" && (permissions?.canAdd ?? true) && (
+            <button
+              onClick={() => router.push("/admin-panel/add-batch")}
+              className="flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition shrink-0 self-start lg:self-auto"
+            >
+              <FaPlus className="text-xs" />
+              <span>Create Batch</span>
+            </button>
+          )}
         </div>
       </motion.div>
 

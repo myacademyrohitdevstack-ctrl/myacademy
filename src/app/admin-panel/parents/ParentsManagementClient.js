@@ -34,24 +34,60 @@ export default function ParentsManagementClient() {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  // Fetch list of parents and students in the academy
+  // Fetch list of parents and students in the academy (all accounts, no 10-item pagination limit)
   const { data: parentsData, isLoading: isParentsLoading } = useAdminStudent(
     1,
     "",
     "all",
     "all",
-    "parent"
+    "parent",
+    "all"
   );
   const { data: studentsData, isLoading: isStudentsLoading } = useAdminStudent(
     1,
     "",
     "all",
     "all",
-    "student"
+    "student",
+    "all"
   );
 
   const parentsList = parentsData?.data || parentsData?.users || [];
   const studentsList = studentsData?.data || studentsData?.users || [];
+
+  const [studentSearch, setStudentSearch] = useState("");
+  const [parentSearch, setParentSearch] = useState("");
+  const [createStudentSearch, setCreateStudentSearch] = useState("");
+
+  const filteredParents = parentsList.filter((p) => {
+    if (!parentSearch.trim()) return true;
+    const q = parentSearch.toLowerCase();
+    return (
+      p.fullName?.toLowerCase().includes(q) ||
+      p.email?.toLowerCase().includes(q) ||
+      p.phone?.includes(q)
+    );
+  });
+
+  const filteredStudents = studentsList.filter((s) => {
+    if (!studentSearch.trim()) return true;
+    const q = studentSearch.toLowerCase();
+    return (
+      s.fullName?.toLowerCase().includes(q) ||
+      s.email?.toLowerCase().includes(q) ||
+      s.phone?.includes(q)
+    );
+  });
+
+  const filteredCreateStudents = studentsList.filter((s) => {
+    if (!createStudentSearch.trim()) return true;
+    const q = createStudentSearch.toLowerCase();
+    return (
+      s.fullName?.toLowerCase().includes(q) ||
+      s.email?.toLowerCase().includes(q) ||
+      s.phone?.includes(q)
+    );
+  });
 
   // Link Modal Form
   const [form, setForm] = useState({
@@ -78,6 +114,8 @@ export default function ParentsManagementClient() {
   const createMutation = useCreateParentMutation();
 
   const openLinkModal = () => {
+    setStudentSearch("");
+    setParentSearch("");
     setForm({
       parentId: parentsList[0]?._id || "",
       studentUserId: studentsList[0]?._id || "",
@@ -88,6 +126,7 @@ export default function ParentsManagementClient() {
   };
 
   const openCreateModal = () => {
+    setCreateStudentSearch("");
     setCreateForm({
       fullName: "",
       email: "",
@@ -534,26 +573,45 @@ export default function ParentsManagementClient() {
                   </p>
 
                   <div>
-                    <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1 text-[10px]">
-                      Select Student
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
+                        Select Student
+                      </label>
+                      <span className="text-[10px] font-semibold text-slate-400">
+                        {studentsList.length} total
+                      </span>
+                    </div>
                     {isStudentsLoading ? (
                       <p className="text-slate-400 py-1 text-xs">Loading students...</p>
                     ) : (
-                      <select
-                        value={createForm.studentUserId}
-                        onChange={(e) =>
-                          setCreateForm({ ...createForm, studentUserId: e.target.value })
-                        }
-                        className="w-full rounded-xl border border-slate-200 p-2.5 text-xs font-bold bg-white outline-none focus:border-[#D6451B]"
-                      >
-                        <option value="">-- No student link right now --</option>
-                        {studentsList.map((s) => (
-                          <option key={s._id} value={s._id}>
-                            {s.fullName} ({s.email})
-                          </option>
-                        ))}
-                      </select>
+                      <div className="space-y-1.5">
+                        {studentsList.length > 5 && (
+                          <div className="relative">
+                            <FaSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]" />
+                            <input
+                              type="text"
+                              placeholder="Quick filter students..."
+                              value={createStudentSearch}
+                              onChange={(e) => setCreateStudentSearch(e.target.value)}
+                              className="w-full rounded-lg border border-slate-200 pl-7 pr-2.5 py-1 text-[11px] bg-white outline-none focus:border-[#D6451B]"
+                            />
+                          </div>
+                        )}
+                        <select
+                          value={createForm.studentUserId}
+                          onChange={(e) =>
+                            setCreateForm({ ...createForm, studentUserId: e.target.value })
+                          }
+                          className="w-full rounded-xl border border-slate-200 p-2.5 text-xs font-bold bg-white outline-none focus:border-[#D6451B]"
+                        >
+                          <option value="">-- No student link right now --</option>
+                          {filteredCreateStudents.map((s) => (
+                            <option key={s._id} value={s._id}>
+                              {s.fullName} ({s.email || "No email"}{s.phone ? ` • ${s.phone}` : ""})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     )}
                   </div>
 
@@ -693,51 +751,84 @@ export default function ParentsManagementClient() {
                       </button>
                     </div>
                   ) : (
-                    <select
-                      required
-                      value={form.parentId}
-                      onChange={(e) => setForm({ ...form, parentId: e.target.value })}
-                      className="w-full rounded-xl border border-slate-200 p-2.5 text-xs sm:text-sm font-bold bg-slate-50 outline-none focus:border-[#D6451B]"
-                    >
-                      <option value="" disabled>
-                        -- Choose a parent account --
-                      </option>
-                      {parentsList.map((p) => (
-                        <option key={p._id} value={p._id}>
-                          {p.fullName} ({p.email})
+                    <div className="space-y-1.5">
+                      {parentsList.length > 5 && (
+                        <div className="relative">
+                          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+                          <input
+                            type="text"
+                            placeholder="Filter parents by name, email, or phone..."
+                            value={parentSearch}
+                            onChange={(e) => setParentSearch(e.target.value)}
+                            className="w-full rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs bg-slate-50 outline-none focus:border-[#D6451B]"
+                          />
+                        </div>
+                      )}
+                      <select
+                        required
+                        value={form.parentId}
+                        onChange={(e) => setForm({ ...form, parentId: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 p-2.5 text-xs sm:text-sm font-bold bg-slate-50 outline-none focus:border-[#D6451B]"
+                      >
+                        <option value="" disabled>
+                          -- Choose a parent account ({filteredParents.length}) --
                         </option>
-                      ))}
-                    </select>
+                        {filteredParents.map((p) => (
+                          <option key={p._id} value={p._id}>
+                            {p.fullName} ({p.email || "No email"}{p.phone ? ` • ${p.phone}` : ""})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   )}
                 </div>
 
                 {/* Select Student */}
                 <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Select Student User *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-700 uppercase tracking-wider text-xs">
+                      Select Student User *
+                    </label>
+                    <span className="text-[11px] font-semibold text-slate-400">
+                      {studentsList.length} {studentsList.length === 1 ? "student" : "students"} total
+                    </span>
+                  </div>
                   {isStudentsLoading ? (
                     <p className="text-slate-400 py-2">Loading students...</p>
                   ) : studentsList.length === 0 ? (
                     <p className="text-slate-400 py-2">No students found.</p>
                   ) : (
-                    <select
-                      required
-                      value={form.studentUserId}
-                      onChange={(e) =>
-                        setForm({ ...form, studentUserId: e.target.value })
-                      }
-                      className="w-full rounded-xl border border-slate-200 p-2.5 text-xs sm:text-sm font-bold bg-slate-50 outline-none focus:border-[#D6451B]"
-                    >
-                      <option value="" disabled>
-                        -- Choose a student account --
-                      </option>
-                      {studentsList.map((s) => (
-                        <option key={s._id} value={s._id}>
-                          {s.fullName} ({s.email})
+                    <div className="space-y-1.5">
+                      {studentsList.length > 5 && (
+                        <div className="relative">
+                          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+                          <input
+                            type="text"
+                            placeholder="Filter students by name, email, or phone..."
+                            value={studentSearch}
+                            onChange={(e) => setStudentSearch(e.target.value)}
+                            className="w-full rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs bg-slate-50 outline-none focus:border-[#D6451B]"
+                          />
+                        </div>
+                      )}
+                      <select
+                        required
+                        value={form.studentUserId}
+                        onChange={(e) =>
+                          setForm({ ...form, studentUserId: e.target.value })
+                        }
+                        className="w-full rounded-xl border border-slate-200 p-2.5 text-xs sm:text-sm font-bold bg-slate-50 outline-none focus:border-[#D6451B]"
+                      >
+                        <option value="" disabled>
+                          -- Choose a student account ({filteredStudents.length}) --
                         </option>
-                      ))}
-                    </select>
+                        {filteredStudents.map((s) => (
+                          <option key={s._id} value={s._id}>
+                            {s.fullName} ({s.email || "No email"}{s.phone ? ` • ${s.phone}` : ""})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   )}
                 </div>
 

@@ -50,13 +50,15 @@ export default function Courses({
             </p>
           </div>
 
-          <button
-            onClick={() => router.push(`/${role === "admin" ? "admin-panel" : "teacher-panel"}/add-course`)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition lg:w-auto shrink-0"
-          >
-            <FaPlus className="text-xs" />
-            <span>Add Course</span>
-          </button>
+          {role === "admin" && (permission?.canAdd ?? true) && (
+            <button
+              onClick={() => router.push("/admin-panel/add-course")}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition lg:w-auto shrink-0"
+            >
+              <FaPlus className="text-xs" />
+              <span>Add Course</span>
+            </button>
+          )}
         </div>
       </motion.div>
 
@@ -222,12 +224,14 @@ export default function Courses({
           <p className="mx-auto mt-1 max-w-sm text-xs sm:text-sm text-slate-500">
             There are currently no courses created. Click below to add your first course.
           </p>
-          <button
-            onClick={() => router.push(`/${role === "admin" ? "admin-panel" : "teacher-panel"}/add-course`)}
-            className="mt-5 rounded-xl bg-[#D6451B] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-orange-600 transition"
-          >
-            Add Course
-          </button>
+          {role === "admin" && (permission?.canAdd ?? true) && (
+            <button
+              onClick={() => router.push("/admin-panel/add-course")}
+              className="mt-5 rounded-xl bg-[#D6451B] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-orange-600 transition"
+            >
+              Add Course
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -34,6 +34,7 @@ export const useLoginMutation = () => {
         return;
       }
 
+      queryClient.clear();
       login({ user: data.user, accessToken: data.accessToken });
       toast.success("Logged in successfully");
 
@@ -137,12 +138,10 @@ export const useLogoutMutation = () => {
     retry: false,
     onError: (error) => handleError(error),
     onSuccess: () => {
+      queryClient.clear();
+      useAuthStore.getState().logout();
       router.replace('/');
       toast.info("You have been logged out successfully");
-      queryClient.removeQueries({
-        queryKey: ["Me"],
-      });
-      useAuthStore.getState().logout();
     },
   });
 };

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import queryClient from "@/lib/queryClient";
 
 const normalizeUser = (user) => {
   if (!user) return null;
@@ -17,14 +18,21 @@ const useAuthStore = create((set) => ({
   isInitialized: false,
   profile: null,
 
-  login: ({ user, accessToken }) =>
+  login: ({ user, accessToken }) => {
+    // Clear any cached queries from a prior session/account
+    try {
+      queryClient.clear();
+    } catch (e) {
+      // ignore in non-browser env
+    }
     set({
       user: normalizeUser(user),
       accessToken,
       isAuthenticated: true,
       isInitialized: true,
       profile: null,
-    }),
+    });
+  },
 
   setAccessToken: (accessToken) =>
     set({
@@ -47,14 +55,21 @@ const useAuthStore = create((set) => ({
       isInitialized: true,
     }),
 
-  logout: () =>
+  logout: () => {
+    // Clear all TanStack query and mutation caches on logout
+    try {
+      queryClient.clear();
+    } catch (e) {
+      // ignore in non-browser env
+    }
     set({
       user: null,
       accessToken: null,
       isAuthenticated: false,
       isInitialized: true,
       profile: null,
-    }),
+    });
+  },
 }));
 
 export default useAuthStore;

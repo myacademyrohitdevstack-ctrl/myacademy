@@ -41,7 +41,7 @@ const [selectedStudents, setSelectedStudents] = useState([]);
 const {data:studentsData,isLoading}=useAdminStudent(page,"" ,"" ,"" ,"student")
   const users=studentsData?.users || []
   const pagination=studentsData?.pagination || {}
-const {data:trainersData}=useAdminStudent(1,"" ,"" ,"" ,"teacher")
+const {data:trainersData}=useAdminStudent(1, "", "", "", "teacher", "all")
 useEffect(()=>{
 if(!batch) return
 reset({
