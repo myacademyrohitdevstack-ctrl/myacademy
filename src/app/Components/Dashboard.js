@@ -475,7 +475,7 @@ export default function Dashboard({
           >
             <div className="flex items-center justify-between">
               <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                Today's Classes
+                Today&apos;s Classes
               </h2>
               <FaVideo className="text-slate-400 text-sm" />
             </div>

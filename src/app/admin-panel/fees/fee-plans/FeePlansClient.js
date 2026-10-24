@@ -298,7 +298,7 @@ export default function FeePlansClient() {
                 No Fee Structures Configured
               </h3>
               <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto">
-                No fee plans have been configured yet. Click "Create Fee Structure" above to define installment rules and fee amounts.
+                No fee plans have been configured yet. Click &quot;Create Fee Structure&quot; above to define installment rules and fee amounts.
               </p>
             </div>
           ) : (
@@ -608,7 +608,7 @@ export default function FeePlansClient() {
                         Fee Plan Assigned Successfully!
                       </h4>
                       <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                        The student's fee account and payment installments have been generated in the ledger. You can now collect payment immediately.
+                        The student&apos;s fee account and payment installments have been generated in the ledger. You can now collect payment immediately.
                       </p>
                     </div>
 

@@ -23,20 +23,18 @@ import ChildSwitcher from "../components/ChildSwitcher";
 export default function ParentFeesClient() {
   const { data: childrenList, isLoading: isChildrenLoading } = useMyChildren();
   const [selectedChildId, setSelectedChildId] = useState("");
+  const activeChildId =
+    selectedChildId ||
+    childrenList?.[0]?.user?._id ||
+    childrenList?.[0]?._id ||
+    "";
   const [viewReceipt, setViewReceipt] = useState(null);
 
-  useEffect(() => {
-    if (childrenList && childrenList.length > 0 && !selectedChildId) {
-      const firstId = childrenList[0]?.user?._id || childrenList[0]?._id;
-      setSelectedChildId(firstId);
-    }
-  }, [childrenList, selectedChildId]);
-
   const { data: feesData, isLoading: isFeesLoading } =
-    useChildFees(selectedChildId);
+    useChildFees(activeChildId);
 
   const selectedChildObj = childrenList?.find(
-    (c) => (c.user?._id || c._id) === selectedChildId
+    (c) => (c.user?._id || c._id) === activeChildId
   );
 
   const fees = feesData?.fees || [];
@@ -60,7 +58,7 @@ export default function ParentFeesClient() {
       {/* Child Switcher */}
       <ChildSwitcher
         childrenList={childrenList}
-        selectedChildId={selectedChildId}
+        selectedChildId={activeChildId}
         onSelect={(id) => setSelectedChildId(id)}
       />
 

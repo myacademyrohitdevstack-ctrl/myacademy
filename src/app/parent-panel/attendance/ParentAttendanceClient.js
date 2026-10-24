@@ -18,6 +18,11 @@ import ChildSwitcher from "../components/ChildSwitcher";
 export default function ParentAttendanceClient() {
   const { data: childrenList, isLoading: isChildrenLoading } = useMyChildren();
   const [selectedChildId, setSelectedChildId] = useState("");
+  const activeChildId =
+    selectedChildId ||
+    childrenList?.[0]?.user?._id ||
+    childrenList?.[0]?._id ||
+    "";
 
   const [dateFilter, setDateFilter] = useState({
     from: "",
@@ -25,21 +30,14 @@ export default function ParentAttendanceClient() {
   });
   const [statusTab, setStatusTab] = useState("all"); // 'all', 'present', 'absent'
 
-  useEffect(() => {
-    if (childrenList && childrenList.length > 0 && !selectedChildId) {
-      const firstId = childrenList[0]?.user?._id || childrenList[0]?._id;
-      setSelectedChildId(firstId);
-    }
-  }, [childrenList, selectedChildId]);
-
   const { data: attendanceData, isLoading: isAttendanceLoading } =
-    useChildAttendance(selectedChildId, {
+    useChildAttendance(activeChildId, {
       from: dateFilter.from || undefined,
       to: dateFilter.to || undefined,
     });
 
   const selectedChildObj = childrenList?.find(
-    (c) => (c.user?._id || c._id) === selectedChildId
+    (c) => (c.user?._id || c._id) === activeChildId
   );
 
   const rawList = attendanceData?.attendance || [];
@@ -60,7 +58,7 @@ export default function ParentAttendanceClient() {
       {/* Child Switcher */}
       <ChildSwitcher
         childrenList={childrenList}
-        selectedChildId={selectedChildId}
+        selectedChildId={activeChildId}
         onSelect={(id) => setSelectedChildId(id)}
       />
 

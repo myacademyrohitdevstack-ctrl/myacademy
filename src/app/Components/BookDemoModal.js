@@ -40,23 +40,27 @@ export default function BookDemoModal() {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
-      setSubmitted(false);
     }
     return () => {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
 
+  const handleCloseModal = () => {
+    setSubmitted(false);
+    closeModal();
+  };
+
   // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && isOpen) {
-        closeModal();
+        handleCloseModal();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, closeModal]);
+  }, [isOpen]);
 
   const toggleModule = (mod) => {
     setFormData((prev) => ({
@@ -96,7 +100,7 @@ export default function BookDemoModal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={closeModal}
+            onClick={handleCloseModal}
             className="fixed inset-0 bg-slate-950/70 backdrop-blur-md"
           />
 
@@ -110,7 +114,7 @@ export default function BookDemoModal() {
           >
             {/* Close Button */}
             <button
-              onClick={closeModal}
+              onClick={handleCloseModal}
               className="absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer"
               aria-label="Close modal"
             >
@@ -328,7 +332,7 @@ export default function BookDemoModal() {
                   </a>
 
                   <button
-                    onClick={closeModal}
+                    onClick={handleCloseModal}
                     className="w-full sm:w-auto rounded-xl border border-slate-300 bg-white px-5 py-3 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                   >
                     Done

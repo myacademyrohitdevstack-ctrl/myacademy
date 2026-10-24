@@ -43,7 +43,7 @@ export default function SuperAdminSubscriptionsClient() {
   const academiesList = academiesData?.academies || [];
   const plansList = plansData || [];
 
-  const [assignForm, setAssignForm] = useState({
+  const [assignForm, setAssignForm] = useState(() => ({
     academyId: "",
     planId: "",
     billingCycle: "monthly",
@@ -52,7 +52,7 @@ export default function SuperAdminSubscriptionsClient() {
     currentPeriodEnd: new Date(Date.now() + 30 * 24 * 3600 * 1000)
       .toISOString()
       .split("T")[0],
-  });
+  }));
 
   const assignSubscriptionMutation = useAssignSubscriptionMutation();
 

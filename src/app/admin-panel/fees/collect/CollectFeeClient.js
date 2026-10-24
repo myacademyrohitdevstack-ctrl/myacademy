@@ -35,17 +35,33 @@ export default function CollectFeeClient({ studentId }) {
 
   const studentsList = serverStudents || [];
 
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [selectedFeeAccountId, setSelectedFeeAccountId] = useState("");
+  const [selectedStudentId, setSelectedStudentId] = useState(studentId || "");
+  const activeStudentId = selectedStudentId || studentId;
 
-  const [amount, setAmount] = useState(0);
+  const selectedStudent =
+    (activeStudentId
+      ? studentsList.find((s) => s._id === activeStudentId || s.userId === activeStudentId)
+      : null) ||
+    studentsList[0] ||
+    null;
+
+  const [customFeeAccountId, setCustomFeeAccountId] = useState("");
+  const selectedFeeAccountId =
+    customFeeAccountId || selectedStudent?.feeAccounts?.[0]?._id || "";
+  const setSelectedFeeAccountId = (id) => setCustomFeeAccountId(id);
+
+  const [customAmount, setCustomAmount] = useState(null);
+  const amount =
+    customAmount !== null ? customAmount : (selectedStudent?.pendingAmount || 0);
+  const setAmount = (val) => setCustomAmount(val);
+
   const [paymentMode, setPaymentMode] = useState("UPI");
   const [refNumber, setRefNumber] = useState(
-    `UPI-${Math.floor(100000 + Math.random() * 900000)}`
+    () => `UPI-${Math.floor(100000 + Math.random() * 900000)}`
   );
   const [discount, setDiscount] = useState(0);
   const [paymentDate, setPaymentDate] = useState(
-    new Date().toISOString().split("T")[0]
+    () => new Date().toISOString().split("T")[0]
   );
   const [remarks, setRemarks] = useState("Tuition installment payment");
   const [receiptOpen, setReceiptOpen] = useState(false);
@@ -53,32 +69,11 @@ export default function CollectFeeClient({ studentId }) {
 
   const collectPaymentMutation = useCollectPaymentMutation();
 
-  // Keep selected student in sync if studentId changes or server list updates
-  useEffect(() => {
-    if (studentsList.length > 0) {
-      const found = studentId
-        ? studentsList.find((s) => s._id === studentId || s.userId === studentId)
-        : null;
-      const target = found || selectedStudent || studentsList[0];
-      setSelectedStudent(target);
-      setAmount(target.pendingAmount || 0);
-      const accId = target.feeAccounts?.[0]?._id || "";
-      setSelectedFeeAccountId(accId);
-    } else {
-      setSelectedStudent(null);
-      setAmount(0);
-      setSelectedFeeAccountId("");
-    }
-  }, [studentId, serverStudents]);
-
   const handleStudentChange = (id) => {
-    const s = studentsList.find((item) => item._id === id || item.userId === id);
-    if (s) {
-      setSelectedStudent(s);
-      setAmount(s.pendingAmount || 0);
-      setDiscount(0);
-      setSelectedFeeAccountId(s.feeAccounts?.[0]?._id || "");
-    }
+    setSelectedStudentId(id);
+    setCustomAmount(null);
+    setDiscount(0);
+    setCustomFeeAccountId("");
   };
 
   const handleCollect = async (e) => {

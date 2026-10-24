@@ -27,6 +27,13 @@ export default function BulkSendConfirmModal({
 }) {
   const bulkSendMutation = useSendBulkRemindersMutation();
 
+  const isCloudApiConnected =
+    integrationData?.mode === "cloud_api" && integrationData?.connectionStatus === "connected";
+
+  const [dispatchMode, setDispatchMode] = useState(
+    isCloudApiConnected ? "custom_api" : "myacademy_api"
+  );
+
   if (!isOpen || !data) return null;
 
   const candidates = data.candidates || [];
@@ -38,13 +45,6 @@ export default function BulkSendConfirmModal({
   const templateBody = selectedTemplate
     ? selectedTemplate.messageBody
     : "Dear {{parentName}}, friendly fee reminder from {{academyName}} for {{studentName}} ({{className}}). Outstanding amount is ₹{{pendingAmount}}, due on {{dueDate}}. Thank you!";
-
-  const isCloudApiConnected =
-    integrationData?.mode === "cloud_api" && integrationData?.connectionStatus === "connected";
-
-  const [dispatchMode, setDispatchMode] = useState(
-    isCloudApiConnected ? "custom_api" : "myacademy_api"
-  );
 
   const handleConfirm = () => {
     bulkSendMutation.mutate(

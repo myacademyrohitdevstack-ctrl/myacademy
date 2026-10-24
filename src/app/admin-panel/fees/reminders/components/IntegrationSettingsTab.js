@@ -223,7 +223,7 @@ function IntegrationSettingsForm({ initialIntegration }) {
               Your Own Meta API
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Connect your academy's own Meta WhatsApp Business Account for custom branded sender number and verification badges.
+              Connect your academy&apos;s own Meta WhatsApp Business Account for custom branded sender number and verification badges.
             </p>
           </div>
 
@@ -273,7 +273,7 @@ function IntegrationSettingsForm({ initialIntegration }) {
                 <p className="font-extrabold text-sm text-slate-900">MyAcademy WhatsApp Gateway Active</p>
               </div>
               <p className="text-xs text-slate-600 max-w-xl">
-                Zero configuration required. All manual and automated reminders will be delivered through MyAcademy's high-speed cloud infrastructure.
+                Zero configuration required. All manual and automated reminders will be delivered through MyAcademy&apos;s high-speed cloud infrastructure.
               </p>
             </div>
 
