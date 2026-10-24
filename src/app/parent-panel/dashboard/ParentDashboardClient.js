@@ -17,6 +17,8 @@ import {
   FaSpinner,
   FaFire,
   FaExclamationTriangle,
+  FaCalendarMinus,
+  FaLayerGroup,
 } from "react-icons/fa";
 import { useMyChildren, useChildDashboard, useChildFees } from "@/Hooks/useParent";
 import ChildSwitcher from "../components/ChildSwitcher";
@@ -84,11 +86,16 @@ export default function ParentDashboardClient() {
   const presentCount =
     attendanceSummary.present ??
     attendance.filter((r) => r.status === "present").length;
+  const leaveCount =
+    attendanceSummary.leave ??
+    attendance.filter((r) => r.status === "leave").length;
   const absentCount =
     attendanceSummary.absent ??
     attendance.filter((r) => r.status === "absent").length;
   const totalMarked =
-    attendanceSummary.total ?? presentCount + absentCount;
+    attendanceSummary.totalClasses ??
+    attendanceSummary.total ??
+    presentCount + leaveCount + absentCount;
   const currentStreak = attendanceSummary.currentStreak ?? 0;
 
   const attendancePercentage =
@@ -281,8 +288,40 @@ export default function ParentDashboardClient() {
               </div>
 
               {/* Attendance Quick Metrics Bar */}
-              <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
                 <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                  <span className="text-[11px] font-medium text-slate-500">Total Classes</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-slate-900">
+                    {totalMarked}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Classes held</p>
+                </div>
+
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3">
+                  <span className="text-[11px] font-medium text-emerald-800">Attended</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-emerald-700">
+                    {presentCount}
+                  </p>
+                  <p className="text-[10px] text-emerald-600 mt-0.5">Marked present</p>
+                </div>
+
+                <div className="rounded-xl border border-amber-100 bg-amber-50/40 p-3">
+                  <span className="text-[11px] font-medium text-amber-800">Leave</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-amber-700">
+                    {leaveCount}
+                  </p>
+                  <p className="text-[10px] text-amber-600 mt-0.5">Approved leave</p>
+                </div>
+
+                <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-3">
+                  <span className="text-[11px] font-medium text-rose-800">Missed / Absent</span>
+                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-rose-700">
+                    {absentCount}
+                  </p>
+                  <p className="text-[10px] text-rose-600 mt-0.5">Missed sessions</p>
+                </div>
+
+                <div className="col-span-2 sm:col-span-1 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
                   <span className="text-[11px] font-medium text-slate-500">Overall Regularity</span>
                   <p
                     className={`mt-1 text-xl sm:text-2xl font-extrabold ${
@@ -298,30 +337,6 @@ export default function ParentDashboardClient() {
                   <p className="text-[10px] text-slate-400 mt-0.5">
                     {attendancePercentage !== null ? "Min 75% required" : "100% Academic Standing"}
                   </p>
-                </div>
-
-                <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3">
-                  <span className="text-[11px] font-medium text-emerald-800">Attended Classes</span>
-                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-emerald-700">
-                    {presentCount}
-                  </p>
-                  <p className="text-[10px] text-emerald-600 mt-0.5">Marked present</p>
-                </div>
-
-                <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-3">
-                  <span className="text-[11px] font-medium text-rose-800">Missed Sessions</span>
-                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-rose-700">
-                    {absentCount}
-                  </p>
-                  <p className="text-[10px] text-rose-600 mt-0.5">Absences recorded</p>
-                </div>
-
-                <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-3">
-                  <span className="text-[11px] font-medium text-orange-900">Current Streak</span>
-                  <p className="mt-1 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
-                    {currentStreak}
-                  </p>
-                  <p className="text-[10px] text-orange-700 mt-0.5">Consecutive days</p>
                 </div>
               </div>
 
@@ -375,7 +390,7 @@ export default function ParentDashboardClient() {
                   <div>
                     <span className="font-bold">Attention Required:</span>
                     <p className="mt-0.5 text-rose-700 leading-relaxed text-[11px]">
-                      Your child&apos;s attendance is currently below the academy&apos;s 75% mandatory threshold. Regular attendance is required to remain eligible for term examinations and certificates.
+                      Your child&apos;s attendance is currently below the academy&apos;s 75% mandatory threshold. Regular attendance is required to remain eligible for term examinations and academic evaluations.
                     </p>
                   </div>
                 </div>
@@ -401,6 +416,7 @@ export default function ParentDashboardClient() {
                   <div className="space-y-2">
                     {attendance.slice(0, 8).map((record, idx) => {
                       const isPresent = record.status === "present";
+                      const isLeave = record.status === "leave";
                       const isAbsent = record.status === "absent";
                       const recordDate = record.date
                         ? new Date(record.date).toLocaleDateString("en-IN", {
@@ -419,6 +435,8 @@ export default function ParentDashboardClient() {
                           <div className="flex items-center gap-2.5 min-w-0">
                             {isPresent ? (
                               <FaCheckCircle className="text-emerald-500 text-sm shrink-0" />
+                            ) : isLeave ? (
+                              <FaCalendarMinus className="text-amber-500 text-sm shrink-0" />
                             ) : isAbsent ? (
                               <FaTimesCircle className="text-rose-500 text-sm shrink-0" />
                             ) : (
@@ -436,9 +454,11 @@ export default function ParentDashboardClient() {
                             className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider shrink-0 ${
                               isPresent
                                 ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : isLeave
+                                ? "bg-amber-50 text-amber-700 border border-amber-200"
                                 : isAbsent
                                 ? "bg-rose-50 text-rose-700 border border-rose-200"
-                                : "bg-slate-100 text-slate-600"
+                                : "bg-slate-100 text-slate-600 border border-slate-200"
                             }`}
                           >
                             {record.status || "Unmarked"}

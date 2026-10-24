@@ -11,7 +11,6 @@ import {
   FaBookOpen,
   FaVideo,
   FaUsers,
-  FaCertificate,
   FaCog,
   FaBars,
   FaTimes,
@@ -33,7 +32,6 @@ const studentNavItems = [
   { name: "My Batches", href: "/student-profile/batches", icon: FaUsers },
   { name: "Homework", href: "/student-profile/homework", icon: FaClipboardList },
   { name: "Exam Results", href: "/student-profile/exams", icon: FaFileAlt },
-  { name: "Certificates", href: "/student-profile/certificates", icon: FaCertificate },
   { name: "Settings", href: "/student-profile/settings", icon: FaCog },
 ];
 

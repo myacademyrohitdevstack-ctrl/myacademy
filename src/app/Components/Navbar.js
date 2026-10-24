@@ -105,7 +105,6 @@ export default function Navbar() {
     { name: "My Batches", path: "/student-profile/batches", icon: FaUsers },
     { name: "Live Classes", path: "/student-profile/classes", icon: FaVideo },
     { name: "My Courses", path: "/student-profile/courses", icon: FaBookOpen },
-    { name: "Certificates", path: "/student-profile/certificates", icon: FaCertificate },
   ];
 
   const adminLinks = [

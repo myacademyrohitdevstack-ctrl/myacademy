@@ -8,7 +8,6 @@ import {
   FaBookOpen,
   FaVideo,
   FaUsers,
-  FaCertificate,
   FaCog,
 } from "react-icons/fa";
 
@@ -37,11 +36,6 @@ const navItems = [
     id: "courses",
     label: "My Courses",
     icon: FaBookOpen,
-  },
-  {
-    id: "certificates",
-    label: "Certificates",
-    icon: FaCertificate,
   },
   {
     id: "settings",

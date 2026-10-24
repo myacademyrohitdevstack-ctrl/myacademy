@@ -89,6 +89,13 @@ export default function Dashboard({
       icon: <FaLayerGroup />,
       color: "bg-orange-50 text-[#D6451B]",
     },
+    {
+      title: "Attendance Sessions",
+      value: data?.totalAttendanceSessions ?? 0,
+      growth: `${data?.totalAttendanceSessions ?? 0} marked`,
+      icon: <FaCheckCircle />,
+      color: "bg-emerald-50 text-emerald-600",
+    },
   ];
 
   if (statsLoading || classesLoading || annoucementsLoading || activitiesLoading) {
@@ -382,6 +389,83 @@ export default function Dashboard({
               </div>
             </motion.div>
           )}
+
+          {/* Attendance Marked */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                Attendance Marked
+              </h2>
+              <Link
+                href={role === "teacher" ? "/teacher-panel/mark-attendence" : "/admin-panel/attendence"}
+                className="text-xs font-bold text-[#D6451B] hover:underline"
+              >
+                Mark Attendance
+              </Link>
+            </div>
+
+            <div className="mt-4 space-y-2.5">
+              {data?.recentAttendanceSessions?.length > 0 ? (
+                data.recentAttendanceSessions.map((session) => {
+                  const presentCount = session.records?.filter((r) => r.status === "present").length || 0;
+                  const leaveCount = session.records?.filter((r) => r.status === "leave").length || 0;
+                  const absentCount = session.records?.filter((r) => r.status === "absent").length || 0;
+                  const total = session.records?.length || 0;
+                  const dateStr = session.date
+                    ? new Date(session.date).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "N/A";
+
+                  return (
+                    <div
+                      key={session._id}
+                      className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                            {session.batchName || session.batch?.name || "Batch"}
+                          </h3>
+                          <span className="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                            {presentCount}/{total} Present
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          {dateStr} • {leaveCount > 0 ? `${leaveCount} Leave • ` : ""}{absentCount} Absent
+                        </p>
+                      </div>
+
+                      <div className="shrink-0">
+                        <button
+                          onClick={() =>
+                            router.push(
+                              role === "teacher"
+                                ? "/teacher-panel/batches"
+                                : `/admin-panel/attendence?attendanceId=${session._id}`
+                            )
+                          }
+                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-colors"
+                        >
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-xs text-slate-400 py-4 text-center">
+                  No attendance marked yet.
+                </p>
+              )}
+            </div>
+          </motion.div>
 
           {/* Today's Classes */}
           <motion.div

@@ -12,6 +12,7 @@ import {
   FaCalendarAlt,
   FaArrowLeft,
   FaSearch,
+  FaCalendarMinus,
 } from "react-icons/fa";
 
 export default function AttendancePage() {
@@ -63,7 +64,16 @@ export default function AttendancePage() {
     setStatusOverrides(next);
   };
 
+  const markAllLeave = () => {
+    const next = {};
+    (data || []).forEach((s) => {
+      next[s._id] = "leave";
+    });
+    setStatusOverrides(next);
+  };
+
   const presentCount = rawStudents.filter((s) => s.status === "present").length;
+  const leaveCount = rawStudents.filter((s) => s.status === "leave").length;
   const absentCount = rawStudents.filter((s) => s.status === "absent").length;
 
   const handleSubmit = async () => {
@@ -105,22 +115,29 @@ export default function AttendancePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:min-w-[340px]">
-            <div className="rounded-2xl bg-white/10 p-3.5 sm:p-4 backdrop-blur-sm border border-white/20">
-              <p className="text-xs text-orange-100 font-medium">Total Enrolled</p>
-              <h3 className="mt-1 text-2xl sm:text-3xl font-extrabold">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[390px]">
+            <div className="rounded-2xl bg-white/10 p-3 sm:p-4 backdrop-blur-sm border border-white/20">
+              <p className="text-xs text-orange-100 font-medium">Enrolled</p>
+              <h3 className="mt-1 text-xl sm:text-2xl font-extrabold">
                 {rawStudents.length}
               </h3>
             </div>
 
-            <div className="rounded-2xl bg-white/10 p-3.5 sm:p-4 backdrop-blur-sm border border-white/20">
-              <p className="text-xs text-orange-100 font-medium">Present Today</p>
-              <h3 className="mt-1 text-2xl sm:text-3xl font-extrabold text-white">
+            <div className="rounded-2xl bg-white/10 p-3 sm:p-4 backdrop-blur-sm border border-white/20">
+              <p className="text-xs text-orange-100 font-medium">Present</p>
+              <h3 className="mt-1 text-xl sm:text-2xl font-extrabold text-white">
                 {presentCount}
               </h3>
             </div>
 
-            <div className="col-span-2">
+            <div className="rounded-2xl bg-white/10 p-3 sm:p-4 backdrop-blur-sm border border-white/20">
+              <p className="text-xs text-orange-100 font-medium">Leave</p>
+              <h3 className="mt-1 text-xl sm:text-2xl font-extrabold text-amber-200">
+                {leaveCount}
+              </h3>
+            </div>
+
+            <div className="col-span-3">
               <div className="relative">
                 <FaCalendarAlt className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/60 text-xs" />
                 <input
@@ -150,16 +167,23 @@ export default function AttendancePage() {
         <div className="flex w-full sm:w-auto items-center gap-2">
           <button
             onClick={markAllPresent}
-            className="flex-1 sm:flex-initial rounded-xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition hover:bg-emerald-700 shadow-xs"
+            className="flex-1 sm:flex-initial rounded-xl bg-emerald-600 px-3.5 py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-emerald-700 shadow-xs"
           >
-            Mark All Present
+            All Present
+          </button>
+
+          <button
+            onClick={markAllLeave}
+            className="flex-1 sm:flex-initial rounded-xl bg-amber-500 px-3.5 py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-amber-600 shadow-xs"
+          >
+            All Leave
           </button>
 
           <button
             onClick={markAllAbsent}
-            className="flex-1 sm:flex-initial rounded-xl bg-rose-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition hover:bg-rose-700 shadow-xs"
+            className="flex-1 sm:flex-initial rounded-xl bg-rose-600 px-3.5 py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-rose-700 shadow-xs"
           >
-            Mark All Absent
+            All Absent
           </button>
         </div>
       </div>
@@ -179,30 +203,43 @@ export default function AttendancePage() {
                 <p className="text-xs text-slate-500 truncate">{student?.email}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:w-[240px]">
+              <div className="grid grid-cols-3 gap-1.5 sm:w-[310px]">
                 <button
                   type="button"
                   onClick={() => handleStatusChange(student._id, "present")}
-                  className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition ${
+                  className={`flex items-center justify-center gap-1 rounded-xl py-2 px-2 text-xs font-bold transition ${
                     student.status === "present"
                       ? "bg-emerald-600 text-white shadow-xs"
                       : "bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100"
                   }`}
                 >
-                  <FaCheck className="text-xs" />
+                  <FaCheck className="text-[11px]" />
                   <span>Present</span>
                 </button>
 
                 <button
                   type="button"
+                  onClick={() => handleStatusChange(student._id, "leave")}
+                  className={`flex items-center justify-center gap-1 rounded-xl py-2 px-2 text-xs font-bold transition ${
+                    student.status === "leave"
+                      ? "bg-amber-500 text-white shadow-xs"
+                      : "bg-amber-50 text-amber-700 border border-amber-200/60 hover:bg-amber-100"
+                  }`}
+                >
+                  <FaCalendarMinus className="text-[11px]" />
+                  <span>Leave</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => handleStatusChange(student._id, "absent")}
-                  className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition ${
+                  className={`flex items-center justify-center gap-1 rounded-xl py-2 px-2 text-xs font-bold transition ${
                     student.status === "absent"
                       ? "bg-rose-600 text-white shadow-xs"
                       : "bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100"
                   }`}
                 >
-                  <FaTimes className="text-xs" />
+                  <FaTimes className="text-[11px]" />
                   <span>Absent</span>
                 </button>
               </div>

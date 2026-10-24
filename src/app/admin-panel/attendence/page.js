@@ -16,6 +16,7 @@ import {
   FaPhoneAlt,
   FaEnvelope,
   FaClock,
+  FaCalendarMinus,
 } from "react-icons/fa";
 
 import Loading from "@/app/Components/ui/Loading";
@@ -38,6 +39,7 @@ export default function AttendancePage() {
   const records = attendance?.records || [];
 
   const present = records.filter((r) => r.status === "present").length;
+  const leave = records.filter((r) => r.status === "leave").length;
   const absent = records.filter((r) => r.status === "absent").length;
   const totalStudents = records.length;
 
@@ -170,6 +172,19 @@ export default function AttendancePage() {
 
         <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
           <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-slate-500">Leave</p>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 text-xs sm:text-sm">
+              <FaCalendarMinus />
+            </div>
+          </div>
+          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-amber-600">
+            {leave}
+          </h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">Excused leaves</p>
+        </div>
+
+        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+          <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-slate-500">Absent</p>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 text-xs sm:text-sm">
               <FaTimesCircle />
@@ -229,6 +244,16 @@ export default function AttendancePage() {
             }`}
           >
             Present ({present})
+          </button>
+          <button
+            onClick={() => setStatusFilter("leave")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              statusFilter === "leave"
+                ? "bg-amber-500 text-white shadow-xs"
+                : "text-slate-600 hover:text-amber-700"
+            }`}
+          >
+            Leave ({leave})
           </button>
           <button
             onClick={() => setStatusFilter("absent")}
@@ -297,35 +322,40 @@ export default function AttendancePage() {
                   </div>
                 </div>
 
-                {/* Status Toggle Action Button */}
-                <div className="mt-3 pt-3 border-t border-slate-100">
+                {/* Status Toggle Action Buttons */}
+                <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-3 gap-1.5">
                   <button
                     disabled={updateAttendance.isPending}
-                    onClick={() =>
-                      updateStatus(
-                        record.student._id,
-                        record.status === "present" ? "absent" : "present"
-                      )
-                    }
-                    className={`w-full flex items-center justify-center gap-2 rounded-xl py-2.5 px-4 text-xs font-bold transition-all ${
+                    onClick={() => updateStatus(record.student._id, "present")}
+                    className={`rounded-lg py-1.5 text-xs font-bold transition ${
                       record.status === "present"
-                        ? "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
-                        : "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
-                    } ${
-                      updateAttendance.isPending ? "cursor-not-allowed opacity-60" : ""
+                        ? "bg-emerald-600 text-white shadow-xs"
+                        : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     }`}
                   >
-                    {record.status === "present" ? (
-                      <>
-                        <FaTimesCircle className="text-xs" />
-                        <span>Change to Absent</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaCheckCircle className="text-xs" />
-                        <span>Change to Present</span>
-                      </>
-                    )}
+                    Present
+                  </button>
+                  <button
+                    disabled={updateAttendance.isPending}
+                    onClick={() => updateStatus(record.student._id, "leave")}
+                    className={`rounded-lg py-1.5 text-xs font-bold transition ${
+                      record.status === "leave"
+                        ? "bg-amber-500 text-white shadow-xs"
+                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                    }`}
+                  >
+                    Leave
+                  </button>
+                  <button
+                    disabled={updateAttendance.isPending}
+                    onClick={() => updateStatus(record.student._id, "absent")}
+                    className={`rounded-lg py-1.5 text-xs font-bold transition ${
+                      record.status === "absent"
+                        ? "bg-rose-600 text-white shadow-xs"
+                        : "bg-rose-50 text-rose-700 border border-rose-200"
+                    }`}
+                  >
+                    Absent
                   </button>
                 </div>
               </div>

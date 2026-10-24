@@ -178,10 +178,7 @@ export default function BatchDetailsPage({permissions}) {
 />
 <StatCard
   title="Attendance"
-  value={attendance?.length || 0}
-
-
-
+  value={attendance?.stats?.totalClasses ?? attendance?.attendanceHistory?.length ?? 0}
   icon={<FaClipboardCheck />}
   color="bg-emerald-50 text-emerald-600"
 />

@@ -22,6 +22,8 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaShieldAlt,
+  FaCalendarMinus,
+  FaLayerGroup,
 } from "react-icons/fa";
 import CommingSoon from "@/app/Components/ui/CommingSoon";
 import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
@@ -53,8 +55,8 @@ export default function Dashboard({ user }) {
       title: "Attendance Rate",
       value: attendancePercentage !== null ? `${attendancePercentage}%` : "100%",
       sub: attendanceStats.totalClasses
-        ? `${attendanceStats.present || 0} / ${attendanceStats.totalClasses} Present`
-        : "0 Absences • Good Standing",
+        ? `${attendanceStats.present || 0} Attended • ${attendanceStats.leave || 0} Leave`
+        : "100% Academic Standing",
       icon: <FaCalendarCheck />,
       highlight: true,
       color:
@@ -72,9 +74,9 @@ export default function Dashboard({ user }) {
       color: "text-slate-800",
     },
     {
-      title: "Live Classes",
-      value: statics?.classes || 0,
-      sub: "Scheduled links",
+      title: "Total Classes",
+      value: attendanceStats.totalClasses || statics?.classes || 0,
+      sub: `${attendanceStats.present || 0} Attended • ${attendanceStats.leave || 0} Leave`,
       icon: <FaChalkboardTeacher />,
       color: "text-slate-800",
     },
@@ -225,24 +227,21 @@ export default function Dashboard({ user }) {
           </div>
 
           {/* Metric Highlights Row */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            {/* Overall Rate */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+            {/* Total Classes */}
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-4">
-              <span className="text-xs font-semibold text-slate-500">Overall Regularity</span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-600">Total Classes</span>
+                <FaLayerGroup className="text-xs text-slate-500" />
+              </div>
               <div className="mt-1 flex items-baseline gap-1.5">
-                <span className={`text-2xl sm:text-3xl font-extrabold ${
-                  attendancePercentage !== null
-                    ? attendancePercentage >= 75
-                      ? "text-emerald-600"
-                      : "text-rose-600"
-                    : "text-emerald-600"
-                }`}>
-                  {attendancePercentage !== null ? `${attendancePercentage}%` : "100%"}
+                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                  {attendanceStats.totalClasses || 0}
                 </span>
-                <span className="text-[11px] text-slate-400 font-medium">rate</span>
+                <span className="text-[11px] text-slate-400 font-medium">classes</span>
               </div>
               <p className="mt-1 text-[11px] text-slate-400">
-                {attendancePercentage !== null ? "Min. 75% required for exam hall ticket" : "100% Regularity • Zero unexcused absences"}
+                {attendanceStats.totalClasses ? "Conducted cohort sessions" : "Zero classes recorded"}
               </p>
             </div>
 
@@ -256,44 +255,71 @@ export default function Dashboard({ user }) {
                 <span className="text-2xl sm:text-3xl font-extrabold text-emerald-700">
                   {attendanceStats.present || 0}
                 </span>
-                <span className="text-[11px] text-emerald-600 font-medium">classes</span>
+                <span className="text-[11px] text-emerald-600 font-medium">present</span>
               </div>
               <p className="mt-1 text-[11px] text-emerald-600/80">
                 Marked present by faculty
               </p>
             </div>
 
+            {/* Leave Count */}
+            <div className="rounded-xl border border-amber-100 bg-amber-50/40 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-amber-800">Leave</span>
+                <FaCalendarMinus className="text-xs text-amber-600" />
+              </div>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-2xl sm:text-3xl font-extrabold text-amber-700">
+                  {attendanceStats.leave || 0}
+                </span>
+                <span className="text-[11px] text-amber-600 font-medium">leave</span>
+              </div>
+              <p className="mt-1 text-[11px] text-amber-600/80">
+                {attendanceStats.leave > 0 ? "Approved academic leave" : "Zero leaves recorded"}
+              </p>
+            </div>
+
             {/* Absent Count */}
             <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-rose-800">Missed Classes</span>
+                <span className="text-xs font-semibold text-rose-800">Missed / Absent</span>
                 <FaTimesCircle className="text-xs text-rose-600" />
               </div>
               <div className="mt-1 flex items-baseline gap-1.5">
                 <span className="text-2xl sm:text-3xl font-extrabold text-rose-700">
                   {attendanceStats.absent || 0}
                 </span>
-                <span className="text-[11px] text-rose-600 font-medium">absences</span>
+                <span className="text-[11px] text-rose-600 font-medium">absent</span>
               </div>
               <p className="mt-1 text-[11px] text-rose-600/80">
-                {attendanceStats.absent > 0 ? "Leaves or unexcused" : "Zero missed classes 🎉"}
+                {attendanceStats.absent > 0 ? "Unexcused absences" : "Zero missed classes 🎉"}
               </p>
             </div>
 
-            {/* Active Streak */}
-            <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-4">
+            {/* Overall Rate */}
+            <div className="col-span-2 sm:col-span-1 rounded-xl border border-orange-100 bg-orange-50/40 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-orange-900">Current Streak</span>
+                <span className="text-xs font-semibold text-orange-900">Attendance Rate</span>
                 <FaFire className="text-xs text-[#D6451B]" />
               </div>
               <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-extrabold text-[#D6451B]">
-                  {attendanceInsights.currentStreak || 0}
+                <span className={`text-2xl sm:text-3xl font-extrabold ${
+                  attendancePercentage !== null
+                    ? attendancePercentage >= 75
+                      ? "text-emerald-600"
+                      : "text-rose-600"
+                    : "text-emerald-600"
+                }`}>
+                  {attendancePercentage !== null ? `${attendancePercentage}%` : "100%"}
                 </span>
-                <span className="text-[11px] text-[#D6451B] font-medium">sessions</span>
+                <span className="text-[11px] text-orange-700 font-medium">rate</span>
               </div>
               <p className="mt-1 text-[11px] text-orange-700/80">
-                {attendanceInsights.currentStreak > 0 ? "Consecutive classes attended" : "Attend next class to start streak"}
+                {attendancePercentage !== null && attendancePercentage >= 75
+                  ? "75%+ exam benchmark met"
+                  : attendancePercentage !== null
+                  ? "Shortage below 75%"
+                  : "Zero absences recorded"}
               </p>
             </div>
           </div>
@@ -358,6 +384,7 @@ export default function Dashboard({ user }) {
               <div className="mt-3 divide-y divide-slate-100">
                 {recentAttendance.map((item, idx) => {
                   const isPresent = item.status === "present";
+                  const isLeave = item.status === "leave";
                   const isAbsent = item.status === "absent";
                   const recordDate = item.date
                     ? new Date(item.date).toLocaleDateString("en-IN", {
@@ -378,6 +405,8 @@ export default function Dashboard({ user }) {
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm ${
                             isPresent
                               ? "bg-emerald-50 text-emerald-600"
+                              : isLeave
+                              ? "bg-amber-50 text-amber-600"
                               : isAbsent
                               ? "bg-rose-50 text-rose-600"
                               : "bg-slate-100 text-slate-500"
@@ -385,6 +414,8 @@ export default function Dashboard({ user }) {
                         >
                           {isPresent ? (
                             <FaCheckCircle />
+                          ) : isLeave ? (
+                            <FaCalendarMinus />
                           ) : isAbsent ? (
                             <FaTimesCircle />
                           ) : (
@@ -406,6 +437,8 @@ export default function Dashboard({ user }) {
                         className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
                           isPresent
                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : isLeave
+                            ? "bg-amber-50 text-amber-700 border border-amber-200"
                             : isAbsent
                             ? "bg-rose-50 text-rose-700 border border-rose-200"
                             : "bg-slate-100 text-slate-600 border border-slate-200"

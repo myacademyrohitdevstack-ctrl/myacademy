@@ -28,12 +28,6 @@ const stats = [
     color: "bg-blue-50 text-blue-600",
   },
   {
-    title: "Certificates",
-    value: "3",
-    icon: <FaAward />,
-    color: "bg-orange-50 text-[#D6451B]",
-  },
-  {
     title: "Pending Fees",
     value: "₹4,000",
     icon: <FaMoneyBillWave />,
@@ -599,61 +593,6 @@ export default function StudentProfile() {
         </motion.div>
 
       </div>
-
-      {/* Certificates */}
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm"
-      >
-
-        <div className="flex items-center justify-between">
-
-          <h2 className="text-2xl font-bold">
-            Certificates
-          </h2>
-
-          <button className="rounded-xl bg-[#D6451B] px-5 py-2 text-white">
-            Generate Certificate
-          </button>
-
-        </div>
-
-        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-
-          {[
-            "Grammar Completion",
-            "Speaking Excellence",
-            "Intermediate English",
-          ].map((certificate) => (
-
-            <div
-              key={certificate}
-              className="rounded-2xl border border-slate-200 p-6 transition hover:border-[#D6451B]"
-            >
-
-              <FaAward className="text-4xl text-[#D6451B]" />
-
-              <h3 className="mt-5 font-semibold">
-                {certificate}
-              </h3>
-
-              <p className="mt-2 text-sm text-slate-500">
-                Issued on 15 June 2026
-              </p>
-
-              <button className="mt-5 rounded-xl bg-orange-50 px-5 py-2 font-medium text-[#D6451B]">
-                Download
-              </button>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </motion.div>
 
       {/* Activity Timeline */}
 

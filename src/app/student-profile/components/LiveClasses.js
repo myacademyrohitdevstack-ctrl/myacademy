@@ -33,6 +33,7 @@ import {
   FaTimes,
   FaExclamationTriangle,
   FaLayerGroup,
+  FaCalendarMinus,
 } from "react-icons/fa";
 import { formatISTDateTime } from "@/Utils/formatDate";
 import { useGetStudentBatchById } from "@/Hooks/useGetStudentBatchById";
@@ -61,7 +62,7 @@ export default function LiveClasses() {
   const { data: notes, isLoading: notesLoading } = useGetStudentNotes(batchId, activeTab);
   const { data: batch, isLoading: batchLoading, isError: batchError } = useGetStudentBatchById(batchId);
   const { data: announcements, isLoading: annoucementLoading } = useAnnouncementByBatchId(batchId, activeTab);
-  const { data: attendance } = useGetStudentAttendenceDashboard();
+  const { data: attendance } = useGetStudentAttendenceDashboard(batchId);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
 
@@ -847,20 +848,27 @@ export default function LiveClasses() {
 
     {/* Stats */}
 
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
 
       <StatCard
-        title="Attendance"
-        value={`${attendance?.stats?.attendancePercentage || 0}%`}
-        icon={<FaClipboardCheck />}
+        title="Total Classes"
+        value={attendance?.stats?.totalClasses || 0}
+        icon={<FaLayerGroup />}
+        color="bg-slate-100 text-slate-700"
+      />
+
+      <StatCard
+        title="Attended"
+        value={attendance?.stats?.present || 0}
+        icon={<FaCheck />}
         color="bg-green-50 text-green-600"
       />
 
       <StatCard
-        title="Present"
-        value={attendance?.stats?.present || 0}
-        icon={<FaCheck />}
-        color="bg-blue-50 text-blue-600"
+        title="Leave"
+        value={attendance?.stats?.leave || 0}
+        icon={<FaCalendarMinus />}
+        color="bg-amber-50 text-amber-600"
       />
 
       <StatCard
@@ -951,13 +959,15 @@ export default function LiveClasses() {
               </div>
 
               <span
-                className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${
+                className={`w-fit rounded-full px-4 py-1.5 text-xs font-bold capitalize ${
                   item.status === "present"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : item.status === "leave"
+                    ? "bg-amber-50 text-amber-700 border border-amber-200"
+                    : "bg-rose-50 text-rose-700 border border-rose-200"
                 }`}
               >
-                {item.status === "present" ? "Present" : "Absent"}
+                {item.status === "present" ? "Present" : item.status === "leave" ? "Leave" : "Absent"}
               </span>
 
             </div>
