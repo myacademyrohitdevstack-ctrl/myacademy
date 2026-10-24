@@ -1,5 +1,15 @@
 import { create } from "zustand";
 
+const normalizeUser = (user) => {
+  if (!user) return null;
+  const id = user._id || user.id;
+  return {
+    ...user,
+    _id: id,
+    id: id,
+  };
+};
+
 const useAuthStore = create((set) => ({
   user: null,
   accessToken: null,
@@ -9,7 +19,7 @@ const useAuthStore = create((set) => ({
 
   login: ({ user, accessToken }) =>
     set({
-      user,
+      user: normalizeUser(user),
       accessToken,
       isAuthenticated: true,
       isInitialized: true,
@@ -24,7 +34,7 @@ const useAuthStore = create((set) => ({
 
   setUser: (user) =>
     set({
-      user,
+      user: normalizeUser(user),
     }),
 
   setProfile: (profile) =>

@@ -1,21 +1,18 @@
-import {  adminGetBatchApi } from "@/app/api/adminApi"
-import { announcementByBatchIdApi } from "@/app/api/AnnoucementsApi"
-import { getStudentAllAnnocemntsApi, getStudentAllClassesApi, getStudentStaticsApi } from "@/app/api/userApi"
-import useAuthStore from "@/store/authStore"
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { getStudentStaticsApi } from "@/app/api/userApi";
+import useAuthStore from "@/store/authStore";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-
-export  const useStudentStatics=()=>{
-    const user=useAuthStore.getState().user
-    return useQuery({
-        queryKey:["statics",user._id],
-        queryFn:async()=>{
-            const response = await getStudentStaticsApi()
-       
-            return response.data.statics
-        },
-        keepPreviousData:true,
-        placeholderData:keepPreviousData,
-        enabled:!!user
-    })
-}
+export const useStudentStatics = () => {
+  const user = useAuthStore((state) => state.user);
+  const userId = user?._id || user?.id;
+  return useQuery({
+    queryKey: ["statics", userId],
+    queryFn: async () => {
+      const response = await getStudentStaticsApi();
+      return response.data?.statics;
+    },
+    keepPreviousData: true,
+    placeholderData: keepPreviousData,
+    enabled: !!userId,
+  });
+};
