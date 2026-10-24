@@ -1,5 +1,6 @@
 import "./globals.css";
 import Navbar from "./Components/Navbar";
+import BookDemoModal from "./Components/BookDemoModal";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import { Toaster } from "sonner";
 import AuthProvider from "./Components/AuthProvider";
@@ -47,6 +48,7 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <Navbar />
             <main className="flex-1 w-full">{children}</main>
+            <BookDemoModal />
           </AuthProvider>
         </ReactQueryProvider>
         <Toaster

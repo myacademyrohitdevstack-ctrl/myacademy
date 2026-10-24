@@ -1,56 +1,110 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaBars,
-  FaTimes,
-  FaChevronDown,
-  FaUserCircle,
-  FaHome,
-  FaBookOpen,
-  FaVideo,
-  FaCog,
-  FaSignOutAlt,
-  FaUsers,
-  FaChalkboardTeacher,
-  FaMoneyBillWave,
-  FaCertificate,
-  FaGraduationCap,
-  FaPhoneAlt,
-  FaCheckCircle,
-  FaCrown,
-  FaChartPie,
-  FaUserFriends,
-} from "react-icons/fa";
+  Menu,
+  X,
+  ChevronDown,
+  GraduationCap,
+  Sparkles,
+  Shield,
+  UserCheck,
+  Users,
+  HeartHandshake,
+  ArrowRight,
+  LogOut,
+  Calendar,
+  MessageSquare,
+  Home,
+  Layers,
+  BookOpen,
+  CreditCard,
+  User,
+  Phone,
+} from "lucide-react";
 import useAuthStore from "@/store/authStore";
-import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
+import useDemoModalStore from "@/store/demoModalStore";
 import { useLogoutMutation } from "../mutations/AuthenticationMutations";
-import { usePathname } from "next/navigation";
+import capitalizeFirstLetter from "@/Utils/captilizeFirstLetter";
+import SITE_CONFIG from "../siteConfig";
 
 export default function Navbar() {
-  const logoutMutation = useLogoutMutation();
-  const [open, setOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef(null);
-  const user = useAuthStore((state) => state.user);
   const pathname = usePathname();
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const logoutMutation = useLogoutMutation();
+  const openDemoModal = useDemoModalStore((state) => state.openModal);
 
-  // Close profile dropdown on outside click
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+
+  const loginDropdownRef = useRef(null);
+  const profileDropdownRef = useRef(null);
+
+  // Detect scroll for blur/glass effect
   useEffect(() => {
-    const handler = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setProfileOpen(false);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+
+      // Section spy on home page
+      if (pathname === "/") {
+        const sections = [
+          "contact",
+          "fees",
+          "teachers",
+          "batches",
+          "courses",
+          "features",
+          "home",
+        ];
+        for (const section of sections) {
+          const el = document.getElementById(section);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= 160 && rect.bottom >= 160) {
+              setActiveSection(section);
+              break;
+            }
+          }
+        }
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (
+        loginDropdownRef.current &&
+        !loginDropdownRef.current.contains(e.target)
+      ) {
+        setLoginDropdownOpen(false);
+      }
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(e.target)
+      ) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  // Lock body scroll when mobile menu is open
+  // Prevent background scroll when mobile menu is open
   useEffect(() => {
-    if (open) {
+    if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -58,584 +112,456 @@ export default function Navbar() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [mobileMenuOpen]);
 
-  const isSuperAdmin =
-    user?.platformRole === "super_admin" || user?.role === "super_admin";
-  const isParent = user?.role === "parent";
+  // Smooth scroll handler
+  const handleNavClick = (sectionId) => {
+    setMobileMenuOpen(false);
+    if (pathname === "/") {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        setActiveSection(sectionId);
+      }
+    } else {
+      router.push(`/#${sectionId}`);
+    }
+  };
 
-  // Determine portal path based on user role
-  const portalPath = isSuperAdmin
-    ? "super-admin"
-    : isParent
-    ? "parent-panel"
-    : user?.role === "admin"
-    ? "admin-panel"
-    : user?.role === "teacher"
-    ? "teacher-panel"
-    : "student-profile";
-
-  // Dynamic Navigation Links based on authentication
-  const guestLinks = [
-    { name: "Home", path: "/" },
-    { name: "Features", path: "/#features" },
-    { name: "Fees & Finance", path: "/#fees" },
-    { name: "Attendance", path: "/#attendance" },
-    { name: "Batches", path: "/#batches" },
-    { name: "Portals", path: "/#portals" },
+  const navLinks = [
+    { id: "home", label: "Home" },
+    { id: "features", label: "Features" },
+    { id: "courses", label: "Courses" },
+    { id: "batches", label: "Batches" },
+    { id: "teachers", label: "Teachers" },
+    { id: "fees", label: "Fees" },
+    { id: "contact", label: "Contact" },
   ];
 
-  const superAdminLinks = [
-    { name: "Platform Overview", path: "/super-admin/dashboard", icon: FaChartPie },
-    { name: "Academies", path: "/super-admin/academies", icon: FaUsers },
-    { name: "SaaS Plans", path: "/super-admin/plans", icon: FaBookOpen },
-    { name: "Subscriptions", path: "/super-admin/subscriptions", icon: FaMoneyBillWave },
-    { name: "Audit Logs", path: "/super-admin/audit-logs", icon: FaCertificate },
-  ];
-
-  const parentLinks = [
-    { name: "Dashboard", path: "/parent-panel/dashboard", icon: FaHome },
-    { name: "Attendance", path: "/parent-panel/attendance", icon: FaCheckCircle },
-    { name: "Fees", path: "/parent-panel/fees", icon: FaMoneyBillWave },
-    { name: "Batches", path: "/parent-panel/batches", icon: FaUsers },
-  ];
-
-  const studentLinks = [
-    { name: "Dashboard", path: "/student-profile/dashboard", icon: FaHome },
-    { name: "My Batches", path: "/student-profile/batches", icon: FaUsers },
-    { name: "Live Classes", path: "/student-profile/classes", icon: FaVideo },
-    { name: "My Courses", path: "/student-profile/courses", icon: FaBookOpen },
-  ];
-
-  const adminLinks = [
-    { name: "Dashboard", path: "/admin-panel/dashboard", icon: FaHome },
-    { name: "Students", path: "/admin-panel/student", icon: FaUsers },
-    { name: "Teachers", path: "/admin-panel/teachers", icon: FaChalkboardTeacher },
-    { name: "Courses", path: "/admin-panel/courses", icon: FaBookOpen },
-    { name: "Fees", path: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave },
-  ];
-
-  const teacherLinks = [
-    { name: "Dashboard", path: "/teacher-panel/dashboard", icon: FaHome },
-    { name: "My Batches", path: "/teacher-panel/batches", icon: FaUsers },
-    { name: "Courses", path: "/teacher-panel/courses", icon: FaBookOpen },
-    { name: "Attendance", path: "/teacher-panel/mark-attendence", icon: FaCheckCircle },
-  ];
-
-  const currentNavLinks = !user
-    ? guestLinks
-    : isSuperAdmin
-    ? superAdminLinks
-    : isParent
-    ? parentLinks
-    : user.role === "admin"
-    ? adminLinks
-    : user.role === "teacher"
-    ? teacherLinks
-    : studentLinks;
-
-  // Profile dropdown menu items
-  const profileItems = [
+  const roleLogins = [
     {
-      title: "Dashboard",
-      icon: FaHome,
-      href: `/${portalPath}/dashboard`,
+      role: "admin",
+      title: "Admin Console",
+      sub: "Academy management, finance & settings",
+      href: "/login?role=admin",
+      icon: Shield,
+      badgeColor: "bg-orange-50 text-[#D6451B] border-orange-200",
     },
     {
-      title: "My Profile",
-      icon: FaUserCircle,
-      href: `/${portalPath}/profile`,
+      role: "teacher",
+      title: "Teacher Hub",
+      sub: "Roll call, study notes & batches",
+      href: "/login?role=teacher",
+      icon: UserCheck,
+      badgeColor: "bg-purple-50 text-purple-600 border-purple-200",
     },
     {
-      title: "Courses",
-      icon: FaBookOpen,
-      href: `/${portalPath}/courses`,
+      role: "student",
+      title: "Student Portal",
+      sub: "Classes, attendance rate & fee receipts",
+      href: "/login?role=student",
+      icon: GraduationCap,
+      badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
     },
-    ...(portalPath === "student-profile"
-      ? [
-          {
-            title: "My Batches",
-            icon: FaUsers,
-            href: `/${portalPath}/batches`,
-          },
-          {
-            title: "Live Classes",
-            icon: FaVideo,
-            href: `/${portalPath}/classes`,
-          },
-        ]
-      : []),
-    ...(portalPath === "super-admin"
-      ? [
-          {
-            title: "Academies",
-            icon: FaUsers,
-            href: "/super-admin/academies",
-          },
-          {
-            title: "SaaS Plans",
-            icon: FaBookOpen,
-            href: "/super-admin/plans",
-          },
-          {
-            title: "Subscriptions",
-            icon: FaMoneyBillWave,
-            href: "/super-admin/subscriptions",
-          },
-          {
-            title: "Audit Logs",
-            icon: FaCertificate,
-            href: "/super-admin/audit-logs",
-          },
-        ]
-      : []),
-    ...(portalPath === "parent-panel"
-      ? [
-          {
-            title: "Attendance",
-            icon: FaCheckCircle,
-            href: "/parent-panel/attendance",
-          },
-          {
-            title: "Fee Status",
-            icon: FaMoneyBillWave,
-            href: "/parent-panel/fees",
-          },
-        ]
-      : []),
-    ...(portalPath === "admin-panel"
-      ? [
-          {
-            title: "Students",
-            icon: FaUsers,
-            href: `/${portalPath}/student`,
-          },
-          {
-            title: "Teachers",
-            icon: FaChalkboardTeacher,
-            href: `/${portalPath}/teachers`,
-          },
-          {
-            title: "Fee Management",
-            icon: FaMoneyBillWave,
-            href: `/${portalPath}/fees/dashboard`,
-          },
-        ]
-      : []),
     {
-      title: "Settings",
-      icon: FaCog,
-      href: `/${portalPath}/settings`,
+      role: "parent",
+      title: "Parent Portal",
+      sub: "Child progress & fee payments",
+      href: "/login?role=parent",
+      icon: HeartHandshake,
+      badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
     },
   ];
+
+  const getPortalHref = () => {
+    if (!user) return "/login";
+    if (user.platformRole === "super_admin" || user.role === "super_admin") {
+      return "/super-admin/dashboard";
+    }
+    switch (user.role) {
+      case "parent":
+        return "/parent-panel/dashboard";
+      case "teacher":
+        return "/teacher-panel/dashboard";
+      case "admin":
+        return "/admin-panel/dashboard";
+      default:
+        return "/student-profile/dashboard";
+    }
+  };
 
   const handleLogout = () => {
-    setProfileOpen(false);
-    setOpen(false);
+    setProfileDropdownOpen(false);
     logoutMutation.mutate();
   };
 
-  // Hide global website navbar on dedicated portal pages
-  if (
-    pathname?.startsWith("/super-admin") ||
-    pathname?.startsWith("/parent-panel") ||
-    pathname?.startsWith("/admin-panel") ||
-    pathname?.startsWith("/student-profile") ||
-    pathname?.startsWith("/teacher-panel") ||
-    pathname?.startsWith("/teacher-profile")
-  ) {
+  // The public navbar must only be rendered on the home page
+  if (pathname !== "/") {
     return null;
   }
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-xs transition-all">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-20">
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-[#D6451B] shadow-md shadow-orange-200/60 transition group-hover:scale-105 p-1.5">
-            <Image
-              src="/icon1.png"
-              alt="MyAcademy"
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 group-hover:text-[#D6451B] transition">
-                MyAcademy
-              </h2>
-              <span className="hidden sm:inline-flex rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-extrabold text-[#D6451B] uppercase tracking-wider">
-                SaaS
-              </span>
-            </div>
-            <p className="text-[10px] font-medium tracking-[0.2em] text-[#D6451B] uppercase">
-              Academy Management
-            </p>
-          </div>
-        </Link>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {currentNavLinks.map((item) => {
-            const isActive = pathname === item.path || (item.path !== "/" && pathname?.startsWith(item.path));
-            return (
-              <Link
-                key={item.name}
-                href={item.path}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  isActive
-                    ? "bg-orange-50 text-[#D6451B] font-bold"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                }`}
-              >
-                {item.icon && <item.icon className="text-sm opacity-80" />}
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Desktop User Actions */}
-        <div className="hidden lg:flex items-center gap-4">
-          {!user ? (
-            <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-[#D6451B] hover:bg-orange-50"
-              >
-                Student Login
-              </Link>
-
-              <Link
-                href="/signup"
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-500/20 transition hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/30"
-              >
-                <span>Register Academy</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="relative" ref={profileRef}>
-              <button
-                onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-3 rounded-full border border-slate-200 bg-white p-1.5 pr-4 transition hover:border-[#D6451B] hover:shadow-md"
-              >
-                {user.profileImage?.url ? (
-                  <Image
-                    src={user.profileImage.url}
-                    alt={user.fullName || "User"}
-                    width={36}
-                    height={36}
-                    className="h-9 w-9 rounded-full object-cover ring-2 ring-orange-100"
-                  />
-                ) : (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#D6451B] to-orange-500 text-sm font-bold text-white shadow-xs">
-                    {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
-                  </div>
-                )}
-
-                <div className="text-left">
-                  <p className="text-xs font-bold text-slate-800 leading-tight">
-                    {capitalizeFirstLetter(user?.fullName || "User")}
-                  </p>
-                  <p className="text-[10px] font-medium capitalize text-[#D6451B]">
-                    {isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role} Portal
-                  </p>
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs py-2.5 sm:py-3"
+            : "bg-white/80 backdrop-blur-sm border-b border-slate-200/40 py-3 sm:py-4"
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link
+              href="/"
+              onClick={() => setActiveSection("home")}
+              className="flex items-center gap-2.5 group focus:outline-none"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-extrabold shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform duration-200">
+                <GraduationCap className="h-5 w-5" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight font-heading">
+                    MyAcademy
+                  </span>
+                  <span className="hidden xs:inline-block rounded-md bg-orange-100/90 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#D6451B]">
+                    CRM
+                  </span>
                 </div>
+                <span className="text-[10px] text-slate-400 font-medium -mt-1 hidden sm:block">
+                  Academy Management System
+                </span>
+              </div>
+            </Link>
 
-                <FaChevronDown
-                  className={`text-xs text-slate-400 transition-transform duration-200 ${
-                    profileOpen ? "rotate-180 text-[#D6451B]" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Profile Dropdown */}
-              <AnimatePresence>
-                {profileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="absolute right-0 mt-3 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl z-50"
+            {/* Desktop Center Links */}
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.id && pathname === "/";
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => handleNavClick(link.id)}
+                    className={`relative px-3 py-1.5 text-xs xl:text-sm font-bold transition-colors cursor-pointer rounded-lg ${
+                      isActive
+                        ? "text-[#D6451B]"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
                   >
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-[#D6451B] via-orange-600 to-orange-500 p-4 text-white">
-                      <div className="flex items-center gap-3">
-                        {user.profileImage?.url ? (
-                          <Image
-                            src={user.profileImage.url}
-                            alt=""
-                            width={48}
-                            height={48}
-                            className="h-12 w-12 rounded-full border-2 border-white object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-lg font-bold backdrop-blur">
-                            {user?.fullName?.charAt(0)?.toUpperCase()}
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <h3 className="truncate text-sm font-bold">
-                            {user?.fullName}
-                          </h3>
-                          <p className="truncate text-xs text-orange-100">
-                            {user?.email}
-                          </p>
-                          <span className="mt-1 inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
-                            {isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role}
-                          </span>
-                        </div>
+                    <span>{link.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeNavIndicator"
+                        className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#D6451B] rounded-full"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Desktop Right CTAs */}
+            <div className="hidden lg:flex items-center gap-3">
+              {/* If Authenticated: Show Portal Button & User Menu */}
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={getPortalHref()}
+                    className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition shadow-xs"
+                  >
+                    <span>Open {capitalizeFirstLetter(user.role)} Portal</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+
+                  {/* Profile Dropdown */}
+                  <div className="relative" ref={profileDropdownRef}>
+                    <button
+                      onClick={() =>
+                        setProfileDropdownOpen(!profileDropdownOpen)
+                      }
+                      className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-1.5 pr-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                    >
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-100 font-extrabold text-xs text-[#D6451B]">
+                        {user.fullName ? user.fullName[0].toUpperCase() : "U"}
                       </div>
-                    </div>
+                      <span className="max-w-[100px] truncate">
+                        {capitalizeFirstLetter(user.fullName)}
+                      </span>
+                      <ChevronDown
+                        className={`h-3 w-3 text-slate-400 transition-transform ${
+                          profileDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
 
-                    {/* Menu Items */}
-                    <div className="p-2 space-y-1">
-                      {profileItems.map((item) => (
-                        <Link
-                          key={item.title}
-                          href={item.href}
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-[#D6451B]"
+                    <AnimatePresence>
+                      {profileDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-50"
                         >
-                          <item.icon className="text-[#D6451B] text-sm" />
-                          <span>{item.title}</span>
-                        </Link>
-                      ))}
-                    </div>
+                          <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                            <p className="text-xs font-bold text-slate-800 truncate">
+                              {user.fullName}
+                            </p>
+                            <p className="text-[11px] text-slate-400 truncate">
+                              {user.email}
+                            </p>
+                            <span className="mt-1.5 inline-block rounded-md bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-[#D6451B] border border-orange-200 uppercase">
+                              {user.role}
+                            </span>
+                          </div>
 
-                    {/* Logout */}
-                    <div className="border-t border-slate-100 p-2">
-                      <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50"
-                      >
-                        <FaSignOutAlt className="text-sm" />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                          <Link
+                            href={getPortalHref()}
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                          >
+                            <Home className="h-3.5 w-3.5 text-slate-400" />
+                            <span>Dashboard Home</span>
+                          </Link>
+
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 w-full rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition cursor-pointer text-left"
+                          >
+                            <LogOut className="h-3.5 w-3.5" />
+                            <span>Sign Out</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              ) : (
+                /* Guest View: Role Login Dropdown & Book a Demo Button */
+                <>
+                  <div className="relative" ref={loginDropdownRef}>
+                    <button
+                      onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
+                      className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition cursor-pointer"
+                    >
+                      <User className="h-3.5 w-3.5 text-slate-500" />
+                      <span>Login</span>
+                      <ChevronDown
+                        className={`h-3 w-3 text-slate-400 transition-transform ${
+                          loginDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    <AnimatePresence>
+                      {loginDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-2xl z-50"
+                        >
+                          <div className="px-3 py-2 border-b border-slate-100 mb-1.5">
+                            <p className="text-xs font-extrabold text-slate-900">
+                              Choose Your Portal
+                            </p>
+                            <p className="text-[11px] text-slate-400">
+                              Select your role to access your workspace
+                            </p>
+                          </div>
+
+                          <div className="space-y-1">
+                            {roleLogins.map((item) => {
+                              const Icon = item.icon;
+                              return (
+                                <Link
+                                  key={item.role}
+                                  href={item.href}
+                                  onClick={() => setLoginDropdownOpen(false)}
+                                  className="flex items-start gap-2.5 rounded-xl p-2.5 hover:bg-slate-50 transition group"
+                                >
+                                  <div
+                                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm ${item.badgeColor}`}
+                                  >
+                                    <Icon className="h-4 w-4" />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="text-xs font-bold text-slate-800 group-hover:text-[#D6451B] transition flex items-center justify-between">
+                                      <span>{item.title}</span>
+                                      <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 truncate">
+                                      {item.sub}
+                                    </p>
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Primary Book a Demo Button */}
+                  <button
+                    onClick={() => openDemoModal()}
+                    className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 px-4 py-2 text-xs font-bold text-white shadow-md shadow-orange-500/20 hover:from-[#ba3913] hover:to-orange-600 transition active:scale-95 cursor-pointer"
+                  >
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span>Book a Demo</span>
+                  </button>
+                </>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Mobile Header Buttons */}
-        <div className="flex items-center gap-2 lg:hidden">
-          {user ? (
-            <Link
-              href={`/${portalPath}/dashboard`}
-              className="flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-bold text-[#D6451B]"
-            >
-              <span>{isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role}</span>
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="rounded-lg bg-[#D6451B] px-3.5 py-1.5 text-xs font-semibold text-white"
-            >
-              Login
-            </Link>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:bg-slate-50 cursor-pointer active:scale-95"
-            aria-label="Toggle Navigation Menu"
-          >
-            {open ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
-          </button>
-        </div>
-      </div>
-    </header>
-
-    {/* Mobile Drawer Menu rendered OUTSIDE <header> to escape backdrop-filter containing block */}
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-[9999] lg:hidden">
-          {/* Backdrop overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
-            onClick={() => setOpen(false)}
-          />
-
-          {/* Slide-out Drawer */}
-          <motion.aside
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 350, damping: 35 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-sm h-full bg-white shadow-2xl flex flex-col justify-between overflow-hidden z-10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Drawer Top */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 shrink-0 bg-white">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 shadow-xs p-1.5">
-                  <Image
-                    src="/icon1.png"
-                    alt="MyAcademy"
-                    width={28}
-                    height={28}
-                    className="h-7 w-7 object-contain"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900">MyAcademy</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#D6451B]">
-                    Academy Portal
-                  </p>
-                </div>
-              </div>
+            {/* Mobile Menu Button */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <button
+                onClick={() => openDemoModal()}
+                className="flex items-center gap-1 rounded-lg bg-orange-50 px-2.5 py-1.5 text-xs font-bold text-[#D6451B] border border-orange-200"
+              >
+                <Calendar className="h-3 w-3" />
+                <span>Demo</span>
+              </button>
 
               <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 cursor-pointer"
-                aria-label="Close menu"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                aria-label="Toggle navigation menu"
               >
-                <FaTimes />
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5 text-slate-900" />
+                ) : (
+                  <Menu className="h-5 w-5 text-slate-900" />
+                )}
               </button>
             </div>
-
-            {/* Scrollable middle container */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Drawer User Card */}
-              <div className="p-5 border-b border-slate-100 bg-slate-50/70">
-                {user ? (
-                  <div className="rounded-2xl bg-gradient-to-r from-[#D6451B] to-orange-500 p-4 text-white shadow-md">
-                    <div className="flex items-center gap-3">
-                      {user.profileImage?.url ? (
-                        <Image
-                          src={user.profileImage.url}
-                          alt=""
-                          width={48}
-                          height={48}
-                          className="h-12 w-12 rounded-full border-2 border-white object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-lg font-bold">
-                          {user?.fullName?.charAt(0)?.toUpperCase()}
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <h4 className="truncate font-bold text-white">
-                          {user?.fullName}
-                        </h4>
-                        <p className="truncate text-xs text-orange-100">
-                          {user?.email}
-                        </p>
-                        <span className="mt-1.5 inline-block rounded-full bg-white/25 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
-                          {isSuperAdmin ? "Super Admin" : isParent ? "Parent" : user?.role} Portal
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-slate-500 text-center mb-3">
-                      Access your interactive batches, notes & study portal
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link
-                        href="/login"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center justify-center rounded-xl border border-slate-300 bg-white py-3 text-center text-sm font-bold text-slate-800 transition hover:border-[#D6451B]"
-                      >
-                        Login
-                      </Link>
-                      <Link
-                        href="/signup"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center justify-center rounded-xl bg-[#D6451B] py-3 text-center text-sm font-bold text-white shadow-xs transition hover:bg-orange-700"
-                      >
-                        Register Academy
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Drawer Links */}
-              <div className="px-4 py-4 space-y-6">
-                <div>
-                  <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                    {user ? `${user.role} Navigation` : "Explore Academy"}
-                  </p>
-                  <div className="space-y-1">
-                    {currentNavLinks.map((item) => (
-                      <Link
-                        key={item.name}
-                        href={item.path}
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-[#D6451B]"
-                      >
-                        {item.icon && <item.icon className="text-[#D6451B] text-base" />}
-                        <span>{item.name}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
-                {user && (
-                  <div>
-                    <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                      Account & Preferences
-                    </p>
-                    <div className="space-y-1">
-                      {profileItems.map((item) => (
-                        <Link
-                          key={item.title}
-                          href={item.href}
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-[#D6451B]"
-                        >
-                          <item.icon className="text-slate-400 text-sm" />
-                          <span>{item.title}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Drawer Footer */}
-            <div className="border-t border-slate-200 p-4 bg-slate-50 shrink-0">
-              {user ? (
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white py-3 text-sm font-bold text-rose-600 transition hover:bg-rose-50 cursor-pointer"
-                >
-                  <FaSignOutAlt />
-                  <span>Log Out</span>
-                </button>
-              ) : (
-                <div className="text-center">
-                  <p className="text-xs text-slate-500">
-                    Need help enrolling? Call +91 98787 61488
-                  </p>
-                </div>
-              )}
-              <p className="mt-3 text-center text-[10px] text-slate-400">
-                &copy; 2026 MyAcademy. All rights reserved.
-              </p>
-            </div>
-          </motion.aside>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
-  </>
-);
+      </header>
+
+      {/* Mobile Slide-in Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs"
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 240 }}
+              className="fixed top-0 right-0 bottom-0 w-full max-w-xs sm:max-w-sm bg-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
+            >
+              <div>
+                {/* Drawer Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-extrabold shadow-xs">
+                      <GraduationCap className="h-4 w-4" />
+                    </div>
+                    <span className="font-extrabold text-slate-900 text-base">
+                      MyAcademy
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Navigation Links */}
+                <div className="mt-4 space-y-1">
+                  <p className="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    Navigation
+                  </p>
+                  {navLinks.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => handleNavClick(link.id)}
+                      className={`flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-xs sm:text-sm font-bold text-left transition ${
+                        activeSection === link.id && pathname === "/"
+                          ? "bg-orange-50 text-[#D6451B]"
+                          : "text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      <ArrowRight className="h-3 w-3 text-slate-300" />
+                    </button>
+                  ))}
+                </div>
+
+                {/* Role Logins Section */}
+                <div className="mt-6 pt-4 border-t border-slate-100">
+                  <p className="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                    Portal Access
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {roleLogins.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.role}
+                          href={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-orange-50/50 hover:border-orange-200 transition text-center"
+                        >
+                          <div
+                            className={`flex h-7 w-7 items-center justify-center rounded-lg border text-xs mb-1.5 ${item.badgeColor}`}
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="text-[11px] font-bold text-slate-800">
+                            {item.title.split(" ")[0]}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Actions in Drawer */}
+              <div className="mt-6 pt-4 border-t border-slate-100 space-y-2.5">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openDemoModal();
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D6451B] to-orange-500 py-3 px-4 text-xs font-bold text-white shadow-md shadow-orange-500/20"
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>Book a Live Demo</span>
+                </button>
+
+                <a
+                  href={`https://wa.me/${SITE_CONFIG.whatsappNumber}?text=Hello%20MyAcademy,%20I%20want%20to%20learn%20more%20about%20your%20Academy%20Management%20Platform.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 py-2.5 px-4 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  <span>WhatsApp Inquiry</span>
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }

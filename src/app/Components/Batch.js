@@ -1225,13 +1225,15 @@ export default function BatchDetailsPage({permissions}) {
 )}
     </div>
     <Modal
-     isOpen={pdfOpen}
-      onClose={() => setPdfOpen(false)}>
-      <PdfViewer url={pdfUrl}></PdfViewer>
-      
-
+      isOpen={pdfOpen}
+      size="xl"
+      title="Study Material Viewer"
+      subtitle="Read notes, zoom or download PDF"
+      onClose={() => setPdfOpen(false)}
+    >
+      <PdfViewer url={pdfUrl} />
     </Modal>
-    </div>
+  </div>
   );
 }
 

@@ -1001,14 +1001,16 @@ export default function LiveClasses() {
   </div>
 )}
     </div>
-     <Modal
-         isOpen={pdfOpen}
-          onClose={() => setPdfOpen(false)}>
-          <PdfViewer url={pdfUrl}></PdfViewer>
-          
-    
-        </Modal>
-    </div>
+    <Modal
+      isOpen={pdfOpen}
+      size="xl"
+      title="Study Material Viewer"
+      subtitle="Read notes, zoom or download PDF"
+      onClose={() => setPdfOpen(false)}
+    >
+      <PdfViewer url={pdfUrl} />
+    </Modal>
+  </div>
   );
 }
 function TabButton({ active, onClick, icon, label }) {
