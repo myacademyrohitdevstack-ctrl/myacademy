@@ -103,6 +103,7 @@ export default function HomePage() {
       case "teacher":
         return "/teacher-panel/dashboard";
       case "admin":
+      case "academy_staff":
         return "/admin-panel/dashboard";
       default:
         return "/student-profile/dashboard";

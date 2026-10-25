@@ -9,6 +9,8 @@ const normalizeUser = (user) => {
     ...user,
     _id: id,
     id: id,
+    permissions: Array.isArray(user.permissions) ? user.permissions : [],
+    staffTitle: user.staffTitle || "",
   };
 };
 

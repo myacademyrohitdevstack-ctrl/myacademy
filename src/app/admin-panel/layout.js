@@ -13,7 +13,7 @@ export const metadata = {
 export default function Layout({ children }) {
   return (
     <AuthProvider>
-      <ProtectedRoute roles={["admin"]}>
+      <ProtectedRoute roles={["admin", "academy_staff"]}>
         <AdminDrawerNav>{children}</AdminDrawerNav>
       </ProtectedRoute>
     </AuthProvider>

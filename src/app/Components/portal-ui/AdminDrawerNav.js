@@ -29,29 +29,46 @@ import {
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
+import { usePermissions } from "@/Hooks/usePermissions";
 import NotificationBell from "./NotificationBell";
 
 const adminNavItems = [
   { name: "Dashboard", href: "/admin-panel/dashboard", icon: FaChartLine },
-  { name: "Analytics & Insights", href: "/admin-panel/analytics", icon: FaChartPie },
-  { name: "Students", href: "/admin-panel/student", icon: FaUsers },
-  { name: "Parent Links", href: "/admin-panel/parents", icon: FaUserFriends },
-  { name: "Teachers", href: "/admin-panel/teachers", icon: FaChalkboardTeacher },
-  { name: "Courses", href: "/admin-panel/courses", icon: FaBookOpen },
-  { name: "Exams & Results", href: "/admin-panel/exams", icon: FaFileAlt },
-  { name: "Homework", href: "/admin-panel/homework", icon: FaClipboardList },
-  { name: "Fees & Finance", href: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave },
-  { name: "Academy Details", href: "/admin-panel/academy-profile", icon: FaUniversity },
+  { name: "Analytics & Insights", href: "/admin-panel/analytics", icon: FaChartPie, permission: "reports.read" },
+  { name: "Students", href: "/admin-panel/student", icon: FaUsers, permission: "students.read" },
+  { name: "Parent Links", href: "/admin-panel/parents", icon: FaUserFriends, permission: "students.read" },
+  { name: "Teachers", href: "/admin-panel/teachers", icon: FaChalkboardTeacher, permission: "teachers.read" },
+  { name: "Courses", href: "/admin-panel/courses", icon: FaBookOpen, permission: "courses.read" },
+  { name: "Exams & Results", href: "/admin-panel/exams", icon: FaFileAlt, permission: "exams.read" },
+  { name: "Homework", href: "/admin-panel/homework", icon: FaClipboardList, permission: "homework.read" },
+  { name: "Fees & Finance", href: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave, permission: "fees.read" },
+  { name: "Academy Details", href: "/admin-panel/academy-profile", icon: FaUniversity, permission: "academy_settings.read" },
+  { name: "Academy Staff", href: "/admin-panel/staff", icon: FaShieldAlt, ownerOnly: true },
   { name: "Admin Profile", href: "/admin-panel/profile", icon: FaUserCircle },
-  { name: "Settings", href: "/admin-panel/settings", icon: FaCog },
+  { name: "Settings", href: "/admin-panel/settings", icon: FaCog, permission: "academy_settings.read" },
 ];
 
 export default function AdminDrawerNav({ children }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  const { isOwner, isStaff, hasPermission } = usePermissions();
   const logoutMutation = useLogoutMutation();
   const isSuperAdmin = user?.platformRole === "super_admin" || user?.role === "super_admin";
+
+  const filteredNavItems = adminNavItems.filter((item) => {
+    if (item.ownerOnly && !isOwner) return false;
+    if (item.permission && !hasPermission(item.permission)) return false;
+    return true;
+  });
+
+  const displayRole = isSuperAdmin
+    ? "Super Admin"
+    : isStaff
+    ? user?.staffTitle || "Academy Staff"
+    : isOwner
+    ? "Academy Owner"
+    : "Administrator";
 
   const closeDrawer = () => setMobileOpen(false);
 
@@ -156,7 +173,7 @@ export default function AdminDrawerNav({ children }) {
                       </Link>
                     </div>
                   )}
-                  {adminNavItems.map((item) => {
+                  {filteredNavItems.map((item) => {
                     const isActive =
                       pathname === item.href ||
                       (item.href === "/admin-panel/fees/dashboard"
@@ -200,7 +217,7 @@ export default function AdminDrawerNav({ children }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-bold text-slate-900">{user?.fullName || "Administrator"}</p>
-                    <p className="truncate text-[11px] text-slate-500">{user?.email}</p>
+                    <p className="truncate text-[11px] text-[#D6451B] font-semibold">{displayRole}</p>
                   </div>
                 </div>
 
@@ -256,7 +273,7 @@ export default function AdminDrawerNav({ children }) {
                 </Link>
               </div>
             )}
-            {adminNavItems.map((item) => {
+            {filteredNavItems.map((item) => {
               const isActive =
                 pathname === item.href ||
                 (item.href === "/admin-panel/fees/dashboard"
@@ -298,7 +315,7 @@ export default function AdminDrawerNav({ children }) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold text-slate-900">{user?.fullName || "Admin"}</p>
-              <p className="truncate text-xs text-slate-400 font-medium capitalize">{user?.role || "admin"}</p>
+              <p className="truncate text-xs text-[#D6451B] font-semibold">{displayRole}</p>
             </div>
           </div>
 

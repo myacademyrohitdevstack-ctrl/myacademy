@@ -44,8 +44,8 @@ export const useLoginMutation = () => {
         router.replace('/parent-panel/dashboard');
       } else if (data.user?.role === "student") {
         router.replace('/student-profile/profile');
-      } else if (data.user?.role === "admin") {
-        router.replace('/admin-panel/student');
+      } else if (data.user?.role === "admin" || data.user?.role === "academy_staff") {
+        router.replace('/admin-panel/dashboard');
       } else if (data.user?.role === "teacher") {
         router.replace('/teacher-panel/dashboard');
       }
@@ -70,8 +70,8 @@ export const useVerify2FaMutation = () => {
 
       if (data.user?.platformRole === "super_admin" || data.user?.role === "super_admin") {
         router.replace('/super-admin/dashboard');
-      } else if (data.user?.role === "admin") {
-        router.replace('/admin-panel/student');
+      } else if (data.user?.role === "admin" || data.user?.role === "academy_staff") {
+        router.replace('/admin-panel/dashboard');
       } else {
         router.replace('/');
       }
