@@ -21,11 +21,73 @@ import {
 } from "@/app/mutations/superAdminMutations";
 import { toast } from "sonner";
 
+export const AVAILABLE_PLAN_FEATURES = [
+  {
+    category: "Financials & Reminders",
+    items: [
+      { id: "Fee Management & Invoicing", label: "Fee Management & Invoicing", desc: "Installments, fee structures & discounts" },
+      { id: "Fee Ledgers & Offline Receipts", label: "Fee Ledgers & Receipts", desc: "Payment receipts & offline collection" },
+      { id: "Automated WhatsApp Alerts", label: "Automated WhatsApp Alerts", desc: "Meta Cloud API & Direct reminders" },
+      { id: "Resend Email Payment Notices", label: "Resend Email Payment Notices", desc: "Official tuition payment notices via Resend" },
+    ],
+  },
+  {
+    category: "Academics & Operations",
+    items: [
+      { id: "Attendance Tracking", label: "Attendance Tracking", desc: "Daily attendance logs & student activity" },
+      { id: "Batch & Course Management", label: "Batch & Course Management", desc: "Academic curriculum, batches & instructors" },
+      { id: "Homework & Assignments", label: "Homework & Assignments", desc: "Assignment uploads, submissions & grading" },
+      { id: "Exam Management & Results", label: "Exam Management & Results", desc: "Schedule exams & generate report cards" },
+      { id: "Live Virtual Classes", label: "Live Virtual Classes", desc: "Zoom & Google Meet class link integrations" },
+    ],
+  },
+  {
+    category: "Portals & Role Access",
+    items: [
+      { id: "Student Portal", label: "Student Portal", desc: "Progress rings, marks trend & schedule" },
+      { id: "Parent Portal", label: "Parent Portal", desc: "Ward attendance, fee dues & exam records" },
+      { id: "Teacher Portal", label: "Teacher Portal", desc: "Batches, attendance grading & homework" },
+    ],
+  },
+  {
+    category: "Intelligence & Branding",
+    items: [
+      { id: "Advanced Analytics & Reports", label: "Advanced Analytics & Reports", desc: "Revenue charts, enrollment trends & heatmaps" },
+      { id: "Custom Academy Branding & Receipts", label: "Custom Academy Branding", desc: "Academy logo & mode on fee receipts" },
+      { id: "Audit Logs & Security History", label: "Audit Logs & Security", desc: "Track staff actions & system audit trail" },
+      { id: "Priority Support & Cloud Backup", label: "Priority Support & Cloud Backup", desc: "Expedited assistance & automated backups" },
+    ],
+  },
+];
+
+const STARTER_FEATURES = [
+  "Attendance Tracking",
+  "Batch & Course Management",
+  "Fee Management & Invoicing",
+  "Student Portal",
+];
+
+const PRO_FEATURES = [
+  "Attendance Tracking",
+  "Batch & Course Management",
+  "Homework & Assignments",
+  "Exam Management & Results",
+  "Fee Management & Invoicing",
+  "Fee Ledgers & Offline Receipts",
+  "Automated WhatsApp Alerts",
+  "Student Portal",
+  "Parent Portal",
+  "Teacher Portal",
+];
+
+const ALL_FEATURES = AVAILABLE_PLAN_FEATURES.flatMap((cat) => cat.items.map((item) => item.id));
+
 export default function SuperAdminPlansClient() {
   const { data: plans = [], isLoading } = useSuperAdminPlans();
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [customFeatureInput, setCustomFeatureInput] = useState("");
 
   const [planForm, setPlanForm] = useState({
     name: "",
@@ -38,7 +100,7 @@ export default function SuperAdminPlansClient() {
       students: 100,
       courses: 10,
     },
-    features: "Attendance Management, Fee Collection, Automated WhatsApp Alerts, Student Portal",
+    features: [...STARTER_FEATURES],
     isActive: true,
   });
 
@@ -54,14 +116,21 @@ export default function SuperAdminPlansClient() {
       annualPrice: 9999,
       trialDays: 14,
       limits: { students: 100, courses: 10 },
-      features: "Attendance Tracking, Batch Management, Fee Ledgers, Parent Portal",
+      features: [...STARTER_FEATURES],
       isActive: true,
     });
+    setCustomFeatureInput("");
     setCreateModalOpen(true);
   };
 
   const openEditModal = (plan) => {
     setEditingPlan(plan);
+    const existingFeatures = Array.isArray(plan.features)
+      ? plan.features
+      : typeof plan.features === "string"
+      ? plan.features.split(",").map((f) => f.trim()).filter(Boolean)
+      : [];
+
     setPlanForm({
       name: plan.name || "",
       code: plan.code || "",
@@ -73,10 +142,47 @@ export default function SuperAdminPlansClient() {
         students: plan.limits?.students || 100,
         courses: plan.limits?.courses || 10,
       },
-      features: Array.isArray(plan.features) ? plan.features.join(", ") : "",
+      features: existingFeatures,
       isActive: plan.isActive !== false,
     });
+    setCustomFeatureInput("");
   };
+
+  const toggleFeature = (featureId) => {
+    setPlanForm((prev) => {
+      const current = Array.isArray(prev.features) ? prev.features : [];
+      const exists = current.includes(featureId);
+      return {
+        ...prev,
+        features: exists ? current.filter((f) => f !== featureId) : [...current, featureId],
+      };
+    });
+  };
+
+  const handleAddCustomFeature = (e) => {
+    e?.preventDefault();
+    const trimmed = customFeatureInput.trim();
+    if (!trimmed) return;
+    setPlanForm((prev) => {
+      const current = Array.isArray(prev.features) ? prev.features : [];
+      if (current.includes(trimmed)) return prev;
+      return {
+        ...prev,
+        features: [...current, trimmed],
+      };
+    });
+    setCustomFeatureInput("");
+  };
+
+  const handleRemoveFeature = (featureId) => {
+    setPlanForm((prev) => ({
+      ...prev,
+      features: (prev.features || []).filter((f) => f !== featureId),
+    }));
+  };
+
+  const defaultFeatureIds = new Set(ALL_FEATURES);
+  const customSelectedFeatures = (planForm.features || []).filter((f) => !defaultFeatureIds.has(f));
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
@@ -93,10 +199,7 @@ export default function SuperAdminPlansClient() {
       annualPrice: Number(planForm.annualPrice),
       trialDays: Number(planForm.trialDays),
       limits: planForm.limits,
-      features: planForm.features
-        .split(",")
-        .map((f) => f.trim())
-        .filter(Boolean),
+      features: Array.isArray(planForm.features) ? planForm.features.filter(Boolean) : [],
       isActive: planForm.isActive,
     };
 
@@ -117,10 +220,7 @@ export default function SuperAdminPlansClient() {
       annualPrice: Number(planForm.annualPrice),
       trialDays: Number(planForm.trialDays),
       limits: planForm.limits,
-      features: planForm.features
-        .split(",")
-        .map((f) => f.trim())
-        .filter(Boolean),
+      features: Array.isArray(planForm.features) ? planForm.features.filter(Boolean) : [],
       isActive: planForm.isActive,
     };
 
@@ -291,7 +391,7 @@ export default function SuperAdminPlansClient() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-xl sm:max-w-2xl rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
@@ -472,19 +572,154 @@ export default function SuperAdminPlansClient() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Features (comma-separated)
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder="Attendance, Fees, WhatsApp, Parent Portal, Reports..."
-                    value={planForm.features}
-                    onChange={(e) =>
-                      setPlanForm({ ...planForm, features: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-slate-200 p-2.5 text-xs font-medium outline-none focus:border-[#D6451B]"
-                  />
+                {/* Interactive Features Checklist */}
+                <div className="space-y-3 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                    <div>
+                      <label className="block font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                        Features Checklist ({planForm.features?.length || 0} selected)
+                      </label>
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        Tick the modules and capabilities included in this tier.
+                      </p>
+                    </div>
+
+                    {/* Quick Presets */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setPlanForm({ ...planForm, features: [...STARTER_FEATURES] })}
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px] transition cursor-pointer"
+                        title="Select typical starter features"
+                      >
+                        Starter
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPlanForm({ ...planForm, features: [...PRO_FEATURES] })}
+                        className="px-2 py-1 rounded-lg bg-orange-50 hover:bg-orange-100 text-[#D6451B] border border-orange-200 font-bold text-[10px] transition cursor-pointer"
+                        title="Select pro academy features"
+                      >
+                        Pro
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPlanForm({ ...planForm, features: [...ALL_FEATURES] })}
+                        className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[10px] transition cursor-pointer"
+                        title="Select all features"
+                      >
+                        Select All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPlanForm({ ...planForm, features: [] })}
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 font-bold text-[10px] transition cursor-pointer"
+                        title="Clear all selected features"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Categorized Checkbox List */}
+                  <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                    {AVAILABLE_PLAN_FEATURES.map((cat) => (
+                      <div key={cat.category} className="space-y-2">
+                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                          {cat.category}
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {cat.items.map((item) => {
+                            const isChecked = (planForm.features || []).includes(item.id);
+                            return (
+                              <label
+                                key={item.id}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  toggleFeature(item.id);
+                                }}
+                                className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                                  isChecked
+                                    ? "bg-orange-50/70 border-[#D6451B] ring-1 ring-[#D6451B]/30"
+                                    : "bg-slate-50/50 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  readOnly
+                                  className="mt-0.5 rounded text-[#D6451B] focus:ring-[#D6451B] cursor-pointer"
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <p className={`text-xs font-bold leading-tight ${isChecked ? "text-[#D6451B]" : "text-slate-800"}`}>
+                                    {item.label}
+                                  </p>
+                                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
+                                    {item.desc}
+                                  </p>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Custom & Legacy Features Section */}
+                    {customSelectedFeatures.length > 0 && (
+                      <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                          Custom &amp; Legacy Features
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {customSelectedFeatures.map((feat) => (
+                            <span
+                              key={feat}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-100 text-[#D6451B] text-xs font-bold border border-orange-200"
+                            >
+                              <span>{feat}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFeature(feat)}
+                                className="text-orange-600 hover:text-orange-900 cursor-pointer"
+                              >
+                                <FaTimes className="text-[10px]" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Custom Feature Write-in */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Add Bespoke / Custom Feature
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. AI Doubt Assistant, Custom Mobile App..."
+                        value={customFeatureInput}
+                        onChange={(e) => setCustomFeatureInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddCustomFeature();
+                          }
+                        }}
+                        className="flex-1 rounded-xl border border-slate-200 p-2 text-xs font-semibold outline-none focus:border-[#D6451B]"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCustomFeature}
+                        className="px-3 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition cursor-pointer flex items-center gap-1"
+                      >
+                        <FaPlus className="text-[10px]" /> Add
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-1">
