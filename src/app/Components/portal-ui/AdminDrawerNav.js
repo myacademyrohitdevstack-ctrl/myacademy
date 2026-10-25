@@ -24,6 +24,8 @@ import {
   FaCrown,
   FaFileAlt,
   FaClipboardList,
+  FaChartPie,
+  FaUniversity,
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
@@ -31,6 +33,7 @@ import NotificationBell from "./NotificationBell";
 
 const adminNavItems = [
   { name: "Dashboard", href: "/admin-panel/dashboard", icon: FaChartLine },
+  { name: "Analytics & Insights", href: "/admin-panel/analytics", icon: FaChartPie },
   { name: "Students", href: "/admin-panel/student", icon: FaUsers },
   { name: "Parent Links", href: "/admin-panel/parents", icon: FaUserFriends },
   { name: "Teachers", href: "/admin-panel/teachers", icon: FaChalkboardTeacher },
@@ -38,6 +41,7 @@ const adminNavItems = [
   { name: "Exams & Results", href: "/admin-panel/exams", icon: FaFileAlt },
   { name: "Homework", href: "/admin-panel/homework", icon: FaClipboardList },
   { name: "Fees & Finance", href: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave },
+  { name: "Academy Details", href: "/admin-panel/academy-profile", icon: FaUniversity },
   { name: "Admin Profile", href: "/admin-panel/profile", icon: FaUserCircle },
   { name: "Settings", href: "/admin-panel/settings", icon: FaCog },
 ];

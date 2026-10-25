@@ -27,6 +27,7 @@ import {
 } from "react-icons/fa";
 import CommingSoon from "@/app/Components/ui/CommingSoon";
 import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
+import { StatCard, ProgressRing, ProgressBar, AttendanceHeatmap } from "@/app/Components/visual-ui";
 
 export default function Dashboard({ user }) {
   const { data: announcements, isLoading: announcementsLoading } = useStudentsAllAnnouncements();
@@ -121,66 +122,69 @@ export default function Dashboard({ user }) {
               </Link>
             </div>
 
-            {/* Attendance Quick Badge in Hero */}
-            <div className="rounded-2xl bg-white/15 p-4 sm:p-5 backdrop-blur-md lg:w-80 shrink-0 border border-white/20">
-              <div className="flex items-center justify-between text-xs uppercase font-semibold text-orange-100 tracking-wider">
-                <span>Attendance Status</span>
-                <FaCalendarCheck className="text-white/80" />
-              </div>
-
-              <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold">
-                  {attendancePercentage !== null ? `${attendancePercentage}%` : "100%"}
-                </span>
-                <span className="text-xs text-orange-100">
+            {/* Attendance Radial Ring in Hero */}
+            <div className="flex items-center gap-4 bg-white/15 p-4 sm:p-5 rounded-2xl backdrop-blur-md lg:w-80 shrink-0 border border-white/20">
+              <ProgressRing
+                percentage={attendancePercentage !== null ? attendancePercentage : 100}
+                size={82}
+                strokeWidth={7}
+                colorScheme="auto"
+                showPercentage={true}
+                targetPercentage={75}
+              />
+              <div className="space-y-1 text-xs">
+                <p className="font-extrabold text-white text-sm">
+                  {isEligible ? "Exam Eligible" : "Attendance Shortage"}
+                </p>
+                <p className="text-orange-100 text-[11px]">
                   {attendanceStats.totalClasses
                     ? `${attendanceStats.present || 0}/${attendanceStats.totalClasses} attended`
                     : "Zero Missed Sessions"}
+                </p>
+                <span className="inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white">
+                  75% Benchmark
                 </span>
-              </div>
-
-              <div className="mt-3.5 h-2.5 overflow-hidden rounded-full bg-white/30">
-                <div
-                  className="h-full rounded-full bg-white transition-all duration-500"
-                  style={{ width: `${Math.min(100, attendancePercentage ?? 100)}%` }}
-                />
-              </div>
-
-              <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-orange-100">
-                <span>75% Minimum Required</span>
-                <span>{isEligible ? "✓ Eligible" : "⚠️ Shortage"}</span>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Primary KPI Grid (StatCards) */}
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
-          {stats.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ y: -4 }}
-              className="rounded-xl sm:rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-xs hover:shadow-md transition-all"
-            >
-              <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-orange-50 text-base sm:text-lg text-[#D6451B]">
-                {item.icon}
-              </div>
+          <StatCard
+            title="Attendance Rate"
+            value={attendancePercentage !== null ? attendancePercentage : 100}
+            suffix="%"
+            icon={FaCalendarCheck}
+            color={attendancePercentage !== null && attendancePercentage < 75 ? "rose" : "emerald"}
+            trend={attendancePercentage !== null && attendancePercentage >= 75 ? "Eligible" : "Warning"}
+            trendDirection={attendancePercentage !== null && attendancePercentage >= 75 ? "up" : "down"}
+            subText={attendanceStats.totalClasses ? `${attendanceStats.present || 0} attended` : "100% standing"}
+          />
 
-              <h3 className={`mt-2.5 text-lg sm:text-2xl font-extrabold tracking-tight ${item.color}`}>
-                {item.value}
-              </h3>
+          <StatCard
+            title="Enrolled Batches"
+            value={statics?.batches || 0}
+            icon={FaUsers}
+            color="blue"
+            subText="Active cohorts"
+          />
 
-              <p className="mt-0.5 text-xs font-semibold text-slate-700 truncate">
-                {item.title}
-              </p>
-              <p className="text-[11px] text-slate-400 truncate">
-                {item.sub}
-              </p>
-            </motion.div>
-          ))}
+          <StatCard
+            title="Total Sessions"
+            value={attendanceStats.totalClasses || statics?.classes || 0}
+            icon={FaChalkboardTeacher}
+            color="orange"
+            subText={`${attendanceStats.present || 0} attended • ${attendanceStats.leave || 0} leave`}
+          />
+
+          <StatCard
+            title="Study Notes & PDFs"
+            value={(statics?.notes || 0) + (statics?.pdfs || 0)}
+            icon={FaStickyNote}
+            color="purple"
+            subText="Available resources"
+          />
         </div>
 
         {/* ATTENDANCE OVERVIEW SECTION */}
@@ -355,6 +359,17 @@ export default function Dashboard({ user }) {
               <span className="font-bold text-slate-700">75% (Exam Threshold)</span>
               <span>100%</span>
             </div>
+          </div>
+
+          {/* 45-Day Attendance Heatmap Activity */}
+          <div className="mt-6">
+            <AttendanceHeatmap
+              attendanceRecords={recentAttendance}
+              daysCount={45}
+              title="Classroom Attendance Heatmap"
+              subtitle="Daily roll-call regularity over the past 45 class days"
+              currentStreak={attendanceInsights?.currentStreak || 0}
+            />
           </div>
 
           {/* Recent Attendance Log (Last 10 records) */}

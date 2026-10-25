@@ -37,6 +37,7 @@ export default function RemindersClient() {
   // Modal states
   const [manualModalOpen, setManualModalOpen] = useState(false);
   const [selectedCandidateForManual, setSelectedCandidateForManual] = useState(null);
+  const [selectedRecipientRoleForManual, setSelectedRecipientRoleForManual] = useState("student");
 
   const [bulkConfirmModalOpen, setBulkConfirmModalOpen] = useState(false);
   const [bulkConfirmData, setBulkConfirmData] = useState(null);
@@ -56,8 +57,9 @@ export default function RemindersClient() {
     setActiveTab(tabKey);
   };
 
-  const handleOpenManualModal = ({ candidate }) => {
+  const handleOpenManualModal = ({ candidate, recipientRole }) => {
     setSelectedCandidateForManual(candidate);
+    setSelectedRecipientRoleForManual(recipientRole || "student");
     setManualModalOpen(true);
   };
 
@@ -191,6 +193,7 @@ export default function RemindersClient() {
           isOpen={manualModalOpen}
           onClose={() => setManualModalOpen(false)}
           candidate={selectedCandidateForManual}
+          initialRecipientRole={selectedRecipientRoleForManual}
           templates={templates}
           integrationData={integrationData}
         />

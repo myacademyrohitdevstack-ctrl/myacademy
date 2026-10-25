@@ -9,6 +9,7 @@ import {
   FaCalendarAlt,
   FaUserGraduate,
   FaUserFriends,
+  FaUsers,
   FaCheckSquare,
   FaSquare,
   FaExclamationCircle,
@@ -221,7 +222,17 @@ export default function SendRemindersTab({
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <FaUserFriends className="text-xs" /> Parent / Guardian
+                <FaUserFriends className="text-xs" /> Parent
+              </button>
+              <button
+                onClick={() => setRecipientRole("both")}
+                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg inline-flex items-center justify-center gap-1.5 transition-all ${
+                  recipientRole === "both"
+                    ? "bg-white text-[#D6451B] shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <FaUsers className="text-xs" /> Both
               </button>
             </div>
 

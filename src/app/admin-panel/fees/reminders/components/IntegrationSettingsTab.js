@@ -20,6 +20,8 @@ import {
   FaCog,
   FaBolt,
   FaCheck,
+  FaEnvelope,
+  FaClock,
 } from "react-icons/fa";
 import { useWhatsAppIntegration } from "@/Hooks/useWhatsAppReminders";
 import {
@@ -34,8 +36,9 @@ function IntegrationSettingsForm({ initialIntegration }) {
   const testMutation = useTestIntegrationMutation();
   const disconnectMutation = useDisconnectIntegrationMutation();
 
-  // Map initial mode to 3 distinct options: 'direct_whatsapp' | 'myacademy_api' | 'cloud_api'
+  // Map initial mode to 4 distinct options: 'direct_whatsapp' | 'myacademy_api' | 'cloud_api' | 'resend_email'
   const getInitialMode = (m) => {
+    if (m === "resend_email" || m === "email") return "resend_email";
     if (m === "platform_api" || m === "myacademy_api") return "myacademy_api";
     if (m === "cloud_api" || m === "custom_api") return "cloud_api";
     return "direct_whatsapp";
@@ -83,38 +86,44 @@ function IntegrationSettingsForm({ initialIntegration }) {
       <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
-            <FaWhatsapp className="text-emerald-500 text-xl" /> WhatsApp Messaging Engine
+            <span className="flex items-center gap-1.5">
+              <FaWhatsapp className="text-emerald-500 text-xl" />
+              <FaEnvelope className="text-blue-500 text-lg" />
+            </span>
+            Fee Reminder Notification Engine
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Select your preferred WhatsApp communication mode. All modes are fully mobile-responsive.
+            Select your active payment reminder delivery channel. You can opt between any option, with 1 active channel at a time.
           </p>
         </div>
 
-        {mode === "cloud_api" && (
+        {(mode === "cloud_api" || mode === "resend_email") && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
-              onClick={() => testMutation.mutate()}
-              disabled={testMutation.isPending || !phoneNumberId}
-              className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+              onClick={() => testMutation.mutate({ mode })}
+              disabled={testMutation.isPending || (mode === "cloud_api" && !phoneNumberId)}
+              className="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <FaSyncAlt className={`text-xs ${testMutation.isPending ? "animate-spin" : ""}`} />
-              {testMutation.isPending ? "Testing..." : "Test Connection"}
+              {testMutation.isPending ? "Testing..." : mode === "resend_email" ? "Test Resend Gateway" : "Test Connection"}
             </button>
-            <button
-              type="button"
-              onClick={() => disconnectMutation.mutate()}
-              disabled={disconnectMutation.isPending}
-              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              <FaTrashAlt className="text-xs" /> Disconnect
-            </button>
+            {mode === "cloud_api" && (
+              <button
+                type="button"
+                onClick={() => disconnectMutation.mutate()}
+                disabled={disconnectMutation.isPending}
+                className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                <FaTrashAlt className="text-xs" /> Disconnect
+              </button>
+            )}
           </div>
         )}
       </div>
 
-      {/* 2. 3 Distinct Mode Selector Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+      {/* 2. 4 Distinct Single-Choice Mode Selector Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         {/* Mode 1: Direct WhatsApp (Admin's App) */}
         <div
           onClick={() => setMode("direct_whatsapp")}
@@ -155,7 +164,7 @@ function IntegrationSettingsForm({ initialIntegration }) {
           </div>
         </div>
 
-        {/* Mode 2: MyAcademy WhatsApp API (Managed Platform Gateway) */}
+        {/* Mode 2: MyAcademy WhatsApp API (Managed Platform Gateway - Coming Soon) */}
         <div
           onClick={() => setMode("myacademy_api")}
           className={`cursor-pointer p-4 sm:p-5 rounded-2xl border transition-all relative flex flex-col justify-between ${
@@ -170,28 +179,26 @@ function IntegrationSettingsForm({ initialIntegration }) {
                 <span className="h-7 w-7 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-black text-xs">
                   <FaCloud />
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider text-purple-600">Option 2 (Recommended)</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-purple-600">Option 2</span>
               </div>
-              {mode === "myacademy_api" && (
-                <span className="h-5 w-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">
-                  <FaCheck />
-                </span>
-              )}
+              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 text-[9px] font-black uppercase tracking-wider shadow-2xs">
+                Coming Soon
+              </span>
             </div>
 
             <h3 className="font-extrabold text-sm text-slate-900 mb-1">
               MyAcademy WhatsApp API
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Automated cloud messaging handled completely by MyAcademy. No need to obtain or find API keys, webhooks, or Meta accounts!
+              Automated cloud messaging handled completely by MyAcademy. Zero API keys or Meta accounts setup required.
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700">
-              <FaCheckCircle className="text-[10px]" /> Managed Cloud Gateway
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700">
+              <FaClock className="text-[10px]" /> Launching Soon (Beta)
             </span>
-            <span className="text-[10px] text-slate-400 font-medium">Auto Dispatch</span>
+            <span className="text-[10px] text-slate-400 font-medium">Cloud Gateway</span>
           </div>
         </div>
 
@@ -210,7 +217,7 @@ function IntegrationSettingsForm({ initialIntegration }) {
                 <span className="h-7 w-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-xs">
                   <FaCog />
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Option 3</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Option 3 (Meta)</span>
               </div>
               {mode === "cloud_api" && (
                 <span className="h-5 w-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">
@@ -232,6 +239,46 @@ function IntegrationSettingsForm({ initialIntegration }) {
               <FaKey className="text-[10px]" /> Custom Credentials
             </span>
             <span className="text-[10px] text-slate-400 font-medium">Meta Verified</span>
+          </div>
+        </div>
+
+        {/* Mode 4: Official Email via Resend */}
+        <div
+          onClick={() => setMode("resend_email")}
+          className={`cursor-pointer p-4 sm:p-5 rounded-2xl border transition-all relative flex flex-col justify-between ${
+            mode === "resend_email"
+              ? "bg-blue-50/50 border-blue-600 ring-2 ring-blue-600/20 shadow-xs"
+              : "bg-white border-slate-200 hover:border-slate-300"
+          }`}
+        >
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="h-7 w-7 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">
+                  <FaEnvelope />
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-blue-600">Option 4 (Email)</span>
+              </div>
+              {mode === "resend_email" && (
+                <span className="h-5 w-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">
+                  <FaCheck />
+                </span>
+              )}
+            </div>
+
+            <h3 className="font-extrabold text-sm text-slate-900 mb-1">
+              Official Resend Email
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Send professional, branded payment reminder emails directly into student &amp; parent inboxes with auto-generated fee breakdown tables.
+            </p>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700">
+              <FaCheckCircle className="text-[10px]" /> High Deliverability
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">Resend Powered</span>
           </div>
         </div>
       </div>
@@ -265,38 +312,41 @@ function IntegrationSettingsForm({ initialIntegration }) {
 
       {/* Mode 2 Details & Confirmation */}
       {mode === "myacademy_api" && (
-        <div className="p-5 rounded-2xl sm:rounded-3xl bg-purple-50/50 border border-purple-200/80 shadow-xs space-y-4">
+        <div className="p-5 rounded-2xl sm:rounded-3xl bg-amber-50/60 border border-amber-200/80 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-purple-600 animate-pulse" />
-                <p className="font-extrabold text-sm text-slate-900">MyAcademy WhatsApp Gateway Active</p>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider">
+                  Coming Soon
+                </span>
+                <p className="font-extrabold text-sm text-slate-900">
+                  MyAcademy WhatsApp Gateway (In Development)
+                </p>
               </div>
               <p className="text-xs text-slate-600 max-w-xl">
-                Zero configuration required. All manual and automated reminders will be delivered through MyAcademy&apos;s high-speed cloud infrastructure.
+                The MyAcademy automated WhatsApp cloud delivery engine is currently in beta preparation and will be available in an upcoming release. In the meantime, please use <strong>Direct Admin WhatsApp</strong>, <strong>Your Own Meta API</strong>, or <strong>Official Resend Email</strong>.
               </p>
             </div>
 
             <button
               type="button"
-              onClick={handleSave}
-              disabled={saveMutation.isPending}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs shadow-md shadow-purple-200 inline-flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer shrink-0"
+              disabled
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-200 text-slate-500 font-extrabold text-xs inline-flex items-center justify-center gap-2 cursor-not-allowed shrink-0"
             >
-              <FaSave className="text-xs" />
-              {saveMutation.isPending ? "Saving..." : "Activate MyAcademy Gateway"}
+              <FaClock className="text-xs" />
+              Available Soon
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-purple-200/60 text-[11px] text-purple-900">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-amber-200/60 text-[11px] text-amber-900 font-medium">
             <div className="flex items-center gap-2">
-              <FaCheckCircle className="text-purple-600 shrink-0" /> No Meta Business Account Required
+              <FaCheckCircle className="text-amber-600 shrink-0" /> Zero Meta Business Account Required
             </div>
             <div className="flex items-center gap-2">
-              <FaCheckCircle className="text-purple-600 shrink-0" /> Automatic Hourly Fee Alerts
+              <FaCheckCircle className="text-amber-600 shrink-0" /> Automatic Scheduled Fee Alerts
             </div>
             <div className="flex items-center gap-2">
-              <FaCheckCircle className="text-purple-600 shrink-0" /> Fallback Direct WhatsApp Links
+              <FaCheckCircle className="text-amber-600 shrink-0" /> Launching in next update
             </div>
           </div>
         </div>
@@ -448,6 +498,56 @@ function IntegrationSettingsForm({ initialIntegration }) {
                   <FaCopy className="text-[9px]" /> Copy Token
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mode 4: Resend Email Details & Confirmation */}
+      {mode === "resend_email" && (
+        <div className="p-5 rounded-2xl sm:rounded-3xl bg-blue-50/50 border border-blue-200/80 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+                <p className="font-extrabold text-sm text-slate-900">Resend Email Delivery Selected</p>
+              </div>
+              <p className="text-xs text-slate-600 max-w-xl">
+                All automated and manual fee payment reminders will be delivered via high-deliverability branded HTML emails powered by Resend directly to student and parent registered inboxes.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => testMutation.mutate({ mode: "resend_email" })}
+                disabled={testMutation.isPending}
+                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-blue-100 text-blue-700 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors border border-blue-200 disabled:opacity-50 cursor-pointer shadow-2xs"
+              >
+                <FaSyncAlt className={`text-xs ${testMutation.isPending ? "animate-spin" : ""}`} />
+                {testMutation.isPending ? "Verifying..." : "Verify Resend Gateway"}
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={saveMutation.isPending}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-200 inline-flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <FaSave className="text-xs" />
+                {saveMutation.isPending ? "Saving..." : "Set as Default Channel"}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-blue-200/60 text-[11px] text-blue-900">
+            <div className="flex items-center gap-2">
+              <FaCheckCircle className="text-blue-600 shrink-0" /> Zero WhatsApp Business Setup Needed
+            </div>
+            <div className="flex items-center gap-2">
+              <FaCheckCircle className="text-blue-600 shrink-0" /> Branded Invoice Breakdown &amp; Pay Link
+            </div>
+            <div className="flex items-center gap-2">
+              <FaCheckCircle className="text-blue-600 shrink-0" /> Delivered Directly to Inboxes
             </div>
           </div>
         </div>

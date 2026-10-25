@@ -22,6 +22,7 @@ import {
 } from "@/Hooks/useSuperAdmin";
 import { useAssignSubscriptionMutation } from "@/app/mutations/superAdminMutations";
 import { toast } from "sonner";
+import { StatCard } from "@/app/Components/visual-ui";
 
 export default function SuperAdminSubscriptionsClient() {
   const [statusFilter, setStatusFilter] = useState("");
@@ -98,6 +99,11 @@ export default function SuperAdminSubscriptionsClient() {
     }
   };
 
+  const totalSubs = pagination.total || subscriptions.length || 0;
+  const activeSubs = subscriptions.filter((s) => s.status === "active").length;
+  const trialingSubs = subscriptions.filter((s) => s.status === "trialing").length;
+  const delinquentSubs = subscriptions.filter((s) => ["past_due", "cancelled", "expired"].includes(s.status)).length;
+
   return (
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
       {/* Hero Header */}
@@ -130,6 +136,38 @@ export default function SuperAdminSubscriptionsClient() {
           </button>
         </div>
       </motion.section>
+
+      {/* Visual Stat Cards Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          label="Total Subscriptions"
+          value={totalSubs}
+          icon={FaCreditCard}
+          colorScheme="orange"
+          subtitle="Platform billing agreements"
+        />
+        <StatCard
+          label="Active Accounts"
+          value={activeSubs}
+          icon={FaCheckCircle}
+          colorScheme="emerald"
+          subtitle="In good standing"
+        />
+        <StatCard
+          label="Trial Accounts"
+          value={trialingSubs}
+          icon={FaClock}
+          colorScheme="blue"
+          subtitle="Evaluating platform"
+        />
+        <StatCard
+          label="Delinquent / Ended"
+          value={delinquentSubs}
+          icon={FaExclamationCircle}
+          colorScheme="rose"
+          subtitle="Past due or expired"
+        />
+      </div>
 
       {/* Filter Tabs */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">

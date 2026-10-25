@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { useStudentExamResults } from "@/Hooks/useExams";
 import formatDate from "@/Utils/formatDate";
+import { StatCard, ChartCard, ComparisonBarChart, ProgressBar } from "@/app/Components/visual-ui";
 
 export default function StudentExams({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -65,37 +66,77 @@ export default function StudentExams({ user }) {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-[#D6451B] font-black text-lg">
-            <FaFileAlt />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Exams Completed</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.totalExams}</p>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          title="Exams Completed"
+          value={summary.totalExams || 0}
+          icon={FaFileAlt}
+          color="blue"
+          subText="Evaluated tests"
+          loading={isLoading}
+        />
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 font-black text-lg">
-            <FaCheckCircle />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Passed Assessments</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.passedExams}</p>
-          </div>
-        </div>
+        <StatCard
+          title="Passed Assessments"
+          value={summary.passedExams || 0}
+          icon={FaCheckCircle}
+          color="emerald"
+          trend={summary.totalExams > 0 ? `${Math.round(((summary.passedExams || 0) / summary.totalExams) * 100)}%` : "0%"}
+          trendDirection="up"
+          subText="Passing score achieved"
+          loading={isLoading}
+        />
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-black text-lg">
-            <FaAward />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Overall Average</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.avgPercentage}%</p>
-          </div>
-        </div>
+        <StatCard
+          title="Overall Average"
+          value={summary.avgPercentage || 0}
+          suffix="%"
+          icon={FaAward}
+          color="orange"
+          trend={(summary.avgPercentage || 0) >= 75 ? "Distinction" : "Passing"}
+          trendDirection={(summary.avgPercentage || 0) >= 75 ? "up" : "neutral"}
+          subText="Average test marks"
+          loading={isLoading}
+        />
+
+        <StatCard
+          title="Pass Efficiency"
+          value={summary.totalExams > 0 ? Math.round(((summary.passedExams || 0) / summary.totalExams) * 100) : 100}
+          suffix="%"
+          icon={FaUserGraduate}
+          color="purple"
+          subText="Assessment clearance rate"
+          loading={isLoading}
+        />
       </div>
+
+      {/* Visual Subject Marks Progression Chart */}
+      {results.length > 0 && (
+        <ChartCard
+          title="Test Score Progression & Marks Breakdown"
+          subtitle="Score achieved vs maximum marks per scheduled exam"
+          icon={FaAward}
+        >
+          <ComparisonBarChart
+            data={results.slice(0, 8).map((r) => {
+              const exTitle = r.examId?.title || "Test";
+              const short = exTitle.length > 12 ? `${exTitle.slice(0, 11)}…` : exTitle;
+              return {
+                label: short,
+                Scored: r.marksObtained || 0,
+                Total: r.examId?.totalMarks || 100,
+              };
+            })}
+            xAxisKey="label"
+            bars={[
+              { key: "Scored", name: "Marks Scored", color: "#10B981" },
+              { key: "Total", name: "Total Marks", color: "#E2E8F0" },
+            ]}
+            height={230}
+            showLegend={true}
+          />
+        </ChartCard>
+      )}
 
       {/* Filter and Search */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">

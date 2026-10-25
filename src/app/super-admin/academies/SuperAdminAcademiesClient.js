@@ -25,6 +25,7 @@ import {
 import { useSuperAdminAcademies } from "@/Hooks/useSuperAdmin";
 import { useUpdateAcademyStatusMutation } from "@/app/mutations/superAdminMutations";
 import { toast } from "sonner";
+import { StatCard } from "@/app/Components/visual-ui";
 
 export default function SuperAdminAcademiesClient() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -129,6 +130,11 @@ export default function SuperAdminAcademiesClient() {
     }
   };
 
+  const totalTenants = pagination.total || academies.length || 0;
+  const activeCount = academies.filter((a) => a.status === "active").length;
+  const pendingCount = academies.filter((a) => a.status === "pending").length;
+  const holdCount = academies.filter((a) => ["on_hold", "suspended", "rejected"].includes(a.status)).length;
+
   return (
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
       {/* Hero Header */}
@@ -165,6 +171,38 @@ export default function SuperAdminAcademiesClient() {
           </div>
         </div>
       </motion.section>
+
+      {/* Visual Stat Cards Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          label="Total Academies"
+          value={totalTenants}
+          icon={FaUniversity}
+          colorScheme="orange"
+          subtitle="Platform registered tenants"
+        />
+        <StatCard
+          label="Active Operating"
+          value={activeCount}
+          icon={FaCheckCircle}
+          colorScheme="emerald"
+          subtitle="Operational verified"
+        />
+        <StatCard
+          label="Pending Review"
+          value={pendingCount}
+          icon={FaClock}
+          colorScheme="amber"
+          subtitle="Awaiting onboarding"
+        />
+        <StatCard
+          label="Holds / Actions"
+          value={holdCount}
+          icon={FaShieldAlt}
+          colorScheme="rose"
+          subtitle="Suspended or hold status"
+        />
+      </div>
 
       {/* Filter and Search Bar */}
       <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">

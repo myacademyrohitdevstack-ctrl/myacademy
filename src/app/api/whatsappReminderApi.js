@@ -82,8 +82,8 @@ export function saveWhatsAppIntegrationApi(payload) {
   return api.post("/whatsapp-reminders/integration/save", payload);
 }
 
-export function testWhatsAppConnectionApi() {
-  return api.post("/whatsapp-reminders/integration/test");
+export function testWhatsAppConnectionApi(payload) {
+  return api.post("/whatsapp-reminders/integration/test", payload || {});
 }
 
 export function disconnectWhatsAppIntegrationApi() {

@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  FaFileAlt,
   FaFilePdf,
   FaFileExcel,
-  FaCalendarAlt,
   FaMoneyBillWave,
   FaChartLine,
   FaUsers,
@@ -14,18 +12,35 @@ import {
   FaArrowUp,
   FaArrowDown,
   FaSpinner,
+  FaChartPie,
+  FaLayerGroup,
+  FaWallet,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import FeesNav from "../components/FeesNav";
 import { useFeesReports } from "@/Hooks/useFees";
 import { toast } from "sonner";
+import {
+  StatCard,
+  ChartCard,
+  TrendChart,
+  DonutChart,
+  ComparisonBarChart,
+  ProgressBar,
+} from "@/app/Components/visual-ui";
+
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 export default function ReportsClient() {
   const [timeframe, setTimeframe] = useState("month");
 
   // Calculate dynamic date ranges based on timeframe
-  const getDateRange = () => {
+  const { from, to } = useMemo(() => {
     const today = new Date();
-    const to = today.toISOString().split("T")[0];
+    const toDate = today.toISOString().split("T")[0];
     let fromDate = new Date();
 
     if (timeframe === "month") {
@@ -38,14 +53,12 @@ export default function ReportsClient() {
       fromDate = new Date(today.getFullYear(), 3, 1); // FY April 1
     }
 
-    const from = fromDate.toISOString().split("T")[0];
-    return { from, to };
-  };
+    return { from: fromDate.toISOString().split("T")[0], to: toDate };
+  }, [timeframe]);
 
-  const { from, to } = getDateRange();
   const { data: serverReport, isLoading } = useFeesReports({ from, to });
 
-  // Strict server data without dummy fallback values
+  // Server data metrics
   const billedTotal = serverReport?.outstanding?.billed ?? 0;
   const collectedTotal = serverReport?.outstanding?.collected ?? 0;
   const outstandingTotal = serverReport?.outstanding?.outstanding ?? 0;
@@ -54,62 +67,66 @@ export default function ReportsClient() {
   const realizationRate =
     billedTotal > 0 ? ((collectedTotal / billedTotal) * 100).toFixed(1) : 0;
 
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  // Monthly revenue trend for TrendChart
+  const monthlyData = useMemo(() => {
+    if (!serverReport?.collections || serverReport.collections.length === 0) {
+      return [];
+    }
 
-  const monthlyData =
-    serverReport?.collections && serverReport.collections.length > 0
-      ? serverReport.collections.map((c) => ({
-          month: `${monthNames[c._id.month - 1]} ${c._id.year}`,
-          amount: c.amount,
-          count: c.count,
-        }))
-      : [];
+    return serverReport.collections.map((c) => ({
+      date: `${MONTH_NAMES[(c._id.month || 1) - 1]} '${String(c._id.year || 2026).slice(-2)}`,
+      amount: c.amount || 0,
+      count: c.count || 0,
+    }));
+  }, [serverReport]);
 
-  const batchBreakdown =
-    serverReport?.batchLedger && serverReport.batchLedger.length > 0
-      ? serverReport.batchLedger.map((b) => ({
-          batch: b.batchName,
-          students: b.studentCount,
-          billed: b.billed,
-          collected: b.collected,
-          pending: b.outstanding,
-          rate: b.billed > 0 ? Math.round((b.collected / b.billed) * 100) : 0,
-        }))
-      : [];
+  // Batch comparison data for ComparisonBarChart
+  const batchComparisonData = useMemo(() => {
+    if (!serverReport?.batchLedger || serverReport.batchLedger.length === 0) {
+      return [];
+    }
 
-  const paymentModes =
-    serverReport?.paymentModes && serverReport.paymentModes.length > 0
-      ? (() => {
-          const totalAmt =
-            serverReport.paymentModes.reduce((acc, m) => acc + m.amount, 0) || 1;
-          const colors = [
-            "bg-emerald-500",
-            "bg-[#D6451B]",
-            "bg-blue-500",
-            "bg-purple-500",
-            "bg-amber-500",
-          ];
-          return serverReport.paymentModes.map((m, idx) => ({
-            mode: m._id,
-            amount: m.amount,
-            share: Math.round((m.amount / totalAmt) * 100),
-            color: colors[idx % colors.length],
-          }));
-        })()
-      : [];
+    return serverReport.batchLedger.slice(0, 8).map((b) => {
+      const name = b.batchName || "Unassigned";
+      const shortName = name.length > 12 ? `${name.slice(0, 11)}…` : name;
+      return {
+        label: shortName,
+        Billed: b.billed || 0,
+        Collected: b.collected || 0,
+        Outstanding: b.outstanding || 0,
+      };
+    });
+  }, [serverReport]);
+
+  // Batch breakdown for table export and display
+  const batchBreakdown = useMemo(() => {
+    if (!serverReport?.batchLedger || serverReport.batchLedger.length === 0) {
+      return [];
+    }
+
+    return serverReport.batchLedger.map((b) => ({
+      batch: b.batchName || "Unassigned",
+      students: b.studentCount || 0,
+      billed: b.billed || 0,
+      collected: b.collected || 0,
+      pending: b.outstanding || 0,
+      rate: b.billed > 0 ? Math.round((b.collected / b.billed) * 100) : 0,
+    }));
+  }, [serverReport]);
+
+  // Payment modes distribution for DonutChart
+  const paymentModesData = useMemo(() => {
+    if (!serverReport?.paymentModes || serverReport.paymentModes.length === 0) {
+      return [];
+    }
+
+    const palette = ["#10B981", "#D6451B", "#3B82F6", "#F59E0B", "#8B5CF6"];
+    return serverReport.paymentModes.map((m, idx) => ({
+      name: m._id || "Other",
+      value: m.amount || 0,
+      color: palette[idx % palette.length],
+    }));
+  }, [serverReport]);
 
   const handleExportCSV = () => {
     if (batchBreakdown.length === 0) {
@@ -162,30 +179,30 @@ export default function ReportsClient() {
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between min-w-0">
             <div className="min-w-0 flex-1">
-              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                Financial Intelligence
+              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur-xs">
+                Financial Intelligence & Reconciliation
               </span>
 
-              <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
-                Financial Reports & Audit
+              <h1 className="mt-3 text-2xl font-black sm:text-3xl lg:text-4xl tracking-tight">
+                Revenue Reports & Audit
               </h1>
 
               <p className="mt-2 text-xs sm:text-sm lg:text-base max-w-2xl text-orange-100 leading-relaxed font-normal">
-                Analyze revenue collections, cash-flow velocity, recovery rates, and batch profitability metrics.
+                Analyze revenue realization velocity, compare batch recovery ratios, and inspect payment channel distributions.
               </p>
             </div>
 
             <div className="flex items-center gap-2.5 shrink-0">
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition"
+                className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-xs sm:text-sm font-black text-[#D6451B] shadow-xs hover:bg-orange-50 transition cursor-pointer"
               >
                 <FaFilePdf className="text-xs" />
                 <span>Print / PDF</span>
               </button>
               <button
                 onClick={handleExportCSV}
-                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition"
+                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition backdrop-blur-xs cursor-pointer"
               >
                 <FaFileExcel className="text-xs" />
                 <span>Export CSV</span>
@@ -195,7 +212,7 @@ export default function ReportsClient() {
         </motion.section>
 
         {/* Timeframe Selector Bar */}
-        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-xs">
           <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
             {[
               { id: "month", label: "This Month" },
@@ -206,7 +223,7 @@ export default function ReportsClient() {
               <button
                 key={t.id}
                 onClick={() => setTimeframe(t.id)}
-                className={`rounded-xl px-3.5 py-2 text-xs font-bold transition shrink-0 ${
+                className={`rounded-xl px-3.5 py-2 text-xs font-bold transition shrink-0 cursor-pointer ${
                   timeframe === t.id
                     ? "bg-[#D6451B] text-white shadow-xs"
                     : "text-slate-600 hover:bg-slate-100"
@@ -216,226 +233,269 @@ export default function ReportsClient() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 self-start sm:self-auto">
             {isLoading && <FaSpinner className="animate-spin text-[#D6451B]" />}
-            <span className="hidden sm:inline-block">
-              Period: {from} to {to}
+            <span className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-lg">
+              Range: {from} to {to}
             </span>
           </div>
         </div>
 
-        {/* Key Metrics */}
+        {/* Key Metrics Row (StatCards) */}
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
-          <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-            <p className="text-xs font-semibold text-slate-500">Gross Billed</p>
-            <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
-              ₹{billedTotal.toLocaleString("en-IN")}
-            </h3>
-            <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-slate-400">
-              <span>Total invoices raised</span>
-            </div>
-          </div>
+          <StatCard
+            title="Gross Invoiced"
+            value={billedTotal}
+            prefix="₹"
+            icon={FaMoneyBillWave}
+            color="orange"
+            trend={`${activeAccounts} accounts`}
+            trendDirection="neutral"
+            subText="Invoices raised"
+            loading={isLoading}
+          />
 
-          <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-            <p className="text-xs font-semibold text-slate-500">Total Collected</p>
-            <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600">
-              ₹{collectedTotal.toLocaleString("en-IN")}
-            </h3>
-            <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-              <FaArrowUp />
-              <span>{realizationRate}% realization</span>
-            </div>
-          </div>
+          <StatCard
+            title="Realized Cash"
+            value={collectedTotal}
+            prefix="₹"
+            icon={FaWallet}
+            color="emerald"
+            trend={`${realizationRate}%`}
+            trendDirection="up"
+            subText="Recovered inflow"
+            loading={isLoading}
+          />
 
-          <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-            <p className="text-xs font-semibold text-slate-500">Total Outstanding</p>
-            <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-rose-600">
-              ₹{outstandingTotal.toLocaleString("en-IN")}
-            </h3>
-            <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-rose-600">
-              <FaArrowDown />
-              <span>Receivable balance</span>
-            </div>
-          </div>
+          <StatCard
+            title="Receivables Due"
+            value={outstandingTotal}
+            prefix="₹"
+            icon={FaExclamationCircle}
+            color="rose"
+            trend={outstandingTotal > 0 ? "Pending" : "Cleared"}
+            trendDirection={outstandingTotal > 0 ? "down" : "up"}
+            subText="Receivable balance"
+            loading={isLoading}
+          />
 
-          <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-            <p className="text-xs font-semibold text-slate-500">Fee Accounts</p>
-            <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
-              {activeAccounts}
-            </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">Enrolled student ledgers</p>
-          </div>
+          <StatCard
+            title="Recovery Efficiency"
+            value={Number(realizationRate) || 0}
+            suffix="%"
+            icon={FaChartLine}
+            color="blue"
+            trend={Number(realizationRate) >= 80 ? "Healthy" : "Low"}
+            trendDirection={Number(realizationRate) >= 80 ? "up" : "down"}
+            subText="Realization ratio"
+            loading={isLoading}
+          />
         </div>
 
         {/* Charts & Breakdown */}
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-3 w-full min-w-0">
-          {/* Monthly Collection Bars */}
-          <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  Revenue Realization Trend
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Actual collections recorded in the financial ledger
-                </p>
-              </div>
-              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                FY 2026-27
-              </span>
-            </div>
-
-            <div className="mt-6">
-              {isLoading ? (
-                <div className="py-12 text-center text-slate-400 text-xs">
-                  <FaSpinner className="animate-spin inline mr-2 text-[#D6451B]" />
-                  Loading revenue realization trend...
-                </div>
-              ) : monthlyData.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 text-xs sm:text-sm">
-                  No monthly collection trends recorded in this period.
-                </div>
+          {/* Revenue Realization Trend (2 Cols) */}
+          <div className="lg:col-span-2 min-w-0">
+            <ChartCard
+              title="Revenue Realization Trend"
+              subtitle="Actual collections recorded over the selected timeframe"
+              icon={FaChartLine}
+              badge="FY 2026-27"
+            >
+              {monthlyData.length > 0 ? (
+                <TrendChart
+                  data={monthlyData}
+                  dataKey="amount"
+                  xAxisKey="date"
+                  height={240}
+                  strokeColor="#10B981"
+                  fillGradientId="colorReportTrend"
+                  unit="₹"
+                  formatYAxis={(val) => `₹${Number(val) >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
+                />
               ) : (
-                <div className="space-y-4">
-                  {monthlyData.map((item) => (
-                    <div key={item.month} className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-bold">
-                        <span className="text-slate-700">{item.month}</span>
-                        <span className="text-emerald-600">
-                          ₹{item.amount.toLocaleString("en-IN")}{" "}
-                          <span className="text-slate-400 font-normal">
-                            ({item.count} payment{item.count !== 1 ? "s" : ""})
-                          </span>
-                        </span>
-                      </div>
-                      <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                        <div
-                          style={{
-                            width: "100%",
-                          }}
-                          className="h-full rounded-full bg-gradient-to-r from-[#D6451B] to-emerald-500 transition-all duration-500"
-                        />
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex h-48 flex-col items-center justify-center text-center p-6 text-slate-400">
+                  <FaChartLine className="text-3xl text-slate-300 mb-2" />
+                  <p className="text-xs font-semibold text-slate-600">
+                    No monthly collection trends recorded in this period.
+                  </p>
                 </div>
               )}
-            </div>
+            </ChartCard>
           </div>
 
-          {/* Payment Method Distribution */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs flex flex-col justify-between">
-            <div>
-              <div className="pb-4 border-b border-slate-100">
-                <h3 className="text-base font-bold text-slate-900">
-                  Payment Channels
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Collection breakdown by mode
-                </p>
-              </div>
-
-              <div className="mt-6">
-                {isLoading ? (
-                  <div className="py-12 text-center text-slate-400 text-xs">
-                    <FaSpinner className="animate-spin inline mr-2 text-[#D6451B]" />
-                    Loading channels...
-                  </div>
-                ) : paymentModes.length === 0 ? (
-                  <div className="py-12 text-center text-slate-400 text-xs sm:text-sm">
+          {/* Payment Method Distribution Donut (1 Col) */}
+          <div className="min-w-0">
+            <ChartCard
+              title="Payment Channels"
+              subtitle="Collection distribution by payment mode"
+              icon={FaChartPie}
+            >
+              {paymentModesData.length > 0 ? (
+                <DonutChart
+                  data={paymentModesData}
+                  nameKey="name"
+                  valueKey="value"
+                  height={190}
+                  innerRadius={50}
+                  outerRadius={70}
+                  centerValue={`₹${(collectedTotal >= 1000 ? `${(collectedTotal / 1000).toFixed(0)}k` : collectedTotal)}`}
+                  centerLabel="Realized"
+                  unit="₹"
+                  showLegend={true}
+                />
+              ) : (
+                <div className="flex h-48 flex-col items-center justify-center text-center p-6 text-slate-400">
+                  <FaChartPie className="text-3xl text-slate-300 mb-2" />
+                  <p className="text-xs font-semibold text-slate-600">
                     No payment channel distribution data available.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {paymentModes.map((channel) => (
-                      <div key={channel.mode} className="space-y-1">
-                        <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-700">{channel.mode}</span>
-                          <span className="text-slate-900">{channel.share}%</span>
-                        </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            style={{ width: `${Math.max(4, channel.share)}%` }}
-                            className={`h-full rounded-full ${channel.color}`}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-slate-100 rounded-xl bg-orange-50/60 p-3 text-xs text-[#D6451B] font-medium text-center">
-              💡 Digital collections record instant receipt confirmations.
-            </div>
+                  </p>
+                </div>
+              )}
+            </ChartCard>
           </div>
         </div>
 
+        {/* Cohort Profitability Comparative Bar Chart */}
+        {batchComparisonData.length > 0 && (
+          <ChartCard
+            title="Cohort Billing & Inflow Comparison"
+            subtitle="Side-by-side comparison of invoiced fees vs collected cash per batch"
+            icon={FaLayerGroup}
+          >
+            <ComparisonBarChart
+              data={batchComparisonData}
+              xAxisKey="label"
+              bars={[
+                { key: "Billed", name: "Invoiced Billed", color: "#64748B" },
+                { key: "Collected", name: "Collected Inflow", color: "#10B981" },
+                { key: "Outstanding", name: "Pending Balance", color: "#F43F5E" },
+              ]}
+              height={260}
+              unit="₹"
+              showLegend={true}
+              formatYAxis={(val) => `₹${Number(val) >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
+            />
+          </ChartCard>
+        )}
+
         {/* Batch-wise Financial Ledger */}
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/90 bg-white shadow-xs overflow-hidden min-w-0">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 sm:px-6 py-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
                 Cohort Profitability & Ledger
               </h3>
               <p className="text-xs text-slate-500">
-                Batch-level revenue performance and outstanding balances
+                Performance breakdown across active academy batches
               </p>
             </div>
+            <span className="text-xs font-bold text-slate-400">
+              {batchBreakdown.length} Cohorts
+            </span>
           </div>
 
-          <div className="overflow-x-auto">
-            {isLoading ? (
-              <div className="p-12 text-center text-slate-500 text-xs sm:text-sm">
-                <FaSpinner className="animate-spin inline mr-2 text-[#D6451B]" />
-                Loading cohort ledger...
+          {isLoading ? (
+            <div className="py-12 text-center text-slate-400 text-xs">
+              <FaSpinner className="animate-spin inline mr-2 text-[#D6451B]" />
+              Generating financial ledger...
+            </div>
+          ) : batchBreakdown.length === 0 ? (
+            <div className="py-12 text-center text-slate-400 text-xs">
+              No batch ledger records found for this period.
+            </div>
+          ) : (
+            <>
+              {/* Mobile Card List (< 640px) */}
+              <div className="p-3.5 space-y-3 sm:hidden">
+                {batchBreakdown.map((row) => (
+                  <div
+                    key={row.batch}
+                    className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-extrabold text-xs text-slate-900 truncate">
+                        {row.batch}
+                      </h4>
+                      <span className="rounded-md bg-white border border-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                        {row.students} Students
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-medium">Billed</p>
+                        <p className="font-bold text-slate-800">₹{row.billed.toLocaleString("en-IN")}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-medium">Collected</p>
+                        <p className="font-bold text-emerald-600">₹{row.collected.toLocaleString("en-IN")}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-medium">Pending</p>
+                        <p className="font-bold text-rose-600">₹{row.pending.toLocaleString("en-IN")}</p>
+                      </div>
+                    </div>
+
+                    <ProgressBar
+                      percentage={row.rate}
+                      label="Recovery Rate"
+                      colorScheme="emerald"
+                      height="h-1.5"
+                    />
+                  </div>
+                ))}
               </div>
-            ) : batchBreakdown.length === 0 ? (
-              <div className="p-12 text-center text-slate-400 text-xs sm:text-sm">
-                No cohort ledger details recorded for the selected period.
-              </div>
-            ) : (
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase font-semibold">
-                  <tr>
-                    <th className="px-6 py-3.5">Cohort Batch</th>
-                    <th className="px-4 py-3.5">Enrolled</th>
-                    <th className="px-4 py-3.5">Total Billed</th>
-                    <th className="px-4 py-3.5">Collected</th>
-                    <th className="px-4 py-3.5">Pending Dues</th>
-                    <th className="px-6 py-3.5 text-right">Recovery Rate</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {batchBreakdown.map((b) => (
-                    <tr key={b.batch} className="hover:bg-orange-50/40 transition">
-                      <td className="px-6 py-4 font-bold text-slate-900">
-                        {b.batch}
-                      </td>
-                      <td className="px-4 py-4 text-slate-600">
-                        {b.students} students
-                      </td>
-                      <td className="px-4 py-4 text-slate-800">
-                        ₹{b.billed.toLocaleString("en-IN")}
-                      </td>
-                      <td className="px-4 py-4 font-bold text-emerald-600">
-                        ₹{b.collected.toLocaleString("en-IN")}
-                      </td>
-                      <td className="px-4 py-4 font-bold text-rose-600">
-                        ₹{b.pending.toLocaleString("en-IN")}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <span className="inline-block rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-700">
-                          {b.rate}%
-                        </span>
-                      </td>
+
+              {/* Desktop Table (>= 640px) */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left text-xs sm:text-sm">
+                  <thead className="border-b border-slate-100 bg-slate-50/50 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                    <tr>
+                      <th className="px-6 py-3">Cohort</th>
+                      <th className="px-6 py-3">Students</th>
+                      <th className="px-6 py-3">Total Invoiced</th>
+                      <th className="px-6 py-3">Collected</th>
+                      <th className="px-6 py-3">Outstanding</th>
+                      <th className="px-6 py-3">Recovery Progress</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                    {batchBreakdown.map((row) => (
+                      <tr
+                        key={row.batch}
+                        className="hover:bg-slate-50/70 transition-colors"
+                      >
+                        <td className="px-6 py-3.5 font-bold text-slate-900">
+                          {row.batch}
+                        </td>
+                        <td className="px-6 py-3.5 text-slate-500">
+                          {row.students}
+                        </td>
+                        <td className="px-6 py-3.5 font-semibold text-slate-800">
+                          ₹{row.billed.toLocaleString("en-IN")}
+                        </td>
+                        <td className="px-6 py-3.5 font-bold text-emerald-600">
+                          ₹{row.collected.toLocaleString("en-IN")}
+                        </td>
+                        <td className="px-6 py-3.5 font-bold text-rose-600">
+                          ₹{row.pending.toLocaleString("en-IN")}
+                        </td>
+                        <td className="px-6 py-3.5 w-48">
+                          <ProgressBar
+                            percentage={row.rate}
+                            colorScheme="emerald"
+                            height="h-2"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

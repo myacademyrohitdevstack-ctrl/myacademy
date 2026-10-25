@@ -36,6 +36,13 @@ export default function ReminderHistoryTab({ onOpenDetails }) {
   const retryMutation = useRetryReminderMutation();
   const cancelMutation = useCancelReminderMutation();
 
+  const formatChannelName = (channel) => {
+    if (channel === "resend_email" || channel === "email") return "Resend Email";
+    if (channel === "myacademy_api" || channel === "platform_api") return "MyAcademy API";
+    if (channel === "whatsapp_cloud_api" || channel === "cloud_api") return "Meta Cloud API";
+    return "Click-to-Chat";
+  };
+
   const queryParams = {
     page,
     limit: 15,
@@ -232,7 +239,7 @@ export default function ReminderHistoryTab({ onOpenDetails }) {
                     <div className="text-right">
                       <p className="text-[10px] text-slate-400">Channel & Rule</p>
                       <p className="font-semibold text-slate-700 text-[11px]">
-                        {r.channel === "whatsapp_cloud_api" ? "Cloud API" : "Click-to-Chat"}
+                        {formatChannelName(r.channel)}
                       </p>
                       <p className="text-[10px] text-slate-400 capitalize">
                         {r.reminderRule?.replace(/_/g, " ") || "Manual"}
@@ -339,7 +346,7 @@ export default function ReminderHistoryTab({ onOpenDetails }) {
                       </td>
                       <td className="py-3">
                         <span className="text-[11px] font-semibold text-slate-700">
-                          {r.channel === "whatsapp_cloud_api" ? "Cloud API" : "Click-to-Chat"}
+                          {formatChannelName(r.channel)}
                         </span>
                         <p className="text-[10px] text-slate-400 capitalize">{r.reminderRule?.replace(/_/g, " ")}</p>
                       </td>

@@ -27,6 +27,7 @@ import PortalInput from "@/app/Components/portal-ui/PortalInput";
 import PortalSelect from "@/app/Components/portal-ui/PortalSelect";
 import PortalBadge from "@/app/Components/portal-ui/PortalBadge";
 import PortalButton from "@/app/Components/portal-ui/PortalButton";
+import { StatCard } from "@/app/Components/visual-ui";
 
 export default function Students() {
   const router = useRouter();
@@ -227,6 +228,43 @@ export default function Students() {
         onClose={() => setIsImportModalOpen(false)}
         type="student"
       />
+
+      {/* Student Enrollment KPI Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <StatCard
+          title="Total Students"
+          value={pagination.total || users.length || 0}
+          icon={FaUserGraduate}
+          color="blue"
+          subText="Enrolled directory"
+          loading={isLoading}
+        />
+        <StatCard
+          title="Active Accounts"
+          value={users.filter((u) => u.status === "active").length}
+          icon={FaUserCheck}
+          color="emerald"
+          subText="In good standing"
+          loading={isLoading}
+        />
+        <StatCard
+          title="Pending Approvals"
+          value={users.filter((u) => u.approvalStatus === "pending").length}
+          icon={FaFilter}
+          color="amber"
+          subText="Awaiting review"
+          loading={isLoading}
+        />
+        <StatCard
+          title="Current Page"
+          value={pagination.page || 1}
+          suffix={` / ${pagination.totalPages || 1}`}
+          icon={FaEdit}
+          color="orange"
+          subText={`${pagination.total || 0} total records`}
+          loading={isLoading}
+        />
+      </div>
 
       {/* Filter and Search Bar */}
       <PortalCard padding="p-3.5 sm:p-5" className="relative overflow-hidden shadow-xs border border-slate-200/80">

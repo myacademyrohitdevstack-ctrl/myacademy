@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { useMyChildren, useChildAttendance } from "@/Hooks/useParent";
 import ChildSwitcher from "../components/ChildSwitcher";
+import { StatCard, ProgressBar, AttendanceHeatmap } from "@/app/Components/visual-ui";
 
 export default function ParentAttendanceClient() {
   const { data: childrenList, isLoading: isChildrenLoading } = useMyChildren();
@@ -115,37 +116,59 @@ export default function ParentAttendanceClient() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Total Recorded</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
-            {rawList.length}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Session marks</p>
-        </div>
+        <StatCard
+          label="Total Recorded"
+          value={rawList.length}
+          icon={FaCalendarAlt}
+          colorScheme="slate"
+          subtitle="Session marks"
+        />
+        <StatCard
+          label="Classes Present"
+          value={summary.present || 0}
+          icon={FaCheckCircle}
+          colorScheme="emerald"
+          subtitle="Attended sessions"
+        />
+        <StatCard
+          label="Classes Absent"
+          value={summary.absent || 0}
+          icon={FaTimesCircle}
+          colorScheme="rose"
+          subtitle="Missed sessions"
+        />
+        <StatCard
+          label="Attendance Rate"
+          value={percentage !== null ? `${percentage}%` : "N/A"}
+          icon={FaCalendarCheck}
+          colorScheme={percentage !== null && percentage < 75 ? "rose" : "emerald"}
+          subtitle="Realization rate"
+        />
+      </div>
 
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Classes Present</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600">
-            {summary.present || 0}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Attended sessions</p>
+      {/* Target Benchmark Progress Bar */}
+      {rawList.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
+          <ProgressBar
+            value={summary.present || 0}
+            max={(summary.present || 0) + (summary.absent || 0) || 1}
+            label="Attendance Regularity Score"
+            color={percentage !== null && percentage < 75 ? "rose" : "emerald"}
+            showPercentage={true}
+            targetBenchmark={75}
+            targetLabel="Minimum Required: 75%"
+          />
         </div>
+      )}
 
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Classes Absent</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-rose-600">
-            {summary.absent || 0}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Missed sessions</p>
-        </div>
-
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Realization Rate</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
-            {percentage !== null ? `${percentage}%` : "N/A"}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Verified attendance</p>
-        </div>
+      {/* Regularity Heatmap Calendar Grid */}
+      <div className="w-full">
+        <AttendanceHeatmap
+          records={rawList}
+          daysCount={45}
+          title="Attendance Activity (Last 45 Days)"
+          subtitle="Green indicates verified classroom presence"
+        />
       </div>
 
       {/* Date Filters & Tabs */}

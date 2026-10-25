@@ -20,6 +20,7 @@ import {
 import BulkImportModal from "@/app/Components/BulkImportModal";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAdminGetAllNotes } from "@/Hooks/useAdminGetNotes";
+import { StatCard as VisualStatCard, ProgressRing, ProgressBar } from "@/app/Components/visual-ui";
 import Modal from "@/app/Components/ui/Modals";
 import dynamic from "next/dynamic";
 
@@ -171,39 +172,39 @@ export default function BatchDetailsPage() {
         defaultBatchId={batchId}
       />
 
-      {/* Stats */}
-
+      {/* Cohort Stats & Capacity Indicators */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
-      
-
-        <StatCard
-          title="Notes"
-          value={notes?.length}
-          icon={<FaBookOpen />}
-          color="bg-blue-50 text-blue-600"
+        <VisualStatCard
+          title="Study Notes & PDFs"
+          value={notes?.length || 0}
+          icon={FaBookOpen}
+          color="blue"
+          subText="Lecture materials"
         />
 
-        <StatCard
-          title="Class Links"
-          value={classLinks?.length}
-          icon={<FaLink />}
-          color="bg-orange-50 text-[#D6451B]"
+        <VisualStatCard
+          title="Live Meeting Links"
+          value={classLinks?.length || 0}
+          icon={FaLink}
+          color="orange"
+          subText="Scheduled video classes"
         />
-        <StatCard
-  title="Announcements"
-  value={announcements?.length || 0}
-  icon={<FaBullhorn />}
-  color="bg-purple-50 text-purple-600"
-/>
-<StatCard
-  title="Attendance"
-  value={attendance?.length || 0}
 
+        <VisualStatCard
+          title="Announcements"
+          value={announcements?.length || 0}
+          icon={FaBullhorn}
+          color="purple"
+          subText="Cohort broadcasts"
+        />
 
-
-  icon={<FaClipboardCheck />}
-  color="bg-emerald-50 text-emerald-600"
-/>
+        <VisualStatCard
+          title="Attendance Sessions"
+          value={attendance?.length || 0}
+          icon={FaClipboardCheck}
+          color="emerald"
+          subText="Recorded roll calls"
+        />
       </div>
 
       {/* Tabs */}

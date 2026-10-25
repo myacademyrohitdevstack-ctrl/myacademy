@@ -124,8 +124,10 @@ export default function ReminderDashboardTab({
               </span>
               <span
                 className={`px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 w-fit ${
-                  connection.mode === "platform_api" || connection.mode === "myacademy_api"
-                    ? "bg-purple-50 text-purple-700 border border-purple-200"
+                  connection.mode === "resend_email"
+                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                    ? "bg-amber-50 text-amber-800 border border-amber-300"
                     : connection.mode === "cloud_api"
                     ? connection.connectionStatus === "connected"
                       ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -135,8 +137,10 @@ export default function ReminderDashboardTab({
               >
                 <span
                   className={`h-2 w-2 rounded-full ${
-                    connection.mode === "platform_api" || connection.mode === "myacademy_api"
-                      ? "bg-purple-600 animate-pulse"
+                    connection.mode === "resend_email"
+                      ? "bg-blue-600 animate-pulse"
+                      : connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                      ? "bg-amber-500"
                       : connection.mode === "cloud_api"
                       ? connection.connectionStatus === "connected"
                         ? "bg-emerald-500 animate-pulse"
@@ -144,8 +148,10 @@ export default function ReminderDashboardTab({
                       : "bg-orange-500"
                   }`}
                 />
-                {connection.mode === "platform_api" || connection.mode === "myacademy_api"
-                  ? "MyAcademy API (Managed Gateway)"
+                {connection.mode === "resend_email"
+                  ? "Official Resend Email: Live"
+                  : connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                  ? "MyAcademy API (Coming Soon)"
                   : connection.mode === "cloud_api"
                   ? connection.connectionStatus === "connected"
                     ? "Custom Meta API: Live"
@@ -154,8 +160,10 @@ export default function ReminderDashboardTab({
               </span>
             </div>
             <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
-              {connection.mode === "platform_api" || connection.mode === "myacademy_api"
-                ? "MyAcademy Platform Gateway active. Automated and manual messages dispatched instantly without personal API setup."
+              {connection.mode === "resend_email"
+                ? "Official Resend Email channel active. High-deliverability branded payment invoices dispatched directly to student and parent inboxes."
+                : connection.mode === "platform_api" || connection.mode === "myacademy_api"
+                ? "MyAcademy Automated WhatsApp Gateway is currently under development (Coming Soon in next update)."
                 : connection.mode === "cloud_api"
                 ? connection.senderPhoneNumber
                   ? `Active Phone: ${connection.senderPhoneNumber}`

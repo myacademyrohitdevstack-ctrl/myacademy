@@ -20,6 +20,7 @@ import {
   FaCalendarMinus,
 } from "react-icons/fa";
 
+import { StatCard, ProgressRing, ProgressBar } from "@/app/Components/visual-ui";
 import Loading from "@/app/Components/ui/Loading";
 import { formatISTDateTime } from "@/Utils/formatDate";
 import { useGetAttendanceById } from "@/Hooks/useGetAttendenceById";
@@ -171,92 +172,94 @@ function AttendanceViewContent() {
           </div>
 
           {/* Quick Metrics */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur-md border border-white/20">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#D6451B] text-sm">
-                <FaUsers />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase font-semibold text-orange-200">Enrolled</p>
-                <p className="text-base sm:text-lg font-extrabold">{totalStudents}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur-md border border-white/20">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 text-white text-sm">
-                <FaCheckCircle />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase font-semibold text-orange-200">Present</p>
-                <p className="text-base sm:text-lg font-extrabold">{present}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur-md border border-white/20">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500 text-white text-sm">
-                <FaTimesCircle />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase font-semibold text-orange-200">Absent</p>
-                <p className="text-base sm:text-lg font-extrabold">{absent}</p>
-              </div>
+          <div className="flex items-center gap-4 bg-white/10 px-4 py-3 rounded-2xl backdrop-blur-md border border-white/20 shrink-0">
+            <ProgressRing
+              percentage={percentage}
+              size={76}
+              strokeWidth={7}
+              colorScheme="auto"
+              showPercentage={true}
+              targetPercentage={75}
+            />
+            <div className="space-y-1 text-xs">
+              <p className="font-extrabold text-white text-sm">
+                {percentage >= 75 ? "Target Achieved" : "Shortage Alert"}
+              </p>
+              <p className="text-orange-100 text-[11px]">
+                {present} present of {totalStudents} students
+              </p>
+              <span className="inline-block rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+                75% Benchmark
+              </span>
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* KPI Cards Grid */}
+      {/* Primary KPI StatCards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-500">Total Enrolled</p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 text-xs sm:text-sm">
-              <FaUsers />
-            </div>
-          </div>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
-            {totalStudents}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Students in cohort</p>
+        <StatCard
+          title="Total Enrolled"
+          value={totalStudents}
+          icon={FaUsers}
+          color="blue"
+          subText="Cohort roster size"
+        />
+
+        <StatCard
+          title="Marked Present"
+          value={present}
+          icon={FaCheckCircle}
+          color="emerald"
+          trend={`${percentage}%`}
+          trendDirection={percentage >= 75 ? "up" : "down"}
+          subText="Attended today"
+        />
+
+        <StatCard
+          title="Excused Leave"
+          value={leave}
+          icon={FaCalendarMinus}
+          color="amber"
+          subText="Approved leaves"
+        />
+
+        <StatCard
+          title="Unexcused Absent"
+          value={absent}
+          icon={FaTimesCircle}
+          color="rose"
+          trend={absent > 0 ? `${absent} missing` : "Zero absent"}
+          trendDirection={absent > 0 ? "down" : "up"}
+          subText="Missed roll call"
+        />
+      </div>
+
+      {/* Segmented Regularity Distribution Bar */}
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs space-y-2">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+          <span>Session Attendance Distribution</span>
+          <span className="text-slate-400 font-medium">
+            {present} Present • {leave} Leave • {absent} Absent
+          </span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-500">Present</p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-xs sm:text-sm">
-              <FaCheckCircle />
-            </div>
-          </div>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600">
-            {present}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Attended class</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-500">Absent</p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 text-xs sm:text-sm">
-              <FaTimesCircle />
-            </div>
-          </div>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-rose-600">
-            {absent}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Missed session</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-500">Overall Rate</p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B] text-xs sm:text-sm">
-              <FaClipboardCheck />
-            </div>
-          </div>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
-            {percentage}%
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Presence ratio</p>
+        <div className="h-3 w-full rounded-full bg-slate-100 overflow-hidden flex">
+          <div
+            style={{ width: `${totalStudents > 0 ? (present / totalStudents) * 100 : 0}%` }}
+            className="h-full bg-emerald-500 transition-all duration-500"
+            title={`Present: ${present}`}
+          />
+          <div
+            style={{ width: `${totalStudents > 0 ? (leave / totalStudents) * 100 : 0}%` }}
+            className="h-full bg-amber-400 transition-all duration-500"
+            title={`Leave: ${leave}`}
+          />
+          <div
+            style={{ width: `${totalStudents > 0 ? (absent / totalStudents) * 100 : 0}%` }}
+            className="h-full bg-rose-500 transition-all duration-500"
+            title={`Absent: ${absent}`}
+          />
         </div>
       </div>
 

@@ -17,6 +17,7 @@ import {
   FaSpinner,
   FaMobileAlt,
   FaCloud,
+  FaEnvelope,
 } from "react-icons/fa";
 import {
   previewWhatsAppReminderApi,
@@ -27,8 +28,14 @@ import {
 import queryClient from "@/lib/queryClient";
 import { toast } from "sonner";
 
-function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
-  const [recipientRole, setRecipientRole] = useState("student");
+function ManualSendDialog({
+  onClose,
+  candidate,
+  templates,
+  integrationData,
+  initialRecipientRole = "student",
+}) {
+  const [recipientRole, setRecipientRole] = useState(initialRecipientRole || "student");
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [selectedInstallmentId, setSelectedInstallmentId] = useState("");
   const [customMessage, setCustomMessage] = useState("");
@@ -105,13 +112,21 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
       if (channelPreference === "click_to_chat" || channelPreference === "direct_whatsapp") {
         const record = res.data?.data;
         const clickUrl = res.data?.clickToChatUrl || record?.clickToChatUrl;
+        const clickUrls = res.data?.clickToChatUrls || [];
         setSentReminderRecord(record);
-        if (clickUrl) {
+        if (clickUrls.length > 1) {
+          clickUrls.forEach((item) => {
+            if (item.url) window.open(item.url, "_blank", "noopener,noreferrer");
+          });
+        } else if (clickUrl) {
           window.open(clickUrl, "_blank", "noopener,noreferrer");
         }
-        toast.info("WhatsApp opened. Please click 'Confirm Manually Sent' after sending.");
+        toast.info(res.data?.message || "WhatsApp opened. Please click 'Confirm Manually Sent' after sending.");
       } else if (channelPreference === "myacademy_api") {
         toast.success(res.data?.message || "Reminder dispatched via MyAcademy WhatsApp Gateway!");
+        onClose();
+      } else if (channelPreference === "resend_email" || channelPreference === "email") {
+        toast.success(res.data?.message || "Payment reminder email successfully dispatched via Resend!");
         onClose();
       } else {
         toast.success(res.data?.message || "Reminder dispatched via WhatsApp Cloud API!");
@@ -215,14 +230,39 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
               )}
               <div>
                 <p className="font-bold">
-                  Target Recipient: {previewData.recipient.name} ({previewData.recipient.role}) —{" "}
-                  {previewData.recipient.phone || "No phone number configured"}
+                  Target Recipient: {previewData.recipient.name} ({recipientRole === "both" ? "Student & Parent" : previewData.recipient.role})
                 </p>
-                {!previewData.recipient.isValidPhone && (
-                  <p className="text-[11px] font-semibold mt-0.5">
-                    Phone Number Warning: {previewData.recipient.phoneValidationReason}. Please update the
-                    profile phone before dispatching.
-                  </p>
+                {recipientRole === "both" ? (
+                  <div className="mt-1 space-y-0.5 text-[11px] text-slate-700 font-medium">
+                    <p>
+                      • Student ({candidate.studentName}): {previewData.recipient.studentContact?.phone || candidate.phone || "No phone"}
+                      {(previewData.recipient.studentContact?.email || candidate?.studentEmail || candidate?.email) && (
+                        <span className="text-blue-700 font-semibold"> • Email: {previewData.recipient.studentContact?.email || candidate?.studentEmail || candidate?.email}</span>
+                      )}
+                    </p>
+                    <p>
+                      • Parent / Guardian: {previewData.recipient.parentContact?.phone || "No phone linked"}
+                      {previewData.recipient.parentContact?.email && (
+                        <span className="text-blue-700 font-semibold"> • Email: {previewData.recipient.parentContact.email}</span>
+                      )}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-[11px] text-slate-700 font-medium mt-0.5">
+                      Phone: {previewData.recipient.phone || "No phone configured"}
+                      {(previewData.recipient.email || candidate?.studentEmail || candidate?.email) && (
+                        <span className="ml-2 font-semibold text-blue-700">
+                          • Email: {previewData.recipient.email || candidate?.studentEmail || candidate?.email}
+                        </span>
+                      )}
+                    </p>
+                    {!previewData.recipient.isValidPhone && (
+                      <p className="text-[11px] font-semibold mt-0.5">
+                        Phone Number Warning: {previewData.recipient.phoneValidationReason}. You can still dispatch reminders via Resend Email if email is configured.
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -259,6 +299,7 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
               >
                 <option value="student">Student ({candidate.studentName})</option>
                 <option value="parent">Parent / Guardian</option>
+                <option value="both">Both (Student &amp; Parent)</option>
               </select>
             </div>
 
@@ -398,16 +439,18 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
               Open Admin WhatsApp
             </button>
 
-            {/* Option 2: MyAcademy WhatsApp API (Managed Zero-Setup) */}
+            {/* Option 2: MyAcademy WhatsApp API (Coming Soon) */}
             <button
               type="button"
-              onClick={() => handleSend("myacademy_api")}
-              disabled={actionLoading || !previewData?.recipient?.isValidPhone}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-purple-200 transition-all disabled:opacity-50 cursor-pointer"
-              title="Dispatches via MyAcademy Platform Gateway"
+              disabled
+              className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-slate-100 text-slate-400 font-extrabold text-xs inline-flex items-center justify-center gap-1.5 border border-slate-200 cursor-not-allowed opacity-75"
+              title="MyAcademy WhatsApp Gateway is coming soon in an upcoming release"
             >
               <FaCloud className="text-xs" />
-              Send via MyAcademy API
+              MyAcademy API
+              <span className="ml-1 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[9px] font-black uppercase">
+                Soon
+              </span>
             </button>
 
             {/* Option 3: Custom Meta Cloud API (If connected) */}
@@ -423,6 +466,18 @@ function ManualSendDialog({ onClose, candidate, templates, integrationData }) {
                 Send via Custom Meta API
               </button>
             )}
+
+            {/* Option 4: Official Email via Resend */}
+            <button
+              type="button"
+              onClick={() => handleSend("resend_email")}
+              disabled={actionLoading || (!previewData?.recipient?.isValidEmail && !previewData?.recipient?.email && !candidate?.studentEmail && !candidate?.email)}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-blue-200 transition-all disabled:opacity-50 cursor-pointer"
+              title="Send official payment reminder email via Resend"
+            >
+              <FaEnvelope className="text-xs" />
+              Send via Resend Email
+            </button>
           </div>
         </div>
       </motion.div>
@@ -434,6 +489,7 @@ export default function ManualSendModal({
   isOpen,
   onClose,
   candidate,
+  initialRecipientRole = "student",
   templates = [],
   integrationData,
 }) {
@@ -445,6 +501,7 @@ export default function ManualSendModal({
         key={candidate._id}
         onClose={onClose}
         candidate={candidate}
+        initialRecipientRole={initialRecipientRole}
         templates={templates}
         integrationData={integrationData}
       />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import DashboardSkeleton from "@/app/Skeletons/DashBoardSkeleton";
 import useAuthStore from "@/store/authStore";
 import { formatISTDateTime } from "@/Utils/formatDate";
@@ -15,8 +16,19 @@ import {
   FaBell,
   FaCrown,
   FaCheckCircle,
-  FaExclamationTriangle,
+  FaClock,
+  FaChartPie,
+  FaCalendarCheck,
+  FaArrowRight,
+  FaUserGraduate,
 } from "react-icons/fa";
+import {
+  StatCard,
+  ChartCard,
+  DonutChart,
+  ComparisonBarChart,
+  ProgressBar,
+} from "@/app/Components/visual-ui";
 
 export default function Dashboard({
   data,
@@ -56,103 +68,92 @@ export default function Dashboard({
     (item) => permission[item.permission]
   );
 
-  const stats = [
-    {
-      title: "Total Students",
-      value: data?.totalStudents || 0,
-      growth: "+12%",
-      icon: <FaUsers />,
-      color: "bg-blue-50 text-blue-600",
-    },
-    ...(role === "admin"
-      ? [
-          {
-            title: "Active Trainers",
-            value: data?.totalTeachers || 0,
-            growth: "+3%",
-            icon: <FaUserTie />,
-            color: "bg-violet-50 text-violet-600",
-          },
-        ]
-      : []),
-    {
-      title: "Courses",
-      value: data?.totalCourses || 0,
-      growth: "+5%",
-      icon: <FaBookOpen />,
-      color: "bg-green-50 text-green-600",
-    },
-    {
-      title: "Batches",
-      value: data?.totalBatches || 0,
-      growth: "+8%",
-      icon: <FaLayerGroup />,
-      color: "bg-orange-50 text-[#D6451B]",
-    },
-    {
-      title: "Attendance Sessions",
-      value: data?.totalAttendanceSessions ?? 0,
-      growth: `${data?.totalAttendanceSessions ?? 0} marked`,
-      icon: <FaCheckCircle />,
-      color: "bg-emerald-50 text-emerald-600",
-    },
-  ];
+  // Student distribution data for Donut Chart
+  const studentDistribution = useMemo(() => {
+    return [
+      { name: "Approved", value: data?.approvedStudents || 0, color: "#10B981" },
+      { name: "Pending", value: data?.pendingStudents || 0, color: "#F59E0B" },
+      { name: "Blocked", value: data?.blockedStudents || 0, color: "#F43F5E" },
+    ];
+  }, [data]);
+
+  // Attendance bar chart data from recent sessions
+  const attendanceChartData = useMemo(() => {
+    if (!data?.recentAttendanceSessions || data.recentAttendanceSessions.length === 0) {
+      return [];
+    }
+
+    return data.recentAttendanceSessions.slice(0, 6).map((session, idx) => {
+      const present = session.records?.filter((r) => r.status === "present").length || 0;
+      const absent = session.records?.filter((r) => r.status === "absent").length || 0;
+      const leave = session.records?.filter((r) => r.status === "leave").length || 0;
+      const name = session.batchName || session.batch?.name || `Cohort ${idx + 1}`;
+      const shortName = name.length > 10 ? `${name.slice(0, 9)}…` : name;
+
+      return {
+        label: shortName,
+        Present: present,
+        Absent: absent,
+        Leave: leave,
+      };
+    });
+  }, [data]);
 
   if (statsLoading || classesLoading || annoucementsLoading || activitiesLoading) {
     return <DashboardSkeleton />;
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-5 sm:space-y-6 lg:space-y-8">
+    <div className="mx-auto max-w-7xl space-y-5 sm:space-y-6 lg:space-y-8 min-w-0">
       {/* Hero */}
       <motion.section
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-[#ff855e] p-4 sm:p-6 lg:p-8 text-white shadow-lg"
+        className="overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#D6451B] to-[#ff855e] p-4 sm:p-6 lg:p-8 text-white shadow-lg min-w-0"
       >
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-              {user?.role} Dashboard
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between min-w-0">
+          <div className="min-w-0 flex-1">
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur-xs">
+              {role === "admin" ? "Academy Operations" : "Teacher Console"}
             </span>
 
-            <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
-              Welcome Back, {user?.fullName} 👋
+            <h1 className="mt-3 text-2xl font-black sm:text-3xl lg:text-4xl tracking-tight truncate">
+              Welcome Back, {user?.fullName || "Administrator"} 👋
             </h1>
 
             <p className="mt-2 text-xs sm:text-sm lg:text-base max-w-2xl text-orange-100 leading-relaxed font-normal">
-              Monitor admissions, manage students, track batches, schedule live classes, and oversee academy operations from one powerful console.
+              Monitor admissions, cohort attendance, live class timetables, and academic operations from one unified visual console.
             </p>
           </div>
 
-          {/* Overview Card */}
-          <div className="rounded-2xl border hidden lg:block border-white/20 bg-white/10 p-5 backdrop-blur-md lg:w-80 shrink-0">
+          {/* Quick Overview Card */}
+          <div className="rounded-2xl border border-white/20 bg-white/10 p-4 sm:p-5 backdrop-blur-md lg:w-80 shrink-0">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm tracking-wide">Overview</h3>
-              <FaBell className="text-sm opacity-80" />
+              <h3 className="font-extrabold text-xs sm:text-sm tracking-wide uppercase text-orange-100">
+                Admissions Snapshot
+              </h3>
+              <FaUsers className="text-sm opacity-80" />
             </div>
 
-            <div className="mt-4 space-y-3 text-xs sm:text-sm">
+            <div className="mt-3 space-y-2.5 text-xs sm:text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-orange-100">Approved Students</span>
-                <span className="font-bold">{data?.approvedStudents || 0}</span>
+                <span className="text-orange-100 font-medium">Approved Students</span>
+                <span className="font-black text-white">{data?.approvedStudents || 0}</span>
               </div>
-
               <div className="flex items-center justify-between">
-                <span className="text-orange-100">Pending Students</span>
-                <span className="font-bold">{data?.pendingStudents || 0}</span>
+                <span className="text-orange-100 font-medium">Pending Review</span>
+                <span className="font-black text-amber-200">{data?.pendingStudents || 0}</span>
               </div>
-
               <div className="flex items-center justify-between">
-                <span className="text-orange-100">Blocked Students</span>
-                <span className="font-bold">{data?.blockedStudents || 0}</span>
+                <span className="text-orange-100 font-medium">Blocked Accounts</span>
+                <span className="font-black text-rose-200">{data?.blockedStudents || 0}</span>
               </div>
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* SaaS Plan & Resource Quotas Banner for Admin */}
+      {/* SaaS Plan Quota Gauges for Admin */}
       {role === "admin" && subscriptionUsage && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -160,9 +161,9 @@ export default function Dashboard({
           className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-6 shadow-xs"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-[#D6451B]">
-                <FaCrown className="text-base" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-[#D6451B]">
+                <FaCrown className="text-lg" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -170,25 +171,29 @@ export default function Dashboard({
                     {subscriptionUsage.plan?.name || "Active SaaS Plan"}
                   </h3>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase ${
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase ${
                       subscriptionUsage.isActive
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-rose-100 text-rose-700"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-rose-100 text-rose-800"
                     }`}
                   >
-                    {subscriptionUsage.subscription?.isTrial ? "Free Trial" : subscriptionUsage.isActive ? "Active" : "Expired"}
+                    {subscriptionUsage.subscription?.isTrial
+                      ? "Free Trial"
+                      : subscriptionUsage.isActive
+                      ? "Active"
+                      : "Expired"}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 font-medium">
                   {subscriptionUsage.isActive
-                    ? "Enforced by backend • Real-time resource quota monitoring"
+                    ? "Real-time tenant resource allocation & capacity monitoring"
                     : subscriptionUsage.statusReason || "Subscription requires renewal"}
                 </p>
               </div>
             </div>
 
             {subscriptionUsage.subscription?.trialEndsAt && subscriptionUsage.subscription?.isTrial && (
-              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-xl border border-amber-200 self-start sm:self-auto">
+              <span className="text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 self-start sm:self-auto">
                 Trial ends: {new Date(subscriptionUsage.subscription.trialEndsAt).toLocaleDateString("en-IN")}
               </span>
             )}
@@ -204,32 +209,33 @@ export default function Dashboard({
               const Icon = q.icon;
               const isExceeded = q.data?.isExceeded;
               const percent = q.data?.percent || 0;
+
               return (
-                <div key={q.label} className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div key={q.label} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-600 flex items-center gap-1.5">
+                    <span className="font-bold text-slate-700 flex items-center gap-1.5 truncate">
                       <Icon className="text-xs text-slate-400" /> {q.label}
                     </span>
-                    <span className={`font-extrabold ${isExceeded ? "text-rose-600" : percent >= 80 ? "text-amber-600" : "text-slate-800"}`}>
+                    <span className={`font-black ${isExceeded ? "text-rose-600" : percent >= 80 ? "text-amber-600" : "text-slate-900"}`}>
                       {q.data?.current} / {q.data?.limit}
                     </span>
                   </div>
+
                   {!q.data?.isUnlimited && (
-                    <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          isExceeded ? "bg-rose-500" : percent >= 80 ? "bg-amber-500" : "bg-emerald-500"
-                        }`}
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
+                    <ProgressBar
+                      percentage={percent}
+                      colorScheme={isExceeded ? "rose" : percent >= 80 ? "amber" : "emerald"}
+                      height="h-1.5"
+                      showPercentage={false}
+                    />
                   )}
-                  <p className="mt-1 text-[10px] text-slate-400 font-medium">
+
+                  <p className="text-[10px] text-slate-400 font-semibold truncate">
                     {q.data?.isUnlimited
                       ? "Unlimited allocation"
                       : isExceeded
-                      ? "Limit reached! Upgrade needed"
-                      : `${q.data?.remaining} slots available`}
+                      ? "Limit reached! Upgrade plan"
+                      : `${q.data?.remaining} slots remaining`}
                   </p>
                 </div>
               );
@@ -238,107 +244,230 @@ export default function Dashboard({
         </motion.div>
       )}
 
-      {/* Statistics */}
-      <section className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
-        {stats.map((item, index) => (
-          <motion.div
-            key={item.title}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            whileHover={{ y: -4 }}
-            className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-xs hover:shadow-md transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div
-                className={`flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl text-sm sm:text-xl font-bold ${item.color}`}
-              >
-                {item.icon}
-              </div>
-            </div>
+      {/* Primary KPI Grid (StatCards) */}
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 min-w-0">
+        <StatCard
+          title="Total Students"
+          value={data?.totalStudents || 0}
+          icon={FaUsers}
+          color="blue"
+          trend="+12%"
+          trendDirection="up"
+          subText={`${data?.approvedStudents || 0} active enrollment`}
+          onClick={() => router.push("/admin-panel/student")}
+        />
 
-            <div className="mt-2.5 sm:mt-4">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
-                {item.value}
-              </h2>
-              <p className="mt-0.5 text-xs sm:text-sm text-slate-500 font-semibold truncate">
-                {item.title}
-              </p>
-            </div>
-          </motion.div>
-        ))}
+        {role === "admin" ? (
+          <StatCard
+            title="Active Faculty"
+            value={data?.totalTeachers || 0}
+            icon={FaUserTie}
+            color="purple"
+            trend="+3%"
+            trendDirection="up"
+            subText="Assigned instructors"
+            onClick={() => router.push("/admin-panel/teachers")}
+          />
+        ) : (
+          <StatCard
+            title="My Cohorts"
+            value={data?.totalBatches || 0}
+            icon={FaLayerGroup}
+            color="orange"
+            trend="+5%"
+            trendDirection="up"
+            subText="Assigned batches"
+          />
+        )}
+
+        <StatCard
+          title="Curriculum Courses"
+          value={data?.totalCourses || 0}
+          icon={FaBookOpen}
+          color="emerald"
+          trend="+5%"
+          trendDirection="up"
+          subText={`${data?.publishedCourses || data?.totalCourses || 0} published`}
+          onClick={() => router.push(role === "admin" ? "/admin-panel/courses" : "/teacher-panel/courses")}
+        />
+
+        <StatCard
+          title="Attendance Sessions"
+          value={data?.totalAttendanceSessions ?? 0}
+          icon={FaCheckCircle}
+          color="amber"
+          trend="Live"
+          trendDirection="neutral"
+          subText="Recorded roll calls"
+          onClick={() => router.push(role === "admin" ? "/admin-panel/attendence" : "/teacher-panel/mark-attendence")}
+        />
       </section>
 
-      {/* Analytics + Quick Actions */}
-      <div className="grid gap-5 sm:gap-6 xl:grid-cols-[2fr_1fr]">
+      {/* Visual Analytics Row: Attendance Sessions Chart + Student Distribution Donut */}
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3 min-w-0">
+        {/* Recent Attendance Breakdown Chart (2 Cols) */}
+        <div className="lg:col-span-2 min-w-0">
+          <ChartCard
+            title="Recent Cohort Attendance"
+            subtitle="Roll call breakdown across active batch sessions"
+            icon={FaCalendarCheck}
+            actions={
+              <Link
+                href={role === "teacher" ? "/teacher-panel/mark-attendence" : "/admin-panel/attendence"}
+                className="text-xs font-bold text-[#D6451B] hover:underline flex items-center gap-1"
+              >
+                <span>View Register</span>
+                <FaArrowRight className="text-[10px]" />
+              </Link>
+            }
+          >
+            {attendanceChartData.length > 0 ? (
+              <ComparisonBarChart
+                data={attendanceChartData}
+                xAxisKey="label"
+                bars={[
+                  { key: "Present", name: "Present", color: "#10B981" },
+                  { key: "Leave", name: "Leave", color: "#F59E0B" },
+                  { key: "Absent", name: "Absent", color: "#F43F5E" },
+                ]}
+                height={230}
+                showLegend={true}
+              />
+            ) : (
+              <div className="flex h-48 flex-col items-center justify-center text-center p-6 text-slate-400">
+                <FaCalendarCheck className="text-3xl text-slate-300 mb-2" />
+                <p className="text-xs font-semibold text-slate-600">
+                  No attendance sessions marked yet today.
+                </p>
+                <Link
+                  href={role === "teacher" ? "/teacher-panel/mark-attendence" : "/admin-panel/attendence"}
+                  className="mt-2 text-xs font-bold text-[#D6451B] hover:underline"
+                >
+                  Mark Daily Attendance &rarr;
+                </Link>
+              </div>
+            )}
+          </ChartCard>
+        </div>
+
+        {/* Student Enrollment Distribution Donut (1 Col) */}
+        <div className="min-w-0">
+          <ChartCard
+            title="Admissions Split"
+            subtitle="Current status breakdown"
+            icon={FaChartPie}
+          >
+            <DonutChart
+              data={studentDistribution}
+              nameKey="name"
+              valueKey="value"
+              height={190}
+              innerRadius={50}
+              outerRadius={70}
+              centerValue={String(data?.totalStudents || 0)}
+              centerLabel="Students"
+              showLegend={true}
+            />
+          </ChartCard>
+        </div>
+      </div>
+
+      {/* Admissions Activity + Schedules Column */}
+      <div className="grid gap-5 sm:gap-6 xl:grid-cols-[2fr_1fr] min-w-0">
+        {/* Recent Admissions Visual Table */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-6 lg:p-7 shadow-xs"
+          className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-6 lg:p-7 shadow-xs min-w-0"
         >
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-base sm:text-xl font-bold text-slate-900">
-              Recent Admissions
-            </h2>
+          <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-[#D6451B] border border-orange-200/60 text-sm">
+                <FaUserGraduate />
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  Recent Admissions
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Latest students enrolled in academy cohorts
+                </p>
+              </div>
+            </div>
 
             <button
               onClick={() => router.push("/admin-panel/student")}
-              className="shrink-0 text-xs sm:text-sm font-bold text-[#D6451B] hover:underline"
+              className="shrink-0 text-xs font-bold text-[#D6451B] hover:underline flex items-center gap-1 cursor-pointer"
             >
-              View All
+              <span>View All</span>
+              <FaArrowRight className="text-[10px]" />
             </button>
           </div>
 
-          {/* Mobile Cards */}
-          <div className="mt-4 space-y-3 sm:hidden">
+          {/* Mobile Card List (< 640px) */}
+          <div className="mt-4 space-y-2.5 sm:hidden">
             {recentStudents?.length > 0 ? (
               recentStudents.map((item, index) => {
-                const studentName = item?.student?.fullName || item?.fullName || item?.name || "Enrolled Student";
+                const studentName =
+                  item?.student?.fullName || item?.fullName || item?.name || "Enrolled Student";
                 const studentEmail = item?.student?.email || item?.email || "";
-                const courseTitle = typeof item?.course === "object" ? (item?.course?.title || "General Cohort") : (item?.course || item?.batch || "General Cohort");
+                const courseTitle =
+                  typeof item?.course === "object"
+                    ? item?.course?.title || "General Cohort"
+                    : item?.course || item?.batch || "General Cohort";
 
                 return (
                   <div
                     key={item?._id || item?.id || studentEmail || index}
-                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-3"
+                    className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/70 min-w-0"
                   >
-                    <p className="font-bold text-xs text-slate-900">
-                      {studentName}
-                    </p>
-                    {studentEmail && (
-                      <p className="text-[11px] text-slate-400">
-                        {studentEmail}
-                      </p>
-                    )}
-                    <p className="mt-1 text-[11px] font-semibold text-slate-600">
-                      Course: {courseTitle}
-                    </p>
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-2">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[#D6451B] font-bold text-xs border border-orange-200">
+                        {studentName.charAt(0) || "S"}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-extrabold text-xs text-slate-900 truncate">
+                          {studentName}
+                        </p>
+                        <p className="text-[11px] text-slate-500 truncate">
+                          {courseTitle}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-800 shrink-0">
+                      Enrolled
+                    </span>
                   </div>
                 );
               })
             ) : (
-              <p className="text-xs text-slate-400 py-4 text-center">
-                No recent admissions.
+              <p className="text-xs text-slate-400 py-6 text-center">
+                No recent student enrollments found.
               </p>
             )}
           </div>
 
-          {/* Desktop Table */}
+          {/* Desktop Table (>= 640px) */}
           <div className="mt-4 hidden sm:block overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="border-b border-slate-100 text-[11px] uppercase tracking-wider text-slate-400">
+              <thead className="border-b border-slate-100 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
                 <tr>
-                  <th className="pb-3 font-semibold">Student</th>
-                  <th className="pb-3 font-semibold">Course</th>
-                  <th className="pb-3 font-semibold">Enrolled</th>
+                  <th className="pb-3">Student</th>
+                  <th className="pb-3">Course / Cohort</th>
+                  <th className="pb-3">Enrolled At</th>
+                  <th className="pb-3 text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                 {recentStudents?.length > 0 ? (
                   recentStudents.map((item, index) => {
-                    const studentName = item?.student?.fullName || item?.fullName || item?.name || "Enrolled Student";
+                    const studentName =
+                      item?.student?.fullName || item?.fullName || item?.name || "Enrolled Student";
                     const studentEmail = item?.student?.email || item?.email || "";
-                    const courseTitle = typeof item?.course === "object" ? (item?.course?.title || "General Cohort") : (item?.course || item?.batch || "General Cohort");
+                    const courseTitle =
+                      typeof item?.course === "object"
+                        ? item?.course?.title || "General Cohort"
+                        : item?.course || item?.batch || "General Cohort";
                     const dateValue = item?.createdAt || item?.enrolledAt;
 
                     return (
@@ -347,30 +476,39 @@ export default function Dashboard({
                         className="hover:bg-slate-50/70 transition-colors"
                       >
                         <td className="py-3">
-                          <div className="font-bold text-slate-900">
-                            {studentName}
-                          </div>
-                          {studentEmail && (
-                            <div className="text-[11px] text-slate-400">
-                              {studentEmail}
+                          <div className="flex items-center gap-2.5">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[#D6451B] font-bold text-xs border border-orange-200">
+                              {studentName.charAt(0) || "S"}
                             </div>
-                          )}
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                                {studentName}
+                              </p>
+                              {studentEmail && (
+                                <p className="text-[11px] text-slate-400 truncate">
+                                  {studentEmail}
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         </td>
-                        <td className="py-3 text-slate-600 font-semibold">
+                        <td className="py-3 text-slate-600 font-semibold text-xs sm:text-sm">
                           {courseTitle}
                         </td>
                         <td className="py-3 text-slate-400 text-xs">
                           {dateValue ? formatISTDateTime(dateValue) : "Recently"}
+                        </td>
+                        <td className="py-3 text-right">
+                          <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">
+                            Active
+                          </span>
                         </td>
                       </tr>
                     );
                   })
                 ) : (
                   <tr>
-                    <td
-                      colSpan="3"
-                      className="text-center py-6 text-xs text-slate-400"
-                    >
+                    <td colSpan="4" className="text-center py-8 text-xs text-slate-400">
                       No recent admissions found.
                     </td>
                   </tr>
@@ -380,135 +518,67 @@ export default function Dashboard({
           </div>
         </motion.div>
 
-        {/* Right Sidebar: Quick Actions + Today's Schedule */}
-        <div className="space-y-5 sm:space-y-6">
+        {/* Right Sidebar: Quick Actions + Schedule + Announcements */}
+        <div className="space-y-4 sm:space-y-6 min-w-0">
           {/* Quick Actions */}
           {allowedActions.length > 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs"
+              className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs"
             >
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                Quick Actions
+              <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500">
+                Quick Operations
               </h2>
 
-              <div className="mt-4 flex flex-col gap-2.5">
+              <div className="mt-3 flex flex-col gap-2">
                 {allowedActions.map((item) => (
                   <button
                     key={item.action}
                     onClick={() => router.push(item.path)}
-                    className="w-full rounded-xl bg-orange-50 px-4 py-2.5 text-xs sm:text-sm font-bold text-[#D6451B] hover:bg-orange-100 transition-colors text-left"
+                    className="w-full flex items-center justify-between rounded-xl bg-orange-50/70 border border-orange-100 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-[#D6451B] hover:bg-orange-100 transition-colors text-left cursor-pointer"
                   >
-                    + {item.action}
+                    <span>+ {item.action}</span>
+                    <FaArrowRight className="text-[10px] text-orange-400" />
                   </button>
                 ))}
               </div>
             </motion.div>
           )}
 
-          {/* Attendance Marked */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                Attendance Marked
-              </h2>
-              <Link
-                href={role === "teacher" ? "/teacher-panel/mark-attendence" : "/admin-panel/attendence"}
-                className="text-xs font-bold text-[#D6451B] hover:underline"
-              >
-                Mark Attendance
-              </Link>
-            </div>
-
-            <div className="mt-4 space-y-2.5">
-              {data?.recentAttendanceSessions?.length > 0 ? (
-                data.recentAttendanceSessions.map((session) => {
-                  const presentCount = session.records?.filter((r) => r.status === "present").length || 0;
-                  const leaveCount = session.records?.filter((r) => r.status === "leave").length || 0;
-                  const absentCount = session.records?.filter((r) => r.status === "absent").length || 0;
-                  const total = session.records?.length || 0;
-                  const dateStr = session.date
-                    ? new Date(session.date).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "N/A";
-
-                  return (
-                    <div
-                      key={session._id}
-                      className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 flex items-center justify-between gap-3"
-                    >
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
-                            {session.batchName || session.batch?.name || "Batch"}
-                          </h3>
-                          <span className="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800">
-                            {presentCount}/{total} Present
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          {dateStr} • {leaveCount > 0 ? `${leaveCount} Leave • ` : ""}{absentCount} Absent
-                        </p>
-                      </div>
-
-                      <div className="shrink-0">
-                        <button
-                          onClick={() =>
-                            router.push(
-                              role === "teacher"
-                                ? `/teacher-panel/attendence?attendanceId=${session._id}`
-                                : `/admin-panel/attendence?attendanceId=${session._id}`
-                            )
-                          }
-                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-colors"
-                        >
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-xs text-slate-400 py-4 text-center">
-                  No attendance marked yet.
-                </p>
-              )}
-            </div>
-          </motion.div>
-
           {/* Today's Classes */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs"
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                Today&apos;s Classes
-              </h2>
-              <FaVideo className="text-slate-400 text-sm" />
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FaVideo className="text-[#D6451B] text-xs" />
+                <h3 className="text-sm font-bold text-slate-900">
+                  Today&apos;s Live Classes
+                </h3>
+              </div>
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                {classes?.length || 0} scheduled
+              </span>
             </div>
 
-            <div className="mt-4 space-y-2.5">
+            <div className="mt-3 space-y-2.5">
               {classes?.length > 0 ? (
                 classes.map((item) => (
                   <div
                     key={item?._id || item?.title}
-                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 flex items-center justify-between gap-3"
+                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 flex items-center justify-between gap-3 min-w-0"
                   >
-                    <div className="min-w-0">
-                      <h3 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
-                        {item?.title}
-                      </h3>
-                      <p className="text-[11px] text-slate-400">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                          {item?.title}
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">
                         {formatISTDateTime(item?.meetingDate)}
                       </p>
                     </div>
@@ -537,22 +607,33 @@ export default function Dashboard({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs"
+            className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs"
           >
-            <h2 className="text-base sm:text-lg font-bold text-slate-900">
-              Announcements
-            </h2>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FaBell className="text-amber-500 text-xs" />
+                <h3 className="text-sm font-bold text-slate-900">
+                  Broadcast Notices
+                </h3>
+              </div>
+              <Link
+                href={role === "teacher" ? "/teacher-panel/add-announcement" : "/admin-panel/add-announcement"}
+                className="text-xs font-bold text-[#D6451B] hover:underline"
+              >
+                + Post
+              </Link>
+            </div>
 
-            <div className="mt-4 space-y-2.5">
+            <div className="mt-3 space-y-2.5">
               {announcements?.length > 0 ? (
-                announcements.map((item) => (
+                announcements.slice(0, 4).map((item) => (
                   <div
                     key={item?._id || item?.title}
-                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-3"
+                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 min-w-0"
                   >
-                    <h3 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
                       {item?.title}
-                    </h3>
+                    </h4>
                     <p className="mt-1 text-[11px] text-slate-400">
                       {formatISTDateTime(item?.publishAt || item?.createdAt)}
                     </p>
@@ -560,7 +641,7 @@ export default function Dashboard({
                 ))
               ) : (
                 <p className="text-xs text-slate-400 py-4 text-center">
-                  No recent announcements.
+                  No active announcements.
                 </p>
               )}
             </div>

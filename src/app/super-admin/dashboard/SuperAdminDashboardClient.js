@@ -17,6 +17,7 @@ import {
   FaClock,
 } from "react-icons/fa";
 import { useSuperAdminDashboard } from "@/Hooks/useSuperAdmin";
+import { StatCard, ChartCard, DonutChart, ProgressBar } from "@/app/Components/visual-ui";
 
 export default function SuperAdminDashboardClient() {
   const { data, isLoading } = useSuperAdminDashboard();
@@ -68,59 +69,49 @@ export default function SuperAdminDashboardClient() {
         </div>
       </motion.section>
 
-      {/* Primary KPI Grid */}
+      {/* Primary KPI Grid (StatCards) */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
-        {/* Total Academies */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Total Academies</span>
-            <FaUniversity className="text-xs text-[#D6451B]" />
-          </div>
-          <h3 className="mt-2 text-xl sm:text-3xl font-extrabold text-slate-900">
-            {isLoading ? "..." : metrics.totalAcademies || 0}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            {metrics.activeAcademies || 0} Active • {metrics.pendingAcademies || 0} Pending • {metrics.suspendedAcademies || 0} Suspended
-          </p>
-        </div>
+        <StatCard
+          title="Total Academies"
+          value={metrics.totalAcademies || 0}
+          icon={FaUniversity}
+          color="orange"
+          trend={`${metrics.activeAcademies || 0} active`}
+          trendDirection="up"
+          subText={`${metrics.pendingAcademies || 0} pending review`}
+          loading={isLoading}
+        />
 
-        {/* Total Platform Users */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Platform Users</span>
-            <FaUsers className="text-xs text-[#D6451B]" />
-          </div>
-          <h3 className="mt-2 text-xl sm:text-3xl font-extrabold text-slate-900">
-            {isLoading ? "..." : metrics.totalUsers || 0}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Students, teachers & staff</p>
-        </div>
+        <StatCard
+          title="Platform Users"
+          value={metrics.totalUsers || 0}
+          icon={FaUsers}
+          color="blue"
+          trend="+18%"
+          trendDirection="up"
+          subText="Students, teachers & staff"
+          loading={isLoading}
+        />
 
-        {/* Active Subscriptions */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Active Subscriptions</span>
-            <FaCreditCard className="text-xs text-emerald-600" />
-          </div>
-          <h3 className="mt-2 text-xl sm:text-3xl font-extrabold text-emerald-600">
-            {isLoading ? "..." : metrics.activeSubscriptions || 0}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            + {metrics.trials || 0} active trial accounts
-          </p>
-        </div>
+        <StatCard
+          title="Active Subscriptions"
+          value={metrics.activeSubscriptions || 0}
+          icon={FaCreditCard}
+          color="emerald"
+          trend={`${metrics.trials || 0} trials`}
+          trendDirection="up"
+          subText="Paid recurring SaaS tenants"
+          loading={isLoading}
+        />
 
-        {/* Platform Plans */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">SaaS Plans</span>
-            <FaLayerGroup className="text-xs text-amber-500" />
-          </div>
-          <h3 className="mt-2 text-xl sm:text-3xl font-extrabold text-slate-900">
-            {isLoading ? "..." : metrics.activePlans || 0}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Published billing tiers</p>
-        </div>
+        <StatCard
+          title="SaaS Plans"
+          value={metrics.activePlans || 0}
+          icon={FaLayerGroup}
+          color="purple"
+          subText="Published billing tiers"
+          loading={isLoading}
+        />
       </div>
 
       {/* Pending Approvals Alert Banner */}
@@ -263,19 +254,18 @@ export default function SuperAdminDashboardClient() {
                   No subscription records found.
                 </p>
               ) : (
-                <div className="space-y-2.5">
-                  {subscriptionsByStatus.map((item) => (
-                    <div
-                      key={item._id}
-                      className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-xs font-bold"
-                    >
-                      <span className="capitalize text-slate-700">{item._id}</span>
-                      <span className="rounded-full bg-white px-2.5 py-0.5 text-slate-900 shadow-2xs border border-slate-200">
-                        {item.count}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <DonutChart
+                  data={subscriptionsByStatus.map((item) => ({
+                    name: item._id ? item._id.charAt(0).toUpperCase() + item._id.slice(1).replace("_", " ") : "Unknown",
+                    value: item.count || 0,
+                  }))}
+                  height={220}
+                  innerRadius={50}
+                  outerRadius={75}
+                  centerLabel="Total Subs"
+                  centerValue={subscriptionsByStatus.reduce((acc, curr) => acc + (curr.count || 0), 0)}
+                  showLegend={true}
+                />
               )}
             </div>
 

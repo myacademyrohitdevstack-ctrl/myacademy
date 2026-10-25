@@ -28,6 +28,7 @@ import {
 } from "@/app/mutations/homeworkMutations";
 import { toast } from "sonner";
 import formatDate from "@/Utils/formatDate";
+import { StatCard, ProgressBar } from "@/app/Components/visual-ui";
 
 export default function TeacherHomeworkClient() {
   const [selectedBatchId, setSelectedBatchId] = useState("");
@@ -160,27 +161,53 @@ export default function TeacherHomeworkClient() {
         <div className="absolute -right-8 -bottom-10 h-48 w-48 rounded-full bg-white/10 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-[#D6451B] font-black text-lg">
-            <FaClipboardList />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Homework Given</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{totalAssigned}</p>
-          </div>
-        </div>
+      {/* Visual Metrics Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          title="Total Assigned"
+          value={totalAssigned}
+          icon={FaClipboardList}
+          color="blue"
+          subText="Classroom exercises"
+        />
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 font-black text-lg">
-            <FaClock />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Active Submissions Open</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{activeCount}</p>
-          </div>
-        </div>
+        <StatCard
+          title="Active & Open"
+          value={activeCount}
+          icon={FaClock}
+          color="orange"
+          trend={activeCount > 0 ? "Accepting work" : "None open"}
+          trendDirection={activeCount > 0 ? "up" : "neutral"}
+          subText="Students can submit"
+        />
+
+        <StatCard
+          title="Completed / Closed"
+          value={totalAssigned - activeCount}
+          icon={FaCheckCircle}
+          color="emerald"
+          subText="Submissions finalized"
+        />
+
+        <StatCard
+          title="Cycle Completion"
+          value={totalAssigned > 0 ? Math.round(((totalAssigned - activeCount) / totalAssigned) * 100) : 100}
+          suffix="%"
+          icon={FaAward}
+          color="purple"
+          subText="Assignment evaluation rate"
+        />
+      </div>
+
+      {/* Coursework Progression Bar */}
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-xs">
+        <ProgressBar
+          percentage={totalAssigned > 0 ? Math.round(((totalAssigned - activeCount) / totalAssigned) * 100) : 100}
+          label="Coursework Evaluation Progress"
+          subLabel={`${totalAssigned - activeCount} of ${totalAssigned} assignments closed`}
+          colorScheme="emerald"
+          height="h-2"
+        />
       </div>
 
       {/* Filters and Controls */}

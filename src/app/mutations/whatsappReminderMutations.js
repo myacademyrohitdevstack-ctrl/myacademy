@@ -217,15 +217,21 @@ export const useSaveIntegrationMutation = () => {
 
 export const useTestIntegrationMutation = () => {
   return useMutation({
-    mutationFn: async () => {
-      const response = await testWhatsAppConnectionApi();
+    mutationFn: async (payload) => {
+      const response = await testWhatsAppConnectionApi(payload);
       return response.data;
     },
     retry: false,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-integration"] });
       queryClient.invalidateQueries({ queryKey: ["whatsapp-reminders-dashboard"] });
-      toast.success(data.message || "WhatsApp connection verified successfully!");
+      const displayMsg =
+        data?.message ||
+        data?.data?.message ||
+        (data?.data?.mode === "resend_email"
+          ? "Resend Email Gateway verified successfully!"
+          : "Gateway connection verified successfully!");
+      toast.success(displayMsg);
     },
     onError: (error) => handleError(error),
   });

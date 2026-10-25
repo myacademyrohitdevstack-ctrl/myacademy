@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   FaLock,
@@ -10,6 +11,8 @@ import {
   FaSave,
   FaSignOutAlt,
   FaUserShield,
+  FaUniversity,
+  FaArrowRight,
 } from "react-icons/fa";
 import { useLogoutMutation, useUpdatePasswordMutation } from "@/app/mutations/AuthenticationMutations";
 import CommingSoon from "@/app/Components/ui/CommingSoon";
@@ -91,6 +94,30 @@ logoutMutation.mutate()
     Manage your account preferences and security settings.
   </p>
 </motion.div>
+
+      {/* Academy Details Quick Card */}
+      <div className="rounded-2xl sm:rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50/60 to-white p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-[#D6451B] text-xl border border-orange-200 shadow-2xs">
+            <FaUniversity />
+          </div>
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900">
+              Academy Details & Branding
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5 max-w-xl">
+              Configure academy logo, online virtual status, campus addresses, and official fee receipt disclaimers.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/admin-panel/academy-profile"
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-[#D6451B] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-[#b83812] transition shrink-0"
+        >
+          <span>Manage Academy</span>
+          <FaArrowRight className="text-xs" />
+        </Link>
+      </div>
 
       {/* Security */}
 

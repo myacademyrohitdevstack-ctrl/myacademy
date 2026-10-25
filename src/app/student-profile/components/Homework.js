@@ -21,6 +21,7 @@ import { useStudentHomework } from "@/Hooks/useHomework";
 import { useSubmitHomeworkMutation } from "@/app/mutations/homeworkMutations";
 import { toast } from "sonner";
 import formatDate from "@/Utils/formatDate";
+import { StatCard, ProgressBar } from "@/app/Components/visual-ui";
 
 export default function StudentHomework({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,26 +74,50 @@ export default function StudentHomework({ user }) {
 
       {/* Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Assigned</p>
-          <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1">{summary.totalAssigned}</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Turned In</p>
-          <p className="text-xl sm:text-2xl font-black text-emerald-600 mt-1">{summary.completed}</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-600">Pending</p>
-          <p className="text-xl sm:text-2xl font-black text-amber-600 mt-1">{summary.pending}</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-rose-600">Overdue</p>
-          <p className="text-xl sm:text-2xl font-black text-rose-600 mt-1">{summary.overdue}</p>
-        </div>
+        <StatCard
+          label="Total Assigned"
+          value={summary.totalAssigned || 0}
+          icon={FaClipboardList}
+          colorScheme="orange"
+          subtitle="Coursework items"
+        />
+        <StatCard
+          label="Turned In"
+          value={summary.completed || 0}
+          icon={FaCheckCircle}
+          colorScheme="emerald"
+          subtitle="Completed exercises"
+        />
+        <StatCard
+          label="Pending Submission"
+          value={summary.pending || 0}
+          icon={FaClock}
+          colorScheme="amber"
+          subtitle="Awaiting submission"
+        />
+        <StatCard
+          label="Past Deadline"
+          value={summary.overdue || 0}
+          icon={FaExclamationTriangle}
+          colorScheme="rose"
+          subtitle="Action needed"
+        />
       </div>
+
+      {/* Coursework Completion Progress Bar */}
+      {summary.totalAssigned > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
+          <ProgressBar
+            value={summary.completed || 0}
+            max={summary.totalAssigned || 1}
+            label="Coursework Completion Rate"
+            color="emerald"
+            showPercentage={true}
+            targetBenchmark={80}
+            targetLabel="Target: 80% on-time"
+          />
+        </div>
+      )}
 
       {/* Filter and Search */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">

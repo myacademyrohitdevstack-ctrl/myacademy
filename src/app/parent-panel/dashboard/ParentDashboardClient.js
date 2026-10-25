@@ -22,6 +22,7 @@ import {
 } from "react-icons/fa";
 import { useMyChildren, useChildDashboard, useChildFees } from "@/Hooks/useParent";
 import ChildSwitcher from "../components/ChildSwitcher";
+import { StatCard, ProgressRing, ProgressBar, DonutChart, AttendanceHeatmap } from "@/app/Components/visual-ui";
 
 export default function ParentDashboardClient() {
   const { data: childrenList, isLoading: isChildrenLoading } = useMyChildren();
@@ -165,71 +166,50 @@ export default function ParentDashboardClient() {
         </div>
       </motion.section>
 
-      {/* KPI Stats Row */}
+      {/* KPI Stats Row (StatCards) */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
-        {/* Attendance Rate */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Attendance Rate</span>
-            <FaCalendarCheck className="text-xs text-[#D6451B]" />
-          </div>
-          <h3
-            className={`mt-2 text-xl sm:text-2xl font-extrabold ${
-              attendancePercentage !== null
-                ? attendancePercentage >= 75
-                  ? "text-emerald-600"
-                  : "text-rose-600"
-                : "text-emerald-600"
-            }`}
-          >
-            {attendancePercentage !== null ? `${attendancePercentage}%` : "100%"}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            {totalMarked > 0 ? `${presentCount} / ${totalMarked} classes present` : "Zero absences recorded • Good standing"}
-          </p>
-        </div>
+        <StatCard
+          title="Attendance Rate"
+          value={attendancePercentage !== null ? attendancePercentage : 100}
+          suffix="%"
+          icon={FaCalendarCheck}
+          color={attendancePercentage !== null && attendancePercentage < 75 ? "rose" : "emerald"}
+          trend={attendancePercentage !== null && attendancePercentage >= 75 ? "Good Standing" : "Shortage"}
+          trendDirection={attendancePercentage !== null && attendancePercentage >= 75 ? "up" : "down"}
+          subText={totalMarked > 0 ? `${presentCount}/${totalMarked} classes` : "Zero absences"}
+          loading={isDashboardLoading}
+        />
 
-        {/* Enrolled Batches */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Enrolled Cohorts</span>
-            <FaBookOpen className="text-xs text-[#D6451B]" />
-          </div>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
-            {batches.length}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Active curriculum batches</p>
-        </div>
+        <StatCard
+          title="Enrolled Cohorts"
+          value={batches.length || 0}
+          icon={FaBookOpen}
+          color="blue"
+          subText="Curriculum batches"
+          loading={isDashboardLoading}
+        />
 
-        {/* Pending Fee Dues */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Pending Dues</span>
-            <FaMoneyBillWave className="text-xs text-[#D6451B]" />
-          </div>
-          <h3
-            className={`mt-2 text-xl sm:text-2xl font-extrabold ${
-              totalBalance > 0 ? "text-rose-600" : "text-emerald-600"
-            }`}
-          >
-            ₹{totalBalance.toLocaleString("en-IN")}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            {totalBalance > 0 ? "Installment pending" : "All dues cleared"}
-          </p>
-        </div>
+        <StatCard
+          title="Pending Dues"
+          value={totalBalance}
+          prefix="₹"
+          icon={FaMoneyBillWave}
+          color="rose"
+          trend={totalBalance > 0 ? "Due soon" : "Cleared"}
+          trendDirection={totalBalance > 0 ? "down" : "up"}
+          subText="Tuition balance"
+          loading={isDashboardLoading}
+        />
 
-        {/* Total Paid Fees */}
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold">Total Paid</span>
-            <FaCheckCircle className="text-xs text-emerald-500" />
-          </div>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
-            ₹{totalPaid.toLocaleString("en-IN")}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Recorded fee receipts</p>
-        </div>
+        <StatCard
+          title="Total Paid"
+          value={totalPaid}
+          prefix="₹"
+          icon={FaCheckCircle}
+          color="emerald"
+          subText="Verified receipts"
+          loading={isDashboardLoading}
+        />
       </div>
 
       {isDashboardLoading ? (
@@ -396,6 +376,17 @@ export default function ParentDashboardClient() {
                 </div>
               )}
 
+              {/* 45-Day Regularity Heatmap */}
+              <div className="mt-5">
+                <AttendanceHeatmap
+                  attendanceRecords={attendance}
+                  daysCount={45}
+                  title="Daily Classroom Regularity"
+                  subtitle="Consecutive presence tracking over past 45 class days"
+                  currentStreak={currentStreak}
+                />
+              </div>
+
               {/* Recent Classroom Attendance List */}
               <div className="mt-5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
@@ -523,8 +514,44 @@ export default function ParentDashboardClient() {
             </div>
           </div>
 
-          {/* Right Column (1 col): Announcements & Quick Contacts */}
+          {/* Right Column (1 col): Tuition Donut, Announcements & Quick Contacts */}
           <div className="space-y-4 sm:space-y-6 min-w-0">
+            {/* Tuition Breakdown Card */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <FaMoneyBillWave className="text-emerald-600" />
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Tuition & Fee Status
+                  </h3>
+                </div>
+                <Link
+                  href={`/parent-panel/fees?childId=${selectedChildId}`}
+                  className="text-xs font-bold text-[#D6451B] hover:underline"
+                >
+                  Statement &rarr;
+                </Link>
+              </div>
+
+              <div className="mt-4">
+                <DonutChart
+                  data={[
+                    { name: "Cleared Fees", value: totalPaid, color: "#10B981" },
+                    { name: "Outstanding Dues", value: totalBalance, color: "#F43F5E" },
+                  ]}
+                  nameKey="name"
+                  valueKey="value"
+                  height={170}
+                  innerRadius={45}
+                  outerRadius={65}
+                  centerValue={`₹${(totalBalance + totalPaid).toLocaleString("en-IN")}`}
+                  centerLabel="Total Fee"
+                  unit="₹"
+                  showLegend={true}
+                />
+              </div>
+            </div>
+
             {/* Announcements */}
             <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">

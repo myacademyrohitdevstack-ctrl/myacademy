@@ -62,8 +62,11 @@ export default function FeesNav() {
 
   const isActive = (item) => {
     if (pathname === item.href) return true;
+    if (item.href === "/admin-panel/fees/dashboard") {
+      return pathname === "/admin-panel/fees/dashboard" || pathname === "/admin-panel/fees";
+    }
     if (item.aliases?.some((alias) => pathname === alias || pathname?.startsWith(alias + "/"))) return true;
-    if (item.href !== "/admin-panel/fees/dashboard" && pathname?.startsWith(item.href)) return true;
+    if (pathname?.startsWith(item.href + "/")) return true;
     return false;
   };
 

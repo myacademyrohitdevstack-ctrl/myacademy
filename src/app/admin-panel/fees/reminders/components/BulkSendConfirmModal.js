@@ -15,6 +15,7 @@ import {
   FaCloud,
   FaCog,
   FaCheck,
+  FaEnvelope,
 } from "react-icons/fa";
 import { useSendBulkRemindersMutation } from "@/app/mutations/whatsappReminderMutations";
 
@@ -31,7 +32,11 @@ export default function BulkSendConfirmModal({
     integrationData?.mode === "cloud_api" && integrationData?.connectionStatus === "connected";
 
   const [dispatchMode, setDispatchMode] = useState(
-    isCloudApiConnected ? "custom_api" : "myacademy_api"
+    integrationData?.mode === "resend_email"
+      ? "resend_email"
+      : isCloudApiConnected
+      ? "custom_api"
+      : "direct_whatsapp"
   );
 
   if (!isOpen || !data) return null;
@@ -39,6 +44,7 @@ export default function BulkSendConfirmModal({
   const candidates = data.candidates || [];
   const validRecipients = candidates.filter((c) => c.phone && c.phone.trim().length >= 10);
   const invalidRecipients = candidates.filter((c) => !c.phone || c.phone.trim().length < 10);
+  const validEmailRecipients = candidates.filter((c) => (c.studentEmail || c.email));
   const totalAmountDue = candidates.reduce((sum, c) => sum + (c.balanceAmount || 0), 0);
 
   const selectedTemplate = templates.find((t) => t._id === data.templateId);
@@ -103,39 +109,14 @@ export default function BulkSendConfirmModal({
           </div>
 
           <div className="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
-            {/* 3 WhatsApp Messaging Dispatch Modes */}
+            {/* 4 Reminder Messaging Dispatch Modes */}
             <div className="space-y-2">
               <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
-                Choose WhatsApp Dispatch Method
+                Choose Payment Reminder Dispatch Method (Select 1)
               </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {/* 1. MyAcademy WhatsApp API (Managed) */}
-                <div
-                  onClick={() => setDispatchMode("myacademy_api")}
-                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
-                    dispatchMode === "myacademy_api"
-                      ? "bg-purple-50/70 border-purple-600 ring-2 ring-purple-600/20"
-                      : "bg-white border-slate-200 hover:border-slate-300"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-extrabold text-xs text-purple-900 flex items-center gap-1.5">
-                        <FaCloud className="text-purple-600" /> MyAcademy API
-                      </span>
-                      {dispatchMode === "myacademy_api" && (
-                        <FaCheck className="text-purple-600 text-xs" />
-                      )}
-                    </div>
-                    <p className="text-[10px] text-slate-500 leading-tight">
-                      Platform managed gateway. Instant cloud dispatch with zero setup.
-                    </p>
-                  </div>
-                  <span className="mt-2 text-[9px] font-bold text-purple-700 uppercase">Recommended</span>
-                </div>
-
-                {/* 2. Direct Admin WhatsApp */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                {/* 1. Direct Admin WhatsApp */}
                 <div
                   onClick={() => setDispatchMode("direct_whatsapp")}
                   className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
@@ -157,7 +138,28 @@ export default function BulkSendConfirmModal({
                       Creates Click-to-Chat links for sending directly from admin WhatsApp.
                     </p>
                   </div>
-                  <span className="mt-2 text-[9px] font-bold text-orange-700 uppercase">Manual Links</span>
+                  <span className="mt-2 text-[9px] font-bold text-orange-700 uppercase">Option 1</span>
+                </div>
+
+                {/* 2. MyAcademy WhatsApp API (Managed - Coming Soon) */}
+                <div
+                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 opacity-70 cursor-not-allowed flex flex-col justify-between"
+                  title="MyAcademy WhatsApp API is coming soon in an upcoming release"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-xs text-slate-700 flex items-center gap-1.5">
+                        <FaCloud className="text-slate-400" /> MyAcademy API
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded-sm bg-amber-100 text-amber-800 text-[8px] font-black uppercase">
+                        Soon
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      Platform managed gateway. Coming soon in an upcoming release.
+                    </p>
+                  </div>
+                  <span className="mt-2 text-[9px] font-bold text-amber-700 uppercase">Coming Soon</span>
                 </div>
 
                 {/* 3. Custom Meta Cloud API */}
@@ -189,10 +191,49 @@ export default function BulkSendConfirmModal({
                     </p>
                   </div>
                   <span className="mt-2 text-[9px] font-bold text-emerald-700 uppercase">
-                    {isCloudApiConnected ? "Meta Verified" : "Unconnected"}
+                    {isCloudApiConnected ? "Option 3 (Meta)" : "Option 3 (Unconnected)"}
                   </span>
                 </div>
+
+                {/* 4. Official Resend Email */}
+                <div
+                  onClick={() => setDispatchMode("resend_email")}
+                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    dispatchMode === "resend_email"
+                      ? "bg-blue-50/70 border-blue-600 ring-2 ring-blue-600/20"
+                      : "bg-white border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-xs text-blue-900 flex items-center gap-1.5">
+                        <FaEnvelope className="text-blue-600" /> Resend Email
+                      </span>
+                      {dispatchMode === "resend_email" && (
+                        <FaCheck className="text-blue-600 text-xs" />
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      Dispatches branded invoice payment reminder emails via Resend.
+                    </p>
+                  </div>
+                  <span className="mt-2 text-[9px] font-bold text-blue-700 uppercase">Option 4 (Email)</span>
+                </div>
               </div>
+            </div>
+
+            {/* Recipient Target Badge */}
+            <div className="p-3 rounded-2xl bg-orange-50/70 border border-orange-200 text-xs flex items-center justify-between">
+              <span className="font-bold text-orange-950 flex items-center gap-2">
+                <FaUsers className="text-orange-600" /> Target Recipients:
+              </span>
+              <span className="font-black px-2.5 py-0.5 rounded-full bg-white text-orange-700 shadow-2xs border border-orange-200 uppercase text-[10px] tracking-wider">
+                {data.recipientRole === "both"
+                  ? "Both (Student & Parent)"
+                  : data.recipientRole === "parent"
+                  ? "Parent / Guardian"
+                  : "Student"}
+              </span>
             </div>
 
             {/* Recipient Summary Cards */}

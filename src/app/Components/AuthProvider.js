@@ -46,7 +46,7 @@ export default function AuthProvider({ children }) {
           {},
           {
             withCredentials: true,
-            timeout: 2500, // 2.5s strict timeout prevents hung requests or cold-start freezes
+            timeout: 10000, // 10s generous timeout for mobile cellular connections
           }
         );
 
@@ -59,7 +59,11 @@ export default function AuthProvider({ children }) {
           logout();
         }
       } catch (err) {
-        logout();
+        // Only log out if backend explicitly rejected credentials (401 or 403)
+        // Never log out on temporary cellular network timeout, cold start, or offline state
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          logout();
+        }
       } finally {
         setInitialized();
         setLoading(false);

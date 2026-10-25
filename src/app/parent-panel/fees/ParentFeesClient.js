@@ -18,9 +18,12 @@ import {
   FaFileInvoiceDollar,
 } from "react-icons/fa";
 import { useMyChildren, useChildFees } from "@/Hooks/useParent";
+import { usePublicAcademyInfo } from "@/Hooks/useAcademy";
 import ChildSwitcher from "../components/ChildSwitcher";
+import { StatCard, ProgressBar } from "@/app/Components/visual-ui";
 
 export default function ParentFeesClient() {
+  const { data: academy } = usePublicAcademyInfo();
   const { data: childrenList, isLoading: isChildrenLoading } = useMyChildren();
   const [selectedChildId, setSelectedChildId] = useState("");
   const activeChildId =
@@ -100,41 +103,62 @@ export default function ParentFeesClient() {
         </div>
       </motion.section>
 
-      {/* Summary Row */}
+      {/* Summary Row (StatCards) */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Gross Tuition</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">
-            ₹{totalCourseFee.toLocaleString("en-IN")}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Assigned fee structures</p>
-        </div>
+        <StatCard
+          title="Gross Tuition"
+          value={totalCourseFee}
+          prefix="₹"
+          icon={FaFileInvoiceDollar}
+          color="blue"
+          subText="Assigned curriculum fee"
+          loading={isFeesLoading}
+        />
 
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Scholarships & Waivers</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600">
-            ₹{totalDiscounts.toLocaleString("en-IN")}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Total deductions applied</p>
-        </div>
+        <StatCard
+          title="Waivers & Grants"
+          value={totalDiscounts}
+          prefix="₹"
+          icon={FaCheckCircle}
+          color="emerald"
+          subText="Deductions applied"
+          loading={isFeesLoading}
+        />
 
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Total Paid</p>
-          <h3 className="mt-2 text-xl sm:text-2xl font-extrabold text-[#D6451B]">
-            ₹{totalPaid.toLocaleString("en-IN")}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Cleared transactions</p>
-        </div>
+        <StatCard
+          title="Total Paid"
+          value={totalPaid}
+          prefix="₹"
+          icon={FaReceipt}
+          color="orange"
+          trend={totalPayable > 0 ? `${Math.round((totalPaid / totalPayable) * 100)}%` : "0%"}
+          trendDirection="up"
+          subText="Cleared transactions"
+          loading={isFeesLoading}
+        />
 
-        <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">Remaining Due</p>
-          <h3 className={`mt-2 text-xl sm:text-2xl font-extrabold ${
-            totalBalance > 0 ? "text-rose-600" : "text-emerald-600"
-          }`}>
-            ₹{totalBalance.toLocaleString("en-IN")}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Current net balance</p>
-        </div>
+        <StatCard
+          title="Remaining Due"
+          value={totalBalance}
+          prefix="₹"
+          icon={FaExclamationCircle}
+          color={totalBalance > 0 ? "rose" : "emerald"}
+          trend={totalBalance > 0 ? "Due soon" : "All cleared"}
+          trendDirection={totalBalance > 0 ? "down" : "up"}
+          subText="Current net balance"
+          loading={isFeesLoading}
+        />
+      </div>
+
+      {/* Tuition Clearance Progress Bar */}
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-xs">
+        <ProgressBar
+          percentage={totalPayable > 0 ? Math.round((totalPaid / totalPayable) * 100) : 100}
+          label="Overall Tuition Clearance Progress"
+          subLabel={`₹${totalPaid.toLocaleString("en-IN")} cleared of ₹${totalPayable.toLocaleString("en-IN")}`}
+          colorScheme="emerald"
+          height="h-2"
+        />
       </div>
 
       {isFeesLoading ? (
@@ -337,24 +361,60 @@ export default function ParentFeesClient() {
               className="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 shadow-2xl overflow-hidden"
             >
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white shadow-xs">
-                    <FaReceipt className="text-base" />
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 overflow-hidden shadow-2xs">
+                    {academy?.logo ? (
+                      <img
+                        src={academy.logo}
+                        alt={academy.name || "Academy Logo"}
+                        className="h-full w-full object-contain p-1"
+                      />
+                    ) : (
+                      <span className="text-base font-black text-[#D6451B]">
+                        {academy?.name?.charAt(0) || "MA"}
+                      </span>
+                    )}
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-base text-slate-900">Official Fee Receipt</h3>
-                    <p className="text-[11px] text-[#D6451B] font-bold">MyAcademy SaaS Verification</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-extrabold text-base text-slate-900 truncate">
+                      {academy?.name || "MyAcademy"}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                      <span className="text-[11px] text-[#D6451B] font-bold">
+                        Official Fee Receipt
+                      </span>
+                      {(academy?.isOnline || academy?.deliveryMode === "online") && (
+                        <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[9px] font-extrabold text-cyan-700 border border-cyan-200">
+                          🌐 Online Virtual Academy
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setViewReceipt(null)}
-                  className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 shrink-0"
                 >
                   <FaTimes />
                 </button>
               </div>
 
-              <div id="parent-printable-receipt" className="mt-5 space-y-4 text-xs">
+              {/* Academy Contact & Tax Info Header */}
+              <div className="mt-2 text-[11px] text-slate-500 space-y-0.5">
+                {academy?.taxNumber && (
+                  <p><strong>GSTIN / Tax:</strong> {academy.taxNumber}</p>
+                )}
+                <p>
+                  <strong>Contact:</strong> {academy?.phone || "Phone N/A"}{academy?.email ? ` | ${academy.email}` : ""}
+                </p>
+                {(academy?.isOnline || academy?.deliveryMode === "online") && academy?.website ? (
+                  <p><strong>Online Portal:</strong> {academy.website}</p>
+                ) : academy?.address ? (
+                  <p><strong>Campus:</strong> {academy.address}{academy.city ? `, ${academy.city}` : ""}</p>
+                ) : null}
+              </div>
+
+              <div id="parent-printable-receipt" className="mt-3 space-y-4 text-xs">
                 <div className="rounded-2xl bg-orange-50/60 p-4 border border-orange-100 text-center">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     Receipt Number
@@ -397,9 +457,14 @@ export default function ParentFeesClient() {
                 <div className="flex items-center justify-between text-base font-extrabold text-slate-900 pt-1">
                   <span>Amount Paid:</span>
                   <span className="text-xl text-[#D6451B]">
-                    ₹{(viewReceipt.amount || 0).toLocaleString("en-IN")}
+                    {academy?.currency || "₹"}{(viewReceipt.amount || 0).toLocaleString("en-IN")}
                   </span>
                 </div>
+
+                <p className="text-[10px] text-slate-400 text-center italic pt-2">
+                  {academy?.receiptNotes ||
+                    `Certified payment acknowledgement issued by ${academy?.name || "MyAcademy"}.`}
+                </p>
               </div>
 
               <div className="mt-6 flex gap-2.5">

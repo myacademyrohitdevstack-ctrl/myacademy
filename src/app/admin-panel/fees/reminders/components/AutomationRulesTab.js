@@ -37,6 +37,7 @@ function AutomationRulesForm({ initialSettings, templates }) {
   const triggerRunMutation = useTriggerReminderRunMutation();
 
   const [enabled, setEnabled] = useState(initialSettings?.automaticRemindersEnabled || false);
+  const [defaultRecipientRole, setDefaultRecipientRole] = useState(initialSettings?.defaultRecipientRole || "student");
   const [isPaused, setIsPaused] = useState(initialSettings?.isPaused || false);
   const [timezone, setTimezone] = useState(initialSettings?.timezone || "Asia/Kolkata");
   const [startHour, setStartHour] = useState(initialSettings?.allowedSendingHours?.start || "09:00");
@@ -82,6 +83,7 @@ function AutomationRulesForm({ initialSettings, templates }) {
   const handleSaveSettings = () => {
     updateSettingsMutation.mutate({
       automaticRemindersEnabled: enabled,
+      defaultRecipientRole,
       isPaused,
       timezone,
       allowedSendingHours: {
@@ -263,6 +265,22 @@ function AutomationRulesForm({ initialSettings, templates }) {
               onChange={(e) => setMinIntervalDays(e.target.value)}
               className="w-full font-semibold px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800"
             />
+          </div>
+
+          {/* Target Recipient for Automated Rules */}
+          <div>
+            <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+              Automated Target Recipient
+            </label>
+            <select
+              value={defaultRecipientRole}
+              onChange={(e) => setDefaultRecipientRole(e.target.value)}
+              className="w-full font-semibold px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800"
+            >
+              <option value="student">Student</option>
+              <option value="parent">Parent / Guardian</option>
+              <option value="both">Both (Student &amp; Parent)</option>
+            </select>
           </div>
         </div>
 

@@ -26,6 +26,7 @@ import {
 } from "@/app/mutations/examMutations";
 import { toast } from "sonner";
 import formatDate from "@/Utils/formatDate";
+import { StatCard, ProgressBar } from "@/app/Components/visual-ui";
 
 export default function TeacherExamsClient() {
   const [selectedBatchId, setSelectedBatchId] = useState("");
@@ -149,37 +150,55 @@ export default function TeacherExamsClient() {
         <div className="absolute -right-8 -bottom-10 h-48 w-48 rounded-full bg-white/10 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-[#D6451B] font-black text-lg">
-            <FaFileAlt />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Exams</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{totalExamsCount}</p>
-          </div>
-        </div>
+      {/* Visual Metrics Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          title="Total Exams"
+          value={totalExamsCount}
+          icon={FaFileAlt}
+          color="blue"
+          subText="Scheduled assessments"
+        />
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 font-black text-lg">
-            <FaCheckCircle />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Evaluated & Published</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{publishedExamsCount}</p>
-          </div>
-        </div>
+        <StatCard
+          title="Published Results"
+          value={publishedExamsCount}
+          icon={FaCheckCircle}
+          color="emerald"
+          trend={totalExamsCount > 0 ? `${Math.round((publishedExamsCount / totalExamsCount) * 100)}%` : "0%"}
+          trendDirection="up"
+          subText="Official marksheets released"
+        />
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-black text-lg">
-            <FaClock />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Grading Pending</p>
-            <p className="text-xl sm:text-2xl font-black text-slate-900">{pendingEvaluationCount}</p>
-          </div>
-        </div>
+        <StatCard
+          title="Grading Pending"
+          value={pendingEvaluationCount}
+          icon={FaClock}
+          color="amber"
+          trend={pendingEvaluationCount > 0 ? "Action required" : "All graded"}
+          trendDirection={pendingEvaluationCount > 0 ? "down" : "up"}
+          subText="Awaiting teacher review"
+        />
+
+        <StatCard
+          title="Evaluation Pace"
+          value={totalExamsCount > 0 ? Math.round((publishedExamsCount / totalExamsCount) * 100) : 100}
+          suffix="%"
+          icon={FaAward}
+          color="orange"
+          subText="Classroom grading completion"
+        />
+      </div>
+
+      {/* Evaluation Progress Bar */}
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-xs">
+        <ProgressBar
+          percentage={totalExamsCount > 0 ? Math.round((publishedExamsCount / totalExamsCount) * 100) : 100}
+          label="Overall Exam Grading & Publication Progress"
+          subLabel={`${publishedExamsCount} of ${totalExamsCount} finalized`}
+          colorScheme="emerald"
+          height="h-2"
+        />
       </div>
 
       {/* Filters and Controls */}

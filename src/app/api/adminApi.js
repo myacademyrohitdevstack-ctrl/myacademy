@@ -42,6 +42,20 @@ export function adminGetSubscriptionUsageApi() {
     return api.get(`/admin/subscription-usage`);
 }
 
+// Academy Profile & Branding
+export function adminGetAcademyProfileApi() {
+    return api.get("/admin/academy");
+}
+
+export function adminUpdateAcademyProfileApi(formData) {
+    const headers = formData instanceof FormData ? { "Content-Type": "multipart/form-data" } : {};
+    return api.put("/admin/academy", formData, { headers });
+}
+
+export function getPublicAcademyInfoApi() {
+    return api.get("/admin/academy-public");
+}
+
 //batches
 export  function adminGetBatchApi(slug){
     return api.get(`/batches/${slug}/batches`)

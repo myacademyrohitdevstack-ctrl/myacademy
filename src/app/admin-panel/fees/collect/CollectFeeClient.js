@@ -23,10 +23,12 @@ import {
 } from "react-icons/fa";
 import FeesNav from "../components/FeesNav";
 import { useSearchFeeStudents } from "@/Hooks/useFees";
+import { useAcademyProfile } from "@/Hooks/useAcademy";
 import { useCollectPaymentMutation } from "@/app/mutations/feeMutations";
 import { toast } from "sonner";
 
 export default function CollectFeeClient({ studentId }) {
+  const { data: academy } = useAcademyProfile();
   const [searchTerm, setSearchTerm] = useState("");
   const { data: serverStudents, isLoading: isStudentsLoading } = useSearchFeeStudents({
     search: searchTerm,
@@ -544,29 +546,61 @@ export default function CollectFeeClient({ studentId }) {
               >
                 {/* Receipt Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-extrabold shadow-xs">
-                      MA
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 overflow-hidden shadow-2xs">
+                      {academy?.logo ? (
+                        <img
+                          src={academy.logo}
+                          alt={academy.name || "Academy Logo"}
+                          className="h-full w-full object-contain p-1"
+                        />
+                      ) : (
+                        <span className="text-base font-black text-[#D6451B]">
+                          {academy?.name?.charAt(0) || "MA"}
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="font-extrabold text-base text-slate-900">
-                        MyAcademy
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-extrabold text-sm sm:text-base text-slate-900 truncate">
+                        {academy?.name || "MyAcademy"}
                       </h3>
-                      <p className="text-[10px] font-bold tracking-wider text-[#D6451B] uppercase">
-                        Official Fee Receipt
-                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] font-bold tracking-wider text-[#D6451B] uppercase">
+                          Official Fee Receipt
+                        </span>
+                        {(academy?.isOnline || academy?.deliveryMode === "online") && (
+                          <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[9px] font-extrabold text-cyan-700 border border-cyan-200">
+                            🌐 Online Virtual Academy
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <button
                     onClick={() => setReceiptOpen(false)}
-                    className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                    className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 shrink-0"
                   >
                     <FaTimes />
                   </button>
                 </div>
 
+                {/* Academy Contact & Tax Info Header */}
+                <div className="mt-2.5 text-[11px] text-slate-500 space-y-0.5 pb-1">
+                  {academy?.taxNumber && (
+                    <p><strong>GSTIN / Tax ID:</strong> {academy.taxNumber}</p>
+                  )}
+                  <p>
+                    <strong>Contact:</strong> {academy?.phone || "N/A"}{academy?.email ? ` | ${academy.email}` : ""}
+                  </p>
+                  {(academy?.isOnline || academy?.deliveryMode === "online") && academy?.website ? (
+                    <p><strong>Online Portal:</strong> {academy.website}</p>
+                  ) : academy?.address ? (
+                    <p><strong>Campus:</strong> {academy.address}{academy.city ? `, ${academy.city}` : ""}</p>
+                  ) : null}
+                </div>
+
                 {/* Receipt Details Box */}
-                <div className="mt-5 space-y-3 rounded-xl bg-slate-50 p-4 border border-slate-100 text-xs">
+                <div className="mt-3 space-y-2.5 rounded-xl bg-slate-50 p-4 border border-slate-100 text-xs">
                   <div className="flex justify-between border-b border-slate-200/60 pb-2">
                     <span className="text-slate-500">Receipt No:</span>
                     <strong className="font-bold text-slate-900">
@@ -606,20 +640,35 @@ export default function CollectFeeClient({ studentId }) {
                   <div className="flex justify-between pt-1 text-sm font-extrabold">
                     <span className="text-slate-900">Amount Paid:</span>
                     <span className="text-emerald-600 text-base">
-                      ₹{generatedReceipt.amount.toLocaleString("en-IN")}
+                      {academy?.currency || "₹"}{generatedReceipt.amount.toLocaleString("en-IN")}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs font-semibold text-rose-600">
                     <span>Remaining Balance:</span>
                     <span>
-                      ₹{generatedReceipt.remainingPending.toLocaleString("en-IN")}
+                      {academy?.currency || "₹"}{generatedReceipt.remainingPending.toLocaleString("en-IN")}
                     </span>
                   </div>
                 </div>
 
+                {/* Signatory Verification */}
+                {academy?.signatoryName && (
+                  <div className="mt-3 flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+                    <div>
+                      <span className="text-[10px] text-slate-400">Authorized Signatory:</span>
+                      <p className="font-bold text-slate-800 text-[11px]">{academy.signatoryName}</p>
+                      <p className="text-[10px] text-slate-500">{academy.signatoryTitle || "Finance Department"}</p>
+                    </div>
+                    <div className="rounded-lg border border-dashed border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700 uppercase">
+                      Certified
+                    </div>
+                  </div>
+                )}
+
                 {/* Footer Notice */}
-                <p className="mt-4 text-center text-[10px] text-slate-400">
-                  This is a computer-generated fee acknowledgement receipt issued by MyAcademy.
+                <p className="mt-3 text-center text-[10px] text-slate-400">
+                  {academy?.receiptNotes ||
+                    `This is an official computer-generated fee acknowledgement receipt issued by ${academy?.name || "MyAcademy"}.`}
                 </p>
 
                 {/* Receipt Actions */}

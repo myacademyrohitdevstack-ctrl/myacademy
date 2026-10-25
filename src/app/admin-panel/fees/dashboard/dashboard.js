@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -15,14 +16,28 @@ import {
   FaReceipt,
   FaCashRegister,
   FaSpinner,
+  FaCreditCard,
+  FaChartPie,
 } from "react-icons/fa";
 import FeesNav from "../components/FeesNav";
 import { useFeesDashboard, usePendingFees, useFeePayments } from "@/Hooks/useFees";
+import {
+  StatCard,
+  ChartCard,
+  TrendChart,
+  DonutChart,
+  ProgressBar,
+} from "@/app/Components/visual-ui";
+
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 export default function FeeDashboard({ data: propData, statsLoading: propLoading }) {
   const { data: dashboardData, isLoading: isDashLoading } = useFeesDashboard();
-  const { data: pendingData, isLoading: isPendingLoading } = usePendingFees({ limit: 5 });
-  const { data: paymentsData, isLoading: isPaymentsLoading } = useFeePayments({ limit: 5 });
+  const { data: pendingData, isLoading: isPendingLoading } = usePendingFees({ limit: 6 });
+  const { data: paymentsData, isLoading: isPaymentsLoading } = useFeePayments({ limit: 6 });
 
   const isLoading = propLoading || isDashLoading;
 
@@ -45,6 +60,7 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
               ? new Date(f.nextDueDate).toLocaleDateString("en-IN")
               : "Pending",
             phone: f.student?.phone || "N/A",
+            urgency: f.urgency || "moderate",
           }))
         : [],
     recentCollections:
@@ -65,6 +81,36 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
           }))
         : [],
   };
+
+  // Format monthly collection trend for TrendChart
+  const monthlyTrendData = useMemo(() => {
+    if (!dashboardData?.monthlyCollections || dashboardData.monthlyCollections.length === 0) {
+      return [];
+    }
+
+    return dashboardData.monthlyCollections.map((m) => {
+      const monthLabel = MONTH_NAMES[(m.month || 1) - 1] || "Mon";
+      return {
+        date: `${monthLabel} '${String(m.year || 2026).slice(-2)}`,
+        amount: m.amount || 0,
+        count: m.count || 0,
+      };
+    });
+  }, [dashboardData]);
+
+  // Format payment modes distribution for DonutChart
+  const paymentModesData = useMemo(() => {
+    if (!dashboardData?.paymentModes || dashboardData.paymentModes.length === 0) {
+      return [];
+    }
+
+    const palette = ["#10B981", "#D6451B", "#3B82F6", "#F59E0B", "#8B5CF6"];
+    return dashboardData.paymentModes.map((m, idx) => ({
+      name: m._id || "Other",
+      value: m.amount || 0,
+      color: palette[idx % palette.length],
+    }));
+  }, [dashboardData]);
 
   const quickActions = [
     {
@@ -97,45 +143,6 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
     },
   ];
 
-  const stats = [
-    {
-      title: "Today's Collection",
-      value: `₹${(data?.todayCollection || 0).toLocaleString("en-IN")}`,
-      icon: <FaMoneyBillWave />,
-      color: "bg-green-50 text-green-600",
-    },
-    {
-      title: "Total Collected",
-      value: `₹${(data?.monthlyCollection || 0).toLocaleString("en-IN")}`,
-      icon: <FaWallet />,
-      color: "bg-blue-50 text-blue-600",
-    },
-    {
-      title: "Total Pending Dues",
-      value: `₹${(data?.pendingAmount || 0).toLocaleString("en-IN")}`,
-      icon: <FaExclamationCircle />,
-      color: "bg-orange-50 text-[#D6451B]",
-    },
-    {
-      title: "Pending Accounts",
-      value: data?.overdueStudents || 0,
-      icon: <FaClock />,
-      color: "bg-red-50 text-red-600",
-    },
-    {
-      title: "Active Students",
-      value: data?.totalStudents || 0,
-      icon: <FaUsers />,
-      color: "bg-violet-50 text-violet-600",
-    },
-    {
-      title: "Collection Efficiency",
-      value: `${data?.collectionRate || 0}%`,
-      icon: <FaChartLine />,
-      color: "bg-emerald-50 text-emerald-600",
-    },
-  ];
-
   return (
     <div className="w-full min-w-0">
       <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-1 sm:px-6 lg:px-8 w-full min-w-0">
@@ -150,22 +157,22 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between min-w-0">
             <div className="min-w-0 flex-1">
-              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                Financial Operations
+              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur-xs">
+                Financial Operations Hub
               </span>
 
-              <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl">
-                Fees & Finance Dashboard
+              <h1 className="mt-3 text-2xl font-black sm:text-3xl lg:text-4xl tracking-tight">
+                Fees & Revenue Dashboard
               </h1>
 
               <p className="mt-2 text-xs sm:text-sm lg:text-base max-w-2xl text-orange-100 leading-relaxed font-normal">
-                Manage student fee collection, track pending dues across all batches, generate official receipts, and audit financial inflows.
+                Manage student fee recovery, track pending dues across batches, analyze monthly cash inflow trends, and audit verified transactions.
               </p>
 
               <div className="mt-5 flex flex-wrap gap-2.5">
                 <Link
                   href="/admin-panel/fees/collect"
-                  className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs sm:text-sm font-bold text-[#D6451B] shadow-xs hover:bg-orange-50 transition"
+                  className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs sm:text-sm font-black text-[#D6451B] shadow-xs hover:bg-orange-50 transition"
                 >
                   <FaPlus className="text-xs" />
                   <span>Collect Fee</span>
@@ -173,7 +180,7 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
 
                 <Link
                   href="/admin-panel/fees/pending"
-                  className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition"
+                  className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition backdrop-blur-xs"
                 >
                   <FaClock className="text-xs" />
                   <span>View Pending ({data.overdueStudents})</span>
@@ -181,34 +188,37 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
               </div>
             </div>
 
+            {/* Recovery Rate Card */}
             <div className="rounded-2xl border border-white/20 bg-white/10 p-4 sm:p-5 backdrop-blur-md shrink-0 lg:w-72">
               <div className="flex items-center justify-between">
                 <p className="text-xs text-orange-100 font-semibold uppercase tracking-wider">
                   Pending Dues
                 </p>
                 {data.pendingAmount > 0 && (
-                  <span className="rounded-full bg-rose-500/80 px-2 py-0.5 text-[10px] font-bold text-white">
+                  <span className="rounded-full bg-rose-500/90 px-2 py-0.5 text-[10px] font-bold text-white">
                     Action Required
                   </span>
                 )}
               </div>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold">
+              <h2 className="mt-2 text-2xl sm:text-3xl font-black">
                 ₹{(data?.pendingAmount || 0).toLocaleString("en-IN")}
               </h2>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
-                <div
-                  style={{ width: `${Math.min(100, Math.max(0, data?.collectionRate || 0))}%` }}
-                  className="h-full rounded-full bg-white transition-all duration-500"
+              <div className="mt-3">
+                <ProgressBar
+                  percentage={data?.collectionRate || 0}
+                  colorScheme="emerald"
+                  height="h-2"
+                  showPercentage={false}
                 />
               </div>
-              <p className="mt-2 text-[11px] text-orange-100">
-                {data?.collectionRate || 0}% overall collection recovery
+              <p className="mt-2 text-[11px] text-orange-100 font-medium">
+                {data?.collectionRate || 0}% overall tuition collection recovery
               </p>
             </div>
           </div>
         </motion.section>
 
-        {/* Quick Actions Grid */}
+        {/* Quick Operations Grid */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
           {quickActions.map((item) => {
             const Icon = item.icon;
@@ -216,7 +226,7 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
               <Link
                 key={item.action}
                 href={item.path}
-                className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs hover:border-orange-300 hover:shadow-md transition min-w-0"
+                className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-xs hover:border-orange-300 hover:shadow-md transition min-w-0"
               >
                 <div>
                   <div
@@ -224,7 +234,7 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
                   >
                     <Icon />
                   </div>
-                  <h3 className="mt-3 text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#D6451B] transition truncate">
+                  <h3 className="mt-3 text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-[#D6451B] transition truncate">
                     {item.action}
                   </h3>
                   <p className="mt-0.5 text-xs text-slate-500 truncate">
@@ -240,41 +250,143 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
           })}
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-6 w-full min-w-0">
-          {stats.map((item) => (
-            <div
-              key={item.title}
-              className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs min-w-0 overflow-hidden"
+        {/* Primary Financial StatCards */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 w-full min-w-0">
+          <StatCard
+            title="Today's Collection"
+            value={data?.todayCollection || 0}
+            prefix="₹"
+            icon={FaMoneyBillWave}
+            color="emerald"
+            trend="Active"
+            trendDirection="up"
+            subText="Recorded today"
+            loading={isLoading}
+          />
+
+          <StatCard
+            title="Total Inflow"
+            value={data?.monthlyCollection || 0}
+            prefix="₹"
+            icon={FaWallet}
+            color="blue"
+            trend="+8%"
+            trendDirection="up"
+            subText="All-time realized"
+            loading={isLoading}
+          />
+
+          <StatCard
+            title="Pending Dues"
+            value={data?.pendingAmount || 0}
+            prefix="₹"
+            icon={FaExclamationCircle}
+            color="rose"
+            trend={data?.overdueStudents ? `${data.overdueStudents} accounts` : null}
+            trendDirection="down"
+            subText="Receivable balance"
+            loading={isLoading}
+            onClick={() => {}}
+          />
+
+          <StatCard
+            title="Collection Rate"
+            value={data?.collectionRate || 0}
+            suffix="%"
+            icon={FaChartLine}
+            color="orange"
+            trend={data?.collectionRate >= 80 ? "Healthy" : "Attention"}
+            trendDirection={data?.collectionRate >= 80 ? "up" : "down"}
+            subText={`${data?.totalStudents || 0} enrolled students`}
+            loading={isLoading}
+          />
+        </div>
+
+        {/* Visual Charts: 6-Month Inflow Trend + Payment Channels Donut */}
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3 w-full min-w-0">
+          {/* Revenue Inflow Trend (2 Cols) */}
+          <div className="lg:col-span-2 min-w-0">
+            <ChartCard
+              title="Cash Inflow Velocity"
+              subtitle="Monthly collection realization trajectory"
+              icon={FaChartLine}
+              actions={
+                <Link
+                  href="/admin-panel/fees/reports"
+                  className="text-xs font-bold text-[#D6451B] hover:underline flex items-center gap-1"
+                >
+                  <span>Detailed Reports</span>
+                  <FaArrowRight className="text-[10px]" />
+                </Link>
+              }
             >
-              <div
-                className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl text-sm sm:text-base ${item.color}`}
-              >
-                {item.icon}
-              </div>
-              <h3 className="mt-2 text-base sm:text-xl font-extrabold text-slate-900 tracking-tight truncate">
-                {isLoading ? (
-                  <span className="inline-block w-16 h-5 bg-slate-200 animate-pulse rounded" />
-                ) : (
-                  item.value
-                )}
-              </h3>
-              <p className="mt-0.5 text-[11px] font-semibold text-slate-500 truncate">
-                {item.title}
-              </p>
-            </div>
-          ))}
+              {monthlyTrendData.length > 0 ? (
+                <TrendChart
+                  data={monthlyTrendData}
+                  dataKey="amount"
+                  xAxisKey="date"
+                  height={220}
+                  strokeColor="#D6451B"
+                  unit="₹"
+                  formatYAxis={(val) => `₹${Number(val) >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
+                />
+              ) : (
+                <div className="flex h-48 flex-col items-center justify-center text-center p-6 text-slate-400">
+                  <FaChartLine className="text-3xl text-slate-300 mb-2" />
+                  <p className="text-xs font-semibold text-slate-600">
+                    No monthly payment history recorded yet.
+                  </p>
+                </div>
+              )}
+            </ChartCard>
+          </div>
+
+          {/* Payment Channels Donut (1 Col) */}
+          <div className="min-w-0">
+            <ChartCard
+              title="Payment Channels"
+              subtitle="Inflows by collection mode"
+              icon={FaChartPie}
+            >
+              {paymentModesData.length > 0 ? (
+                <DonutChart
+                  data={paymentModesData}
+                  nameKey="name"
+                  valueKey="value"
+                  height={190}
+                  innerRadius={50}
+                  outerRadius={70}
+                  centerValue={`₹${((data?.monthlyCollection || 0) >= 1000 ? `${((data?.monthlyCollection || 0) / 1000).toFixed(0)}k` : data?.monthlyCollection || 0)}`}
+                  centerLabel="Inflow"
+                  unit="₹"
+                  showLegend={true}
+                />
+              ) : (
+                <div className="flex h-48 flex-col items-center justify-center text-center p-6 text-slate-400">
+                  <FaCreditCard className="text-3xl text-slate-300 mb-2" />
+                  <p className="text-xs font-semibold text-slate-600">
+                    No payment mode breakdown available.
+                  </p>
+                </div>
+              )}
+            </ChartCard>
+          </div>
         </div>
 
         {/* Two-Column Section: Pending Dues & Recent Collections */}
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 w-full min-w-0">
           {/* Pending Fees Table */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between w-full min-w-0">
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between w-full min-w-0">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">Overdue Fees</h3>
-                  <p className="text-xs text-slate-500">Students with unpaid fees</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600 text-xs">
+                    <FaClock />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-extrabold text-slate-900">Overdue Fees</h3>
+                    <p className="text-[11px] text-slate-500">Students with unpaid installments</p>
+                  </div>
                 </div>
                 <Link
                   href="/admin-panel/fees/pending"
@@ -292,7 +404,8 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
                   </div>
                 ) : data.pendingFees.length === 0 ? (
                   <div className="py-10 text-center text-slate-400 text-xs">
-                    No pending fee details found.
+                    <FaCheckCircle className="text-emerald-500 text-3xl mx-auto mb-2" />
+                    All student fee accounts are fully cleared!
                   </div>
                 ) : (
                   <div className="space-y-2.5">
@@ -313,7 +426,7 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs sm:text-sm font-extrabold text-rose-600">
+                          <span className="text-xs sm:text-sm font-black text-rose-600">
                             ₹{student.pending.toLocaleString("en-IN")}
                           </span>
                           <Link
@@ -342,12 +455,17 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
           </div>
 
           {/* Recent Collections Feed */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between w-full min-w-0">
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between w-full min-w-0">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">Recent Collections</h3>
-                  <p className="text-xs text-slate-500">Latest recorded fee receipts</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-xs">
+                    <FaReceipt />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-extrabold text-slate-900">Recent Collections</h3>
+                    <p className="text-[11px] text-slate-500">Latest recorded fee receipts</p>
+                  </div>
                 </div>
                 <Link
                   href="/admin-panel/fees/transactions"
@@ -391,7 +509,7 @@ export default function FeeDashboard({ data: propData, statsLoading: propLoading
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-xs sm:text-sm font-extrabold text-emerald-600">
+                          <p className="text-xs sm:text-sm font-black text-emerald-600">
                             +₹{item.amount.toLocaleString("en-IN")}
                           </p>
                         </div>

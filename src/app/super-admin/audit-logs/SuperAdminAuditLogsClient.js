@@ -14,6 +14,7 @@ import {
   FaNetworkWired,
 } from "react-icons/fa";
 import { useSuperAdminAuditLogs } from "@/Hooks/useSuperAdmin";
+import { StatCard } from "@/app/Components/visual-ui";
 
 export default function SuperAdminAuditLogsClient() {
   const [actionFilter, setActionFilter] = useState("");
@@ -27,6 +28,11 @@ export default function SuperAdminAuditLogsClient() {
 
   const logs = data?.logs || [];
   const pagination = data?.pagination || { page: 1, limit: 25, total: 0, pages: 1 };
+
+  const totalEvents = pagination.total || logs.length || 0;
+  const securityEvents = logs.filter((l) => l.action?.includes("suspended") || l.action?.includes("inactive") || l.action?.includes("hold")).length;
+  const subscriptionEvents = logs.filter((l) => l.action?.includes("subscription") || l.action?.includes("plan")).length;
+  const verifiedActors = new Set(logs.map((l) => l.actorId?.email || l.actorId?.fullName || "Platform")).size;
 
   return (
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
@@ -64,6 +70,38 @@ export default function SuperAdminAuditLogsClient() {
           </div>
         </div>
       </motion.section>
+
+      {/* Visual Stat Cards Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          label="Total Logged Events"
+          value={totalEvents}
+          icon={FaHistory}
+          colorScheme="orange"
+          subtitle="System event trail"
+        />
+        <StatCard
+          label="Governance Actions"
+          value={securityEvents}
+          icon={FaShieldAlt}
+          colorScheme="rose"
+          subtitle="Holds & restrictions"
+        />
+        <StatCard
+          label="Commercial Events"
+          value={subscriptionEvents}
+          icon={FaNetworkWired}
+          colorScheme="emerald"
+          subtitle="Plan & billing actions"
+        />
+        <StatCard
+          label="Active Operators"
+          value={verifiedActors}
+          icon={FaUserShield}
+          colorScheme="blue"
+          subtitle="Unique platform actors"
+        />
+      </div>
 
       {/* Filter Bar */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">

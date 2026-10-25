@@ -22,10 +22,12 @@ import {
 } from "react-icons/fa";
 import FeesNav from "../components/FeesNav";
 import { useFeePayments } from "@/Hooks/useFees";
+import { useAcademyProfile } from "@/Hooks/useAcademy";
 import { useReversePaymentMutation } from "@/app/mutations/feeMutations";
 import { toast } from "sonner";
 
 export default function TransactionsClient() {
+  const { data: academy } = useAcademyProfile();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMode, setSelectedMode] = useState("all");
   const [selectedReceipt, setSelectedReceipt] = useState(null);
@@ -522,28 +524,60 @@ export default function TransactionsClient() {
                 className="w-full max-w-lg rounded-2xl sm:rounded-3xl bg-white p-5 sm:p-7 shadow-2xl border border-slate-200"
               >
                 <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6451B] to-orange-500 text-white font-extrabold shadow-xs">
-                      MA
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 overflow-hidden shadow-2xs">
+                      {academy?.logo ? (
+                        <img
+                          src={academy.logo}
+                          alt={academy.name || "Academy Logo"}
+                          className="h-full w-full object-contain p-1"
+                        />
+                      ) : (
+                        <span className="text-base font-black text-[#D6451B]">
+                          {academy?.name?.charAt(0) || "MA"}
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="font-extrabold text-base text-slate-900">
-                        MyAcademy
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-extrabold text-sm sm:text-base text-slate-900 truncate">
+                        {academy?.name || "MyAcademy"}
                       </h3>
-                      <p className="text-[10px] font-bold tracking-wider text-[#D6451B] uppercase">
-                        Official Payment Receipt
-                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] font-bold tracking-wider text-[#D6451B] uppercase">
+                          Official Payment Receipt
+                        </span>
+                        {(academy?.isOnline || academy?.deliveryMode === "online") && (
+                          <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[9px] font-extrabold text-cyan-700 border border-cyan-200">
+                            🌐 Online Virtual Academy
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedReceipt(null)}
-                    className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                    className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 shrink-0"
                   >
                     <FaTimes />
                   </button>
                 </div>
 
-                <div className="mt-5 space-y-3 rounded-xl bg-slate-50 p-4 border border-slate-100 text-xs">
+                {/* Academy Contact & Tax Info Header */}
+                <div className="mt-2.5 text-[11px] text-slate-500 space-y-0.5 pb-1">
+                  {academy?.taxNumber && (
+                    <p><strong>GSTIN / Tax ID:</strong> {academy.taxNumber}</p>
+                  )}
+                  <p>
+                    <strong>Contact:</strong> {academy?.phone || "N/A"}{academy?.email ? ` | ${academy.email}` : ""}
+                  </p>
+                  {(academy?.isOnline || academy?.deliveryMode === "online") && academy?.website ? (
+                    <p><strong>Online Portal:</strong> {academy.website}</p>
+                  ) : academy?.address ? (
+                    <p><strong>Campus:</strong> {academy.address}{academy.city ? `, ${academy.city}` : ""}</p>
+                  ) : null}
+                </div>
+
+                <div className="mt-3 space-y-2.5 rounded-xl bg-slate-50 p-4 border border-slate-100 text-xs">
                   <div className="flex justify-between border-b border-slate-200/60 pb-2">
                     <span className="text-slate-500">Receipt Number:</span>
                     <strong className="font-bold text-slate-900">
@@ -601,13 +635,28 @@ export default function TransactionsClient() {
                           : "text-emerald-600"
                       }`}
                     >
-                      ₹{selectedReceipt.amount.toLocaleString("en-IN")}
+                      {academy?.currency || "₹"}{selectedReceipt.amount.toLocaleString("en-IN")}
                     </span>
                   </div>
                 </div>
 
-                <p className="mt-4 text-center text-[10px] text-slate-400">
-                  Certified payment receipt issued via MyAcademy Finance Ledger.
+                {/* Signatory Verification */}
+                {academy?.signatoryName && (
+                  <div className="mt-3 flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+                    <div>
+                      <span className="text-[10px] text-slate-400">Authorized Signatory:</span>
+                      <p className="font-bold text-slate-800 text-[11px]">{academy.signatoryName}</p>
+                      <p className="text-[10px] text-slate-500">{academy.signatoryTitle || "Finance Department"}</p>
+                    </div>
+                    <div className="rounded-lg border border-dashed border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700 uppercase">
+                      Certified
+                    </div>
+                  </div>
+                )}
+
+                <p className="mt-3 text-center text-[10px] text-slate-400">
+                  {academy?.receiptNotes ||
+                    `Certified payment receipt issued via ${academy?.name || "MyAcademy"} Finance Ledger.`}
                 </p>
 
                 <div className="mt-5 flex gap-2.5">

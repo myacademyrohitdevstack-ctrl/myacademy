@@ -45,7 +45,9 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (err) {
-        logout();
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          logout();
+        }
         return Promise.reject(err);
       }
     }

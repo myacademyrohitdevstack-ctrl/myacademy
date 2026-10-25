@@ -19,6 +19,7 @@ import { useMyChildren } from "@/Hooks/useParent";
 import { useChildExamResults } from "@/Hooks/useExams";
 import ChildSwitcher from "../components/ChildSwitcher";
 import formatDate from "@/Utils/formatDate";
+import { StatCard, ChartCard, ComparisonBarChart } from "@/app/Components/visual-ui";
 
 export default function ParentExamsClient() {
   const { data: childrenList = [], isLoading: isChildrenLoading } = useMyChildren();
@@ -101,38 +102,78 @@ export default function ParentExamsClient() {
         </div>
       ) : (
         <>
-          {/* Performance Overview */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-[#D6451B] font-black text-lg">
-                <FaFileAlt />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Exams Completed</p>
-                <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.totalExams}</p>
-              </div>
-            </div>
+          {/* Performance Overview (StatCards) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <StatCard
+              title="Exams Completed"
+              value={summary.totalExams || 0}
+              icon={FaFileAlt}
+              color="blue"
+              subText="Term assessments"
+              loading={isExamLoading}
+            />
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 font-black text-lg">
-                <FaCheckCircle />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Passed Assessments</p>
-                <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.passedExams}</p>
-              </div>
-            </div>
+            <StatCard
+              title="Passed Tests"
+              value={summary.passedExams || 0}
+              icon={FaCheckCircle}
+              color="emerald"
+              trend={summary.totalExams > 0 ? `${Math.round(((summary.passedExams || 0) / summary.totalExams) * 100)}%` : "0%"}
+              trendDirection="up"
+              subText="Met passing standard"
+              loading={isExamLoading}
+            />
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-black text-lg">
-                <FaAward />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Average Percentage</p>
-                <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.avgPercentage}%</p>
-              </div>
-            </div>
+            <StatCard
+              title="Average Score"
+              value={summary.avgPercentage || 0}
+              suffix="%"
+              icon={FaAward}
+              color="orange"
+              trend={(summary.avgPercentage || 0) >= 75 ? "Distinction" : "Passing"}
+              trendDirection={(summary.avgPercentage || 0) >= 75 ? "up" : "neutral"}
+              subText="Cumulative average"
+              loading={isExamLoading}
+            />
+
+            <StatCard
+              title="Clearance Ratio"
+              value={summary.totalExams > 0 ? Math.round(((summary.passedExams || 0) / summary.totalExams) * 100) : 100}
+              suffix="%"
+              icon={FaUserGraduate}
+              color="purple"
+              subText="Subject success rate"
+              loading={isExamLoading}
+            />
           </div>
+
+          {/* Child Subject Performance Comparison Chart */}
+          {results.length > 0 && (
+            <ChartCard
+              title={`${childName}'s Subject Scores vs Maximum Marks`}
+              subtitle="Side-by-side assessment comparison"
+              icon={FaAward}
+            >
+              <ComparisonBarChart
+                data={results.slice(0, 8).map((r) => {
+                  const title = r.examId?.title || "Exam";
+                  const short = title.length > 12 ? `${title.slice(0, 11)}…` : title;
+                  return {
+                    label: short,
+                    Scored: r.marksObtained || 0,
+                    Total: r.examId?.totalMarks || 100,
+                  };
+                })}
+                xAxisKey="label"
+                bars={[
+                  { key: "Scored", name: "Marks Scored", color: "#10B981" },
+                  { key: "Total", name: "Total Marks", color: "#E2E8F0" },
+                ]}
+                height={230}
+                showLegend={true}
+              />
+            </ChartCard>
+          )}
 
           {/* Filter and Search */}
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
