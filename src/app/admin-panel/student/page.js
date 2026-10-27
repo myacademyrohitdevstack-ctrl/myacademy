@@ -37,7 +37,6 @@ export default function Students() {
   const [filters, setFilters] = useState({
     status: "",
     approvalStatus: "",
-    role: "",
   });
 
   const debouncedSearch = useDebounce(search, 500);
@@ -47,7 +46,7 @@ export default function Students() {
     debouncedSearch,
     filters.status,
     filters.approvalStatus,
-    filters.role
+    "student"
   );
 
   const users = data?.users || [];
@@ -63,28 +62,21 @@ export default function Students() {
     setFilters((prev) => ({ ...prev, approvalStatus: e.target.value }));
   };
 
-  const handleRoleChange = (e) => {
-    setPage(1);
-    setFilters((prev) => ({ ...prev, role: e.target.value }));
-  };
-
   const handleResetFilters = () => {
     setSearch("");
     setPage(1);
     setFilters({
       status: "",
       approvalStatus: "",
-      role: "",
     });
   };
 
   const hasActiveFilters = Boolean(
-    filters.status || filters.approvalStatus || filters.role || search
+    filters.status || filters.approvalStatus || search
   );
   const activeCount = [
     filters.status,
     filters.approvalStatus,
-    filters.role,
     search,
   ].filter(Boolean).length;
 
@@ -300,10 +292,10 @@ export default function Students() {
             )}
           </div>
 
-          <div className="grid gap-2.5 sm:gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-2.5 sm:gap-3.5 sm:grid-cols-3">
             <PortalInput
               icon={FaSearch}
-              placeholder="Search by name, email..."
+              placeholder="Search students by name, email..."
               value={search}
               isLoading={isFetching && Boolean(search)}
               onChange={(e) => {
@@ -334,17 +326,6 @@ export default function Students() {
               <option value="approved">Approved</option>
               <option value="pending">Pending Approval</option>
               <option value="rejected">Rejected</option>
-            </PortalSelect>
-
-            <PortalSelect
-              icon={FaUserGraduate}
-              value={filters.role}
-              isLoading={isFetching}
-              onChange={handleRoleChange}
-            >
-              <option value="">All Roles</option>
-              <option value="student">Student</option>
-              <option value="teacher">Teacher</option>
             </PortalSelect>
           </div>
         </div>

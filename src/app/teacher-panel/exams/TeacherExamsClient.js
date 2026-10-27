@@ -565,7 +565,7 @@ export default function TeacherExamsClient() {
 
 function TeacherMarksEntryModal({ examId, onClose }) {
   const { data, isLoading } = useExamDetails(examId);
-  const saveMutation = useSaveExamResultsMutation();
+  const saveMutation = useSaveExamResultsMutation(examId);
 
   const exam = data?.exam;
   const existingResults = data?.results || [];
@@ -578,12 +578,12 @@ function TeacherMarksEntryModal({ examId, onClose }) {
   const [initialized, setInitialized] = useState(false);
   if (data && !initialized) {
     const map = {};
-    const students = exam?.batchId?.students || [];
+    const students = data?.students || [];
 
     students.forEach((stu) => {
       const studentId = stu._id || stu;
       const existing = existingResults.find(
-        (r) => (r.studentUserId?._id || r.studentUserId) === studentId
+        (r) => (r.studentId?._id || r.studentId || r.studentUserId?._id || r.studentUserId) === studentId
       );
 
       if (existing) {
@@ -629,21 +629,31 @@ function TeacherMarksEntryModal({ examId, onClose }) {
 
   const handleSaveMarks = async (e) => {
     e.preventDefault();
-    const students = exam?.batchId?.students || [];
-    const resultsPayload = students.map((stu) => {
-      const sId = stu._id || stu;
-      const record = entries[sId] || { marksObtained: 0, isAbsent: false, remarks: "" };
-      return {
-        studentUserId: sId,
-        marksObtained: record.isAbsent ? 0 : Number(record.marksObtained || 0),
-        isAbsent: Boolean(record.isAbsent),
-        remarks: record.remarks || "",
-      };
-    });
+    const students = data?.students || [];
+    const resultsPayload = students
+      .filter((stu) => {
+        const sId = (stu._id || stu).toString();
+        const record = entries[sId];
+        return record && (record.isAbsent || (record.marksObtained !== "" && !isNaN(Number(record.marksObtained))));
+      })
+      .map((stu) => {
+        const sId = (stu._id || stu).toString();
+        const record = entries[sId] || { marksObtained: 0, isAbsent: false, remarks: "" };
+        return {
+          studentId: sId,
+          marksObtained: record.isAbsent ? 0 : Number(record.marksObtained || 0),
+          isAbsent: Boolean(record.isAbsent),
+          remarks: record.remarks || "",
+        };
+      });
+
+    if (resultsPayload.length === 0) {
+      toast.error("Please enter marks for at least one student.");
+      return;
+    }
 
     try {
       await saveMutation.mutateAsync({
-        examId,
         results: resultsPayload,
         status: publishStatus,
       });
@@ -727,14 +737,14 @@ function TeacherMarksEntryModal({ examId, onClose }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {(exam?.batchId?.students || []).length === 0 ? (
+                    {(data?.students || []).length === 0 ? (
                       <tr>
                         <td colSpan={5} className="p-6 text-center text-slate-400 font-semibold">
                           No students enrolled in this batch yet.
                         </td>
                       </tr>
                     ) : (
-                      (exam?.batchId?.students || []).map((student) => {
+                      (data?.students || []).map((student) => {
                         const sId = student._id || student;
                         const rec = entries[sId] || { marksObtained: "", isAbsent: false, remarks: "" };
                         const grade = rec.isAbsent ? "ABS" : calculateGrade(rec.marksObtained, exam?.totalMarks);
