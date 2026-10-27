@@ -9,6 +9,7 @@ import {
   FaVideo,
   FaUsers,
   FaCog,
+  FaClipboardCheck,
 } from "react-icons/fa";
 
 const navItems = [
@@ -26,6 +27,11 @@ const navItems = [
     id: "batches",
     label: "My Batches",
     icon: FaUsers,
+  },
+  {
+    id: "attendance",
+    label: "Attendance & Leaves",
+    icon: FaClipboardCheck,
   },
   {
     id: "classes",

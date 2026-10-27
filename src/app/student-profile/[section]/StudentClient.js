@@ -11,6 +11,7 @@ import Profile from "../components/Profile";
 import StudentLoading from "../components/StudentLoading";
 import Exams from "../components/Exams";
 import Homework from "../components/Homework";
+import StudentAttendance from "../components/StudentAttendance";
 
 import useMe from "@/Hooks/useMe";
 import useAuthStore from "@/store/authStore";
@@ -39,6 +40,7 @@ export default function StudentPortal({ section }) {
       {section === "courses" && <Courses />}
       {section === "classes" && <LiveClasses />}
       {section === "batches" && <Batches />}
+      {section === "attendance" && <StudentAttendance user={user} />}
       {section === "homework" && <Homework user={user} />}
       {section === "exams" && <Exams user={user} />}
       {section === "settings" && <Settings />}

@@ -41,6 +41,7 @@ const adminNavItems = [
   { name: "Courses", href: "/admin-panel/courses", icon: FaBookOpen, permission: "courses.read" },
   { name: "Exams & Results", href: "/admin-panel/exams", icon: FaFileAlt, permission: "exams.read" },
   { name: "Homework", href: "/admin-panel/homework", icon: FaClipboardList, permission: "homework.read" },
+  { name: "Attendance & Timetable", href: "/admin-panel/attendence", icon: FaCheckCircle, permission: "attendance.read" },
   { name: "Fees & Finance", href: "/admin-panel/fees/dashboard", icon: FaMoneyBillWave, permission: "fees.read" },
   { name: "Academy Details", href: "/admin-panel/academy-profile", icon: FaUniversity, permission: "academy_settings.read" },
   { name: "Academy Staff", href: "/admin-panel/staff", icon: FaShieldAlt, ownerOnly: true },

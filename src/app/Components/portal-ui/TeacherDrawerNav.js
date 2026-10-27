@@ -17,6 +17,7 @@ import {
   FaGlobe,
   FaFileAlt,
   FaClipboardList,
+  FaCalendarMinus,
 } from "react-icons/fa";
 import useAuthStore from "@/store/authStore";
 import { useLogoutMutation } from "@/app/mutations/AuthenticationMutations";
@@ -28,6 +29,7 @@ const teacherNavItems = [
   { name: "Mark Attendance", href: "/teacher-panel/mark-attendence", icon: FaCheckCircle },
   { name: "Exams & Marks", href: "/teacher-panel/exams", icon: FaFileAlt },
   { name: "Homework & Grading", href: "/teacher-panel/homework", icon: FaClipboardList },
+  { name: "My Leaves", href: "/teacher-panel/leaves", icon: FaCalendarMinus },
   { name: "Announcements", href: "/teacher-panel/add-announcement", icon: FaChalkboardTeacher },
 ];
 

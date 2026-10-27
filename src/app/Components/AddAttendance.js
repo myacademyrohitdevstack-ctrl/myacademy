@@ -34,6 +34,8 @@ function BatchAttendanceRegister({
     useGetBatchStudents(selectedBatchId);
 
   const markAttendanceMutation = useMarkAttendence();
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get("sessionId");
 
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -88,6 +90,8 @@ function BatchAttendanceRegister({
 
     const payload = {
       batch: selectedBatchId,
+      session: sessionId || undefined,
+      sessionId: sessionId || undefined,
       date,
       records: rawStudents.map((student) => ({
         student: student._id,

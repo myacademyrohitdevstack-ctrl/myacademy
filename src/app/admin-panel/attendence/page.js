@@ -1,9 +1,9 @@
-import AttendanceViewClient from "@/app/Components/AttendanceViewClient";
+import AdminAttendanceClient from "./AdminAttendanceClient";
 
 export const metadata = {
-  title: "View Attendance | MyAcademy Admin Console",
+  title: "Attendance & Timetable Console | MyAcademy Admin",
 };
 
 export default function Page() {
-  return <AttendanceViewClient />;
+  return <AdminAttendanceClient />;
 }
